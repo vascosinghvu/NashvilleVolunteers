@@ -1,0 +1,109 @@
+@use "sass:math";
+// this is where we define our colors used in the app
+
+//add spaces so that the hex codes are lined up
+$scramble-color-orange:   #EC7D10;
+$scramble-color-blue:     #2274A5;
+$scramble-color-green:    #6fcf97;
+$scramble-color-pink:     #E83F6F;
+$scramble-color-red:      #DB504A;
+$scramble-color-light:    #ffffff;
+$scramble-color-gray:     #131f41;
+$scramble-color-dark:     #2E294E;
+
+// allow the colors to be used in inline styles
+$palette: (
+    "orange":   $scramble-color-orange,
+    "blue":     $scramble-color-blue,
+    "green":    $scramble-color-green,
+    "red":      $scramble-color-red,
+    "light":    $scramble-color-light,
+    "pink":     $scramble-color-pink,
+    "gray":     $scramble-color-gray,
+    "dark":     $scramble-color-dark
+);
+
+// opacities
+$alphas: 25 50 100 150 200 300 400 500 600 700 800 900 1000;
+
+// this is where we define our colors used in the app
+@mixin scramble-create-color($name, $baseColor, $alphas) {
+  --scramble-color-#{$name}: #{red($baseColor)}, #{green($baseColor)}, #{blue($baseColor)};
+
+  @each $alpha in $alphas {
+    --scramble-color-#{$name}-#{$alpha}: #{rgba($baseColor, math.div($alpha, 1000))};
+  }
+
+  --scramble-color-#{$name}-1000-focus: #{lighten($baseColor, 20)};
+}
+
+// determines what color should go on which background for the max contrast
+@function core-max-contrast($color) {
+  @return if(lightness($color) > 50, var(--scramble-color-dark-1000), var(--scramble-color-light-1000));
+  // @return if(true, var(--scramble-color-dark-1000), var(--scramble-color-light-1000));
+}
+
+:root {
+  @each $name, $color in $palette {
+    @include scramble-create-color($name, $color, $alphas);
+  }
+}
+
+// defines lots of variables for the app
+$fontSizes: 8 9 10 12 14 16 18 20 22 24 26 28 30 32 34 36 40 46 50 72;
+$borderRadii: 0 2 4 8 16;
+$borderWidths: 1 2 3 4 5;
+$margins: 0 1 2 4 6 8 10 12 14 16 18 20 22 24 25 26 28 29 30 40 60 80;
+$paddings: 0 1 2 4 6 8 10 12 14 16 18 20 22 24 25 26 28 29 30 40 60 80;
+$zIndex: -10 -5 0 5 10 50 100 1000;
+
+// initializes all the vairations of the variables
+:root {
+  @each $fontSize in $fontSizes {
+    --scramble-font-size-#{$fontSize}: #{$fontSize}px;
+  }
+
+  @each $borderRadius in $borderRadii {
+    --scramble-border-radius-#{$borderRadius}: #{$borderRadius}px;
+  }
+
+  @each $zIndex in $zIndex {
+    --scramble-z-#{$zIndex}: #{$zIndex};
+  }
+
+  --scramble-shadow-dark: var(--scramble-color-dark-25) 0px 7px 15px 0px;  
+  --scramble-shadow-ambient: var(--scramble-color-gray-100) 0px 15px 35px 0px;
+}
+
+// font weights
+$weights: 25 50 100 200 300 400 500 600 700 800 900 !default;
+
+// defines more variables for the app
+@mixin root-palette($palette) {
+    @each $name, $color in $palette {
+      --#{$name}: #{red($color)}, #{green($color)}, #{blue($color)};
+      --#{$name}-dark: #{red(saturate($color, 20))}, #{green(saturate($color, 20))}, #{blue(saturate($color, 20))};
+      --#{$name}-light: #{red(lighten($color, 20))}, #{green(lighten($color, 20))}, #{blue(lighten($color, 20))};
+    }
+  }
+  
+  @mixin root-property($property, $base, $factors) {
+    @for $i from 1 through length($factors) {
+      --#{$property}-#{$i - 1}: #{$base * nth($factors, $i)};
+    }
+  }
+  
+  @mixin root-color($name, $color) {
+    @each $weight in $weights {
+      --color-#{$name}-#{$weight}: #{lighten($color, math.div((1000 - $weight), 10))};
+    }
+  }
+  
+  @mixin utility($palette, $prefix, $attribute) {
+    @each $name, $color in $palette {
+      .#{$prefix}-#{$name} {
+        #{$attribute}: #{$color};
+      }
+    }
+  }
+

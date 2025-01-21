@@ -1,0 +1,20 @@
+// defines the styles for the widget component
+.Widget {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+    &-body {
+        width: 30%;
+        height: fit-content;
+    }
+
+    &-icon {
+        width: 100;
+        display: flex;
+        justify-content: center;
+        color: var(--scramble-color-pink-1000);
+        font-size: var(--scramble-font-size-72);
+    }
+}

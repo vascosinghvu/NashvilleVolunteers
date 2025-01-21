@@ -1,0 +1,61 @@
+// styles for the formik form
+.Form {
+    color: var(--scramble-color-light-900);
+
+    &-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+
+        label {
+            margin-bottom: 5px;
+            font-size: var(--scramble-font-size-16);
+            color: var(--scramble-color-dark-1000)
+        }
+
+        input {
+            border-radius: var(--scramble-border-radius-8);
+            border: none;
+            background-color: var(--scramble-color-dark-50);
+            color: var(--scramble-color-dark-500);
+            font-family: 'Exo 2', sans-serif;
+            font-size: var(--scramble-font-size-16);
+            padding: 5px 8px;
+            width: 100%;  
+            position: relative;
+        }
+
+        &-toggle {
+            cursor: pointer;  
+            margin: -30px 10px 0 auto;
+            z-index: var(--scramble-z-100);
+            color: var(--scramble-color-light-700);
+
+            &:hover {
+                color: var(--scramble-color-light-900);
+            }
+        }
+
+        select {
+            border-radius: var(--scramble-border-radius-8);
+            border: none;
+            background-color: var(--scramble-color-light-50);
+            color: var(--scramble-color-light-500);
+            font-family: 'Exo 2', sans-serif;
+            font-size: var(--scramble-font-size-14);
+            padding: 8px;
+            width: auto;
+            position: relative;
+          }
+    }
+
+    &-error {
+        color: var(--scramble-color-red-1000);
+        font-size: var(--scramble-font-size-12);
+    }
+
+    &-success {
+        color: var(--scramble-color-green-1000);
+        font-size: var(--scramble-font-size-12);
+    }
+}

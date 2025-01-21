@@ -1,0 +1,105 @@
+.Navbar {
+    display: flex;
+    flex-direction: column;
+    z-index: var(--scramble-z-50);
+
+    &-body {    
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: var(--scramble-color-dark-1000);
+        padding: 5px 32px;
+        box-shadow: var(--scramble-shadow-dark);
+    
+        &-logo {
+            font-size: var(--scramble-font-size-30);
+            font-weight: 900;
+        }
+
+        &-link {
+            color: var(--scramble-color-light-1000);
+            cursor: pointer;
+            font-size: var(--scramble-font-size-14);
+
+            &:hover {
+                color: var(--scramble-color-green-1000);
+            }
+        }
+    }
+}
+
+.Modal-overlay {
+    background-color: rgba(0, 0, 0, .4);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--scramble-z-100);
+    overflow: hidden;
+}
+
+.Modal {
+    position: fixed;
+    padding: 20px;
+    width: 400px;
+    z-index: var(--scramble-z-1000);
+    top: 10%;
+    left: 50%;
+    margin-left: -200px;
+    background-color: var(--scramble-color-light-1000);
+    border-radius: var(--scramble-border-radius-8);
+    border: 1px solid rgba(var(--dark), var(--opacity-tint));
+
+    &-large {
+        width: 500px;
+        margin-left: -250px;
+        max-height: 700px;
+    }
+
+    &-close {
+        display: flex;
+        justify-content: right;
+
+        .Icon {
+            font-size: var(--scramble-font-size-16);
+            margin-left: auto;
+    
+            &:hover {
+                cursor: pointer;
+                color: var(--scramble-color-pink-1000);
+            }
+        }
+    }
+
+    &-content {
+        border-radius: var(--scramble-border-radius-16);
+        color: var(--scramble-color-dark-800);
+        z-index: 5;
+        height: fit-content;
+        max-height: 600px;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    &-tab {
+        cursor: pointer;
+        display: flex;
+
+        &-item {
+            width: 70px;
+            padding-bottom: 5px;
+            text-align: center;
+            border-bottom: 1px solid var(--scramble-color-light-600);
+            &-selected {
+                color: var(--scramble-color-light-1000);
+                border-bottom: 3px solid var(--scramble-color-light-1000);
+            }
+            
+            &:hover {
+                color: var(--scramble-color-light-1000);
+            }
+        }
+    }
+}
+

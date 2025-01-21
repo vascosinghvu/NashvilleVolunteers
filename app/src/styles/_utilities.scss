@@ -1,0 +1,396 @@
+// This file is used to generate several different utility styles that can be used throughout the app
+
+
+// generates color classes with every color in the palette and every opacity in the alphas list
+@each $name, $color in $palette {
+    @each $alpha in $alphas {
+      .Text-color--#{$name}-#{$alpha} { color: var(--scramble-color-#{$name}-#{$alpha}); }
+      .Background-color--#{$name}-#{$alpha} { background-color: var(--scramble-color-#{$name}-#{$alpha}); }
+  
+      .Background-colorHover--#{$name}-#{$alpha} {
+        cursor: pointer;
+  
+        &:hover {
+          color: core-max-contrast(rgba($color, $alpha)) !important;
+          // color: var(--scramble-color-white-1000) !important;
+          background-color: var(--scramble-color-#{$name}-#{$alpha});
+        }
+      }
+  
+  
+      .Text-colorHover--#{$name}-#{$alpha} {
+        cursor: pointer;
+  
+        &:hover {
+          color: var(--scramble-color-#{$name}-#{$alpha});
+        }
+      }
+  
+      .Border-color--#{$name}-#{$alpha} { border-color: var(--scramble-color-#{$name}-#{$alpha}); }
+    }
+  }
+  
+
+  // generates font-size classes with every font-size in the fontSizes list
+  @each $fontSize in $fontSizes {
+    .Text-fontSize--#{$fontSize} {
+      font-size: #{$fontSize}px;
+    }
+  }
+  
+  // below are utilies that can be used for inline styles -- make code more readable and faster development
+  .Text--muted-800 {
+    @extend .Text-color--black-800 !optional;
+  }
+  
+  .Text--center {
+    text-align: center;
+  }
+  
+  .Text--left {
+    text-align: left;
+  }
+
+  .Text--right {
+    text-align: right;
+  }
+  
+  .Text--truncate {
+    width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  
+  .Text--bold,
+  .Text-fontWeight--900 {
+    font-weight: 900;
+  }
+  
+  .Text-fontWeight--600 {
+    font-weight: 600;
+  }
+  
+  .Text-fontWeight--normal {
+    font-weight: normal;
+  }
+  
+  .Text--success {
+    @extend .Text-color--green-1000 !optional;
+    @extend .Text--center !optional;
+    line-height: 26px;
+  }
+  
+  .Justify-content--spaceBetween {
+    justify-content: space-between;
+  }
+
+  .Align-items--center {
+    align-items: center;
+  }
+  
+  .Link {
+    text-decoration: none;
+    color: var(--scramble-color-sky-1000);
+  
+    &:hover {
+      color: var(--scramble-color-orange-1000);
+    }
+  }
+
+  .Box-shadow--dark {
+    box-shadow: var(--scramble-shadow-dark);
+  }
+  
+  @each $margin in $margins {
+    .Margin--#{$margin} { margin: #{$margin}px; }
+    .Margin-left--#{$margin} { margin-left: #{$margin}px; }
+    .Margin-top--#{$margin} { margin-top: #{$margin}px; }
+    .Margin-right--#{$margin} { margin-right: #{$margin}px; }
+    .Margin-bottom--#{$margin} { margin-bottom: #{$margin}px; }
+    .Margin-x--#{$margin} { margin: 0 #{$margin}px; }
+    .Margin-y--#{$margin} { margin-top: #{$margin}px; margin-bottom: #{$margin}px; }
+  
+    // @include media("<desktop") {
+    //   .Margin--#{$margin}--ltDesktop { margin: #{$margin} !important; }
+    //   .Margin-left--#{$margin}--ltDesktop { margin-left: #{$margin}px !important; }
+    //   .Margin-top--#{$margin}--ltDesktop { margin-top: #{$margin}px !important; }
+    //   .Margin-right--#{$margin}--ltDesktop { margin-right: #{$margin}px !important; }
+    //   .Margin-bottom--#{$margin}--ltDesktop { margin-bottom: #{$margin}px !important; }
+    //   .Margin-x--#{$margin}--ltDesktop { margin: 0 #{$margin}px !important; }
+    //   .Margin-y--#{$margin}--ltDesktop { margin: #{$margin}px 0 !important; }
+    // }
+  }
+  
+  .Margin-left--auto { margin-left: auto; }
+  .Margin-top--auto { margin-top: auto; }
+  .Margin-right--auto { margin-right: auto; }
+  .Margin-bottom--auto { margin-bottom: auto; }
+  .Margin-x--auto { margin: 0 auto; }
+  .Margin-y--auto { margin: auto 0; }
+  
+  @each $padding in $paddings {
+    .Padding-left--#{$padding} { padding-left: #{$padding}px; }
+    .Padding-top--#{$padding} { padding-top: #{$padding}px; }
+    .Padding-right--#{$padding} { padding-right: #{$padding}px; }
+    .Padding-bottom--#{$padding} { padding-bottom: #{$padding}px; }
+    .Padding-x--#{$padding} { padding-left: #{$padding}px; padding-right: #{$padding}px; }
+    .Padding-y--#{$padding} { padding-top: #{$padding}px; padding-bottom: #{$padding}px; }
+    .Padding--#{$padding} { padding: #{$padding}px; }
+  }
+  
+  .Padding-left--auto { padding-left: auto; }
+  .Padding-top--auto { padding-top: auto; }
+  .Padding-right--auto { padding-right: auto; }
+  .Padding-bottom--auto { padding-bottom: auto; }
+  .Padding-x--auto { padding: 0 auto; }
+  .Padding-y--auto { padding: auto 0; }
+  
+  
+  @each $borderRadius in $borderRadii {
+    .Border-radius--#{$borderRadius} { border-radius: #{$borderRadius}px; }
+    .Border-radius-topRight--#{$borderRadius} { border-top-right-radius: #{$borderRadius}px }
+    .Border-radius-topLeft--#{$borderRadius} { border-top-left-radius: #{$borderRadius}px }
+    .Border-radius-bottomRight--#{$borderRadius} { border-bottom-right-radius: #{$borderRadius}px }
+    .Border-radius-bottomLeft--#{$borderRadius} { border-bottom-left-radius: #{$borderRadius}px }
+  }
+  
+  @each $borderWidth in $borderWidths {
+    .Border-top--#{$borderWidth} { border-top: #{$borderWidth}px solid var(--scramble-color-black-150); }
+    .Border-right--#{$borderWidth} { border-right: #{$borderWidth}px solid var(--scramble-color-black-150); }
+    .Border-bottom--#{$borderWidth} { border-bottom: #{$borderWidth}px solid var(--scramble-color-black-150); }
+    .Border-left--#{$borderWidth} { border-left: #{$borderWidth}px solid var(--scramble-color-black-150); }
+  
+    @each $alpha in $alphas {
+      .Border-top--#{$borderWidth}-#{$alpha} { border-top: #{$borderWidth}px solid var(--scramble-color-black-#{$alpha}); }
+      .Border-right--#{$borderWidth}-#{$alpha} { border-right: #{$borderWidth}px solid var(--scramble-color-black-#{$alpha}); }
+      .Border-bottom--#{$borderWidth}-#{$alpha} { border-bottom: #{$borderWidth}px solid var(--scramble-color-black-#{$alpha}); }
+      .Border-left--#{$borderWidth}-#{$alpha} { border-left: #{$borderWidth}px solid var(--scramble-color-black-#{$alpha}); }
+    }
+  }
+  
+  .Border--rounded { border-radius: 9999px; }
+  .Border--outer { border: var(--scramble-border-outer); }
+  .Border--inner { border: var(--scramble-border-inner); }
+  
+  @each $name, $color in $palette {
+    @each $alpha in $alphas {
+      .Button-color--#{$name}-#{$alpha} {
+        background-color: var(--scramble-color-#{$name}-#{$alpha});
+        border-color: var(--scramble-color-#{$name}-#{$alpha});
+        color: core-max-contrast(rgba($color, $alpha));
+
+  
+        &:hover,
+        &.Button--hollow {
+          color: var(--scramble-color-#{$name}-#{$alpha});
+        }
+  
+        &.Button--hollow:hover:not(:disabled) {
+          color: core-max-contrast(rgba($color, $alpha));
+          background-color: var(--scramble-color-#{$name}-#{$alpha});
+        }
+      }
+    }
+  }
+  
+  .Button {
+    transition: all var(--scramble-transition-duration) ease;
+    border-radius: var(--scramble-border-radius-4);
+    border-style: solid;
+    border-width: 2px;
+    font-size: 14px;
+    outline: none;
+    height: fit-content;
+    padding: 12px 28px;
+    text-align: center;
+    max-width: 100%;
+    // white-space: nowrap;
+  
+    &--hollow {
+      background-color: transparent;
+    }
+
+    &--small {
+      font-size: 12px;
+      padding: 6px 12px;
+    }
+  
+    &:hover {
+      background-color: transparent;
+      cursor: pointer;
+    }
+  
+    &:disabled {
+      color: var(--scramble-color-dark-400);
+      background-color: var(--scramble-color-dark-50);
+      border-color: var(--scramble-color-dark-150);
+  
+      &:hover {
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  @each $name, $color in $palette {
+    @each $alpha in $alphas {
+      .Badge-color--#{$name}-#{$alpha} {
+        background-color: var(--scramble-color-#{$name}-#{$alpha});
+        border-color: var(--scramble-color-#{$name}-#{$alpha});
+        color: core-max-contrast(rgba($color, $alpha));
+
+        &.Badge--hollow {
+          color: var(--scramble-color-#{$name}-#{$alpha});
+        }
+      }
+    }
+  }
+  
+  .Badge {
+    transition: all var(--scramble-transition-duration) ease;
+    border-radius: var(--scramble-border-radius-4);
+    border-style: solid;
+    border-width: 1px;
+    padding: 2px;
+    font-weight: 700;
+    font-size: var(--scramble-font-size-12);
+    width: fit-content;
+    height: fit-content;
+    text-align: center;
+    // white-space: nowrap;
+  
+    &--hollow {
+      background-color: transparent;
+    }
+
+    .Icon {
+      font-size: 16px;
+      text-align: center;
+      align-items: center;
+    }
+  }
+
+
+  .Block {
+    padding: 56px 48px;
+    box-shadow: var(--scramble-shadow-ambient); 
+    border-radius: var(--scramble-border-radius-8);
+
+    &-header {
+      font-size: var(--scramble-font-size-24);
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    &-subtitle {
+      color: var(--scramble-color-dark-700);
+      font-size: var(--scramble-font-size-16);
+      border-bottom: 1px solid var(--scramble-color-dark-100);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+  }
+  
+  .Flex { display: flex; }
+  
+  .Flex--center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .Flex-row {
+    display: flex;
+    flex-direction: row;
+  
+    &--responsive {
+    //   @include media("<desktop") {
+    //     flex-direction: column;
+    //     justify-content: center;
+    //   }
+    }
+  }
+  
+  .Flex-column {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .Flex-row--verticallyCentered {
+    align-items: center;
+  }
+  
+  .Flex-row--centered {
+    @extend .Flex-row;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .Flex-column--centered {
+    @extend .Flex-column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .Flex-grow--1 { flex-grow: 1; }
+  .Flex-basis--0 { flex-basis: 0; }
+  
+  .Float--left { float: left; }
+  .Float--right { float: right; }
+  
+  .Display--block,
+  .Block-display--block { display: block; }
+  .Block-display--inline-block { display: inline-block; }
+  .Block-verticalAlign--top { vertical-align: top; }
+    
+  .Form-inputWidth--100 {
+    box-sizing: border-box;
+    width: 100% !important;
+  }
+  
+  .Form-inputWidth--75 {
+    box-sizing: border-box;
+    width: 75% !important;
+  }
+  
+  .Width--100 {
+    width: 100%;
+  
+    // @include media("<desktop") {
+    //   &--ltDesktop {
+    //     width: 100%;
+    //   }
+    // }
+  }
+  
+  .Width--50 { width: 50%; }
+  .Width-max--100 { max-width: 100%; }
+  
+  .Height--100 {
+    height: 100%;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  li {
+      display: flex;
+      align-items: center;
+      margin-right: 5px; /* Add spacing between list items */
+      cursor: pointer;
+
+      &:not(:last-child)::after {
+          content: '•';
+          margin-left: 5px; /* Add spacing after the bullet */
+          color: var(--scramble-color-pink-1000); /* Set the color of the bullet */
+      }
+    
+      &:hover {
+          color: var(--scramble-color-blue-1000); /* Change the color of the list item on hover */
+      }
+  }
