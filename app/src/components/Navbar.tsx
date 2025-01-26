@@ -8,8 +8,8 @@ const Navbar = (): ReactElement => {
       <div className="Navbar">
         <div className="Navbar-body">
           <div className="Navbar-body-logo">
-            <span className="Text-color--pink-1000">Word</span>
-            <span className="Text-color--orange-1000">Scramble</span>
+            <span className="Text-color--blue-1000">Nashville</span>
+            <span className="Text-color--red-1000">Volunteers</span>
           </div>
           <div className="Flex-row Margin-left--auto">
             <div

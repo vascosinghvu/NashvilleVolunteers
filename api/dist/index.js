@@ -58,7 +58,7 @@ app.get("/new/:mode", (req, res) => __awaiter(void 0, void 0, void 0, function* 
         return res.status(200).json({
             message: `New game created`,
             word: word,
-            scramble: (0, util_1.scramble)(word),
+            nash: (0, util_1.nash)(word),
         });
     }
     catch (error) {

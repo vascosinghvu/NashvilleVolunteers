@@ -1,5 +1,5 @@
 // Imports for all of the external libraries
-@import url('https://fonts.googleapis.com/css?family=Rubik');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
 @import url('https://pro.fontawesome.com/releases/v5.10.0/css/all.css');
 
 @import 'bootstrap/scss/bootstrap-utilities.scss';
@@ -12,15 +12,15 @@
 @import 'variables';
 @import 'utilities';
 @import 'widget';
-@import 'game';
 @import 'formik';
+@import 'listings';
 
 :root {
   // define colors
     @include root-palette($palette);
   
-    --text-on-dark: var(--scramble-color-light-1000);
-    --text-on-light: var(--scramble-color-dark-1000);
+    --text-on-dark: var(--nash-color-light-1000);
+    --text-on-light: var(--nash-color-dark-1000);
   
     --transition-duration: 0.15s;
   
@@ -34,15 +34,15 @@
   // Fonts
   html,
   body {
-    font-family: 'Rubik', sans-serif;
+    font-family: 'Noto Sans', sans-serif;
     margin: 0;
   }
   
   // default settings for the body
   body {
-    font-size: var(--scramble-font-size-4);
-    background-color: var(--scramble-color-dark-50);
-    color: var(--scramble-color-dark-1000);
+    font-size: var(--nash-font-size-4);
+    background-color: var(--nash-color-dark-50);
+    color: var(--nash-color-dark-1000);
   }
   
   // Background Colors
@@ -50,6 +50,6 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    color: var(--scramble-color-light-1000);
+    color: var(--nash-color-light-1000);
     font-weight: 100;
   }

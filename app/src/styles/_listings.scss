@@ -1,0 +1,8 @@
+.Listings {
+    display: flex;
+    flex-direction: column;
+
+    &-search {
+        border: 1px solid var(--nash-color-dark-1000)
+    }
+}
