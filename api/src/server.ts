@@ -31,6 +31,9 @@ app.use(bodyParser.urlencoded({ extended: true }))
 console.log("Connected to the database...")
 
 app.use("/test", routes.test)
+app.use("/event", routes.event)
+app.use("/organization", routes.organization)
+app.use("/volunteer", routes.volunteer)
 
 const PORT = process.env.PORT || 8000
 app.listen(PORT, () => console.log(`Server running on port ${PORT}...`))
