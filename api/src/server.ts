@@ -1,7 +1,10 @@
 import express from "express"
 import bodyParser from "body-parser"
+import dotenv from "dotenv"
 
 import * as routes from "./routes/index"
+
+dotenv.config()
 
 var cors = require("cors")
 
