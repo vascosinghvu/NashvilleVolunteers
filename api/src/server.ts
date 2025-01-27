@@ -1,7 +1,7 @@
 import express from "express"
 import bodyParser from "body-parser"
 
-import * as routes from "./routes"
+import * as routes from "./routes/index"
 
 var cors = require("cors")
 
@@ -11,6 +11,7 @@ const corsOptions = {
   origin: "http://localhost:3000", // Allow only your React frontend
   credentials: true, // Allow credentials (cookies, etc.)
 }
+
 app.use(cors(corsOptions))
 
 app.options(
