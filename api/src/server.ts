@@ -6,6 +6,8 @@ import * as routes from "./routes/index"
 
 dotenv.config()
 
+console.log(process.env.DATABASE_URI)
+
 var cors = require("cors")
 
 const app = express()
@@ -28,7 +30,7 @@ app.options(
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-console.log("Connected to the database...")
+// console.log("Connected to the database...")
 
 app.use("/test", routes.test)
 app.use("/event", routes.event)
