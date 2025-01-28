@@ -36,6 +36,7 @@ app.use("/test", routes.test)
 app.use("/event", routes.event)
 app.use("/organization", routes.organization)
 app.use("/volunteer", routes.volunteer)
+app.use("/registration", routes.registration)
 
 const PORT = process.env.PORT || 8000
 app.listen(PORT, () => console.log(`Server running on port ${PORT}...`))
