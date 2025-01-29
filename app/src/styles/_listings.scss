@@ -4,13 +4,37 @@
     padding: 36px 52px;
 
     &-search {
-        border: 1px solid var(--nash-color-dark-1000)
+        border: 1px solid var(--nash-color-dark-1000);
+    }
+}
+
+.Event {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--nash-border-radius-8);
+    border: 2px solid var(--nash-color-gray-200);
+    box-shadow: var(--nash-box-shadow);
+    overflow: hidden; // Prevents hover scaling from affecting layout
+    transition: transform 0.3s ease; // Smooth hover effect
+
+    &:hover {
+        transform: scale(1.05); // Slightly enlarge, but not too much
+        cursor: pointer;
     }
 
-    &-events {
+    &-color {
+        background-color: var(--nash-color-blue-500);
+        height: 100px;
+    }
+
+    &-text {
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-between;
+        flex-direction: column;
+        padding: 10px 20px;
+
+        &-title {
+            font-weight: bold;
+            font-size: var(--nash-font-size-18);
+        }
     }
 }

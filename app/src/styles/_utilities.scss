@@ -290,6 +290,25 @@
       margin-bottom: 20px;
     }
   }
+
+  .Card {
+    background-color: var(--nash-color-light-1000);
+    padding: 10px 20px;
+    border-radius: var(--nash-border-radius-8);
+    box-shadow: var(--nash-shadow-dark);
+    height: fit-content;
+  
+    &-hover {
+      &:hover {
+          cursor: pointer;
+          box-shadow: 0 0 3px 3px var(--nash-color-light-500); 
+      }
+    }
+  
+    &-dark {
+      background-color: var(--nash-color-dark-1000);
+    }
+  }
   
   .Flex { display: flex; }
   
