@@ -30,10 +30,10 @@ export const getEvent = async (req: Request, res: Response) => {
 
 export const createEvent = async (req: Request, res: Response) => {
   try {
-    const { o_id, event_date, people_needed, location } = req.body
+    const { o_id, name, description, time, date, people_needed, location } = req.body
     const newEvent = await sql`
-      INSERT INTO events (o_id, event_date, people_needed, location)
-      VALUES (${o_id}, ${event_date}, ${people_needed}, ${location})
+      INSERT INTO events (o_id, name, description, time, date, people_needed, location)
+      VALUES (${o_id}, ${name}, ${description}, ${time}, ${date}, ${people_needed}, ${location})
       RETURNING *
     `
     res.status(201).json(newEvent[0])
@@ -63,7 +63,10 @@ export const updateEvent = async (req: Request, res: Response) => {
       UPDATE events 
       SET 
         o_id = ${updatedData.o_id},
-        event_date = ${updatedData.event_date},
+        name = ${updatedData.name},
+        description = ${updatedData.description},
+        time = ${updatedData.time},
+        date = ${updatedData.date},
         people_needed = ${updatedData.people_needed},
         location = ${updatedData.location}
       WHERE event_id = ${event_id}
