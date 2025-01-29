@@ -1,8 +1,16 @@
 .Listings {
     display: flex;
     flex-direction: column;
+    padding: 36px 52px;
 
     &-search {
         border: 1px solid var(--nash-color-dark-1000)
+    }
+
+    &-events {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
     }
 }
