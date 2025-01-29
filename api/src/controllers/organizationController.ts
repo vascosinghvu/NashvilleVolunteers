@@ -30,10 +30,10 @@ export const getOrganization = async (req: Request, res: Response) => {
 
 export const createOrganization = async (req: Request, res: Response) => {
   try {
-    const { email, website } = req.body
+    const { name, description, email, website } = req.body
     const newOrganization = await sql`
-      INSERT INTO organizations (email, website)
-      VALUES (${email}, ${website})
+      INSERT INTO organizations (name, description, email, website)
+      VALUES (${name}, ${description}, ${email}, ${website})
       RETURNING *
     `
     res.status(201).json(newOrganization[0])
@@ -62,6 +62,8 @@ export const updateOrganization = async (req: Request, res: Response) => {
     const updatedOrganization = await sql`
       UPDATE organizations 
       SET 
+        name = ${updatedData.name},
+        description = ${updatedData.description},
         email = ${updatedData.email},
         website = ${updatedData.website}
       WHERE o_id = ${o_id}
