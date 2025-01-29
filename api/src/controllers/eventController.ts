@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import sql from "../config/db"
+import supabase from "../config/supabase"
 
 export const getEvents = async (req: Request, res: Response) => {
   try {
@@ -96,10 +97,25 @@ export const deleteEvent = async (req: Request, res: Response) => {
   }
 }
 
+export const searchEvents = async (req: Request, res: Response) => {
+  console.log('Received query:', req.query)  // Debug log
+  
+  const { query } = req.query
+  const { data, error } = await supabase.rpc('search_events', {query});
+
+  if (error) {
+      console.error('Error searching events:', error);
+      return res.status(500).json({ error: 'Failed to search events' });
+  }
+
+  return res.status(200).json(data);  // Send the response back to the client
+}
+
 export default {
   getEvents,
   getEvent,
   createEvent,
   updateEvent,
   deleteEvent,
+  searchEvents,
 }

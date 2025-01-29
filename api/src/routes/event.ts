@@ -13,4 +13,6 @@ router.route("/update-event/:event_id").put(eventController.updateEvent)
 
 router.route("/delete-event/:event_id").delete(eventController.deleteEvent)
 
+router.route("/search-events").get(eventController.searchEvents)
+
 export default router
