@@ -199,10 +199,10 @@
     border-radius: var(--nash-border-radius-4);
     border-style: solid;
     border-width: 2px;
-    font-size: 14px;
+    font-weight: bold;
     outline: none;
     height: fit-content;
-    padding: 12px 28px;
+    padding: 10px 20px;
     text-align: center;
     max-width: 100%;
     // white-space: nowrap;
@@ -308,6 +308,24 @@
     &-dark {
       background-color: var(--nash-color-dark-1000);
     }
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--nash-color-dark-1000);
+  }
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--nash-color-dark-1000);
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--nash-color-dark-1000);
   }
   
   .Flex { display: flex; }

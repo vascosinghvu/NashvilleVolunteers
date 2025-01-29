@@ -1,5 +1,6 @@
 import react, { type ReactElement } from "react"
 import { useNavigate } from "react-router-dom"
+import Icon from "./Icon"
 
 const Navbar = (): ReactElement => {
   const navigate = useNavigate()
@@ -8,8 +9,8 @@ const Navbar = (): ReactElement => {
       <div className="Navbar">
         <div className="Navbar-body">
           <div className="Navbar-body-logo">
-            <span className="Text-color--blue-1000">Nashville</span>
-            <span className="Text-color--red-1000">Volunteers</span>
+            <Icon glyph="heart" regular />
+            <span className="Text--bold">Nashville Volunteers</span>
           </div>
           <div className="Flex-row Margin-left--auto">
             <div

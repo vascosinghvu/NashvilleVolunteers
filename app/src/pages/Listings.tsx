@@ -1,11 +1,11 @@
-import React, { useState, type ReactElement } from "react"
+import React, { useState, useEffect, type ReactElement } from "react"
 import { Formik, Form, Field } from "formik"
 import Navbar from "../components/Navbar"
 import { api } from "../api"
 import Icon from "../components/Icon"
 import Modal from "../components/Modal"
 
-// Define the event type
+// Define types
 interface Event {
   event_id: number
   o_id: number
@@ -15,25 +15,48 @@ interface Event {
   name: string
   time: string
   description: string
+  tags: string[]
+}
+
+interface Organization {
+  o_id: number
+  name: string
 }
 
 const Listings = (): ReactElement => {
-  // create a loading state variable
   const [loading, setLoading] = useState(true)
-  const [events, setEvents] = useState<Event[]>([]) // Typed state
+  const [events, setEvents] = useState<Event[]>([])
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [orgMap, setOrgMap] = useState<{ [key: number]: string }>({}) // Lookup for org names
 
-  // Handle form submission (unchanged as per request)
+  // Handle form submission
   const handleSubmit = async () => {
     setLoading(true)
 
     try {
       const response = await api.get(`/event/get-events`)
       setEvents(response.data)
+
+      // Fetch organization names dynamically
+      response.data.forEach((event: Event) => {
+        if (!orgMap[event.o_id]) {
+          fetchOrganization(event.o_id)
+        }
+      })
     } catch (error) {
       console.error(error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Fetch organization name by ID and update state
+  const fetchOrganization = async (o_id: number) => {
+    try {
+      const response = await api.get(`/organization/get-organization/${o_id}`)
+      setOrgMap((prev) => ({ ...prev, [o_id]: response.data.name }))
+    } catch (error) {
+      console.error(`Error fetching organization ${o_id}`, error)
     }
   }
 
@@ -42,24 +65,55 @@ const Listings = (): ReactElement => {
       <Navbar />
       {selectedEvent && (
         <Modal
-          header={selectedEvent.name} // ✅ Corrected prop name
-          action={() => setSelectedEvent(null)} // ✅ Added action prop to close modal
+          header={selectedEvent.name}
+          action={() => setSelectedEvent(null)}
+          large
           body={
             <div>
-              <div>
-                <Icon glyph="calendar" /> {selectedEvent.date}
+              <div className="Event-modal-line">
+                <span>
+                  <Icon glyph="calendar" className="Margin-right--4" />
+                  <strong>Date:</strong>
+                </span>
+                {selectedEvent.date}
               </div>
-              <div>
-                <Icon glyph="clock" /> {selectedEvent.time}
+              <div className="Event-modal-line">
+                <span>
+                  <Icon glyph="clock" className="Margin-right--4" />
+                  <strong>Time:</strong>
+                </span>
+                {selectedEvent.time}
               </div>
-              <div>
-                <Icon glyph="location" /> {selectedEvent.location}
+              <div className="Event-modal-line">
+                <span>
+                  <Icon glyph="location" className="Margin-right--4" />
+                  <strong>Location:</strong>
+                </span>
+                {selectedEvent.location}
               </div>
-              <div>
-                <Icon glyph="people" /> {selectedEvent.people_needed}
+              <div className="Event-modal-line">
+                <span>
+                  <Icon glyph="users" className="Margin-right--4" />
+                  <strong>Volunteers Needed:</strong>
+                </span>
+                {selectedEvent.people_needed}
               </div>
-              <div>
-                <Icon glyph="description" /> {selectedEvent.description}
+              <div className="Event-modal-line">
+                <span>
+                  <Icon glyph="info-circle" className="Margin-right--4" />
+                  <strong>Description:</strong>
+                </span>
+                {selectedEvent.description}
+              </div>
+              <div className="Event-modal-line">
+                <span>
+                  <Icon glyph="building" className="Margin-right--4" />
+                  <strong>Organization:</strong>
+                </span>
+                {orgMap[selectedEvent.o_id] || "Loading..."}
+              </div>
+              <div className="Button Button-color--blue-1000 Margin-top--20">
+                Register for Event
               </div>
             </div>
           }
@@ -85,7 +139,7 @@ const Listings = (): ReactElement => {
                 />
                 <button
                   type="submit"
-                  className="Button Button--small Button-color--pink-1000 Margin-left--10"
+                  className="Button Button--small Button-color--yellow-1000 Margin-left--10"
                 >
                   Search
                 </button>
@@ -105,10 +159,16 @@ const Listings = (): ReactElement => {
               onClick={() => setSelectedEvent(event)}
             >
               <div className="Event">
-                <div className="Event-color"></div>
+                <div className="Event-color">
+                  {event.tags.map((tag: string) => (
+                    <div key={tag} className="Badge Badge-color--light-400">
+                      {tag}
+                    </div>
+                  ))}
+                </div>
                 <div className="Event-text">
                   <div className="Event-text-title">{event.name}</div>
-                  {event.o_id}
+                  <div className="Event-org">{orgMap[event.o_id] || ""}</div>
                 </div>
               </div>
             </div>

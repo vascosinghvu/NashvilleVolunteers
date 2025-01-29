@@ -7,22 +7,29 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        background-color: var(--nash-color-dark-1000);
+        background-color: var(--nash-color-light-1000);
         padding: 5px 32px;
-        box-shadow: var(--nash-shadow-dark);
+        box-shadow: var(--nash-shadow-ambient);
     
         &-logo {
-            font-size: var(--nash-font-size-30);
+            font-size: var(--nash-font-size-24);
             font-weight: 900;
+            align-items: center;
+            color: var(--nash-color-dark-1000);
+
+            .Icon {
+                margin-right: 10px;
+                color: var(--nash-color-red-1000);
+            }
         }
 
         &-link {
-            color: var(--nash-color-light-1000);
+            color: var(--nash-color-dark-1000);
             cursor: pointer;
             font-size: var(--nash-font-size-14);
 
             &:hover {
-                color: var(--nash-color-pink-1000);
+                color: var(--nash-color-yellow-1000);
             }
         }
     }
@@ -55,6 +62,14 @@
         width: 500px;
         margin-left: -250px;
         max-height: 700px;
+    }
+
+    &-header {
+        border-bottom: 2px solid var(--nash-color-dark-200);
+        font-size: var(--nash-font-size-24);
+        padding: 5px 0 10px 0;
+        margin-top: -10px;
+        margin-bottom: 10px;
     }
 
     &-close {

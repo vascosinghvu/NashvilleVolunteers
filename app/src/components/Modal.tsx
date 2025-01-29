@@ -25,9 +25,9 @@ const Modal = (props: ModalProps): ReactElement => {
           <Icon glyph="times" />
         </div>
         {props.header != null && (
-          <h1 className="Margin--10" style={{ marginTop: -10 }}>
+          <div className="Modal-header" style={{ marginTop: -10 }}>
             {props.header}
-          </h1>
+          </div>
         )}
         <div className="Modal-content"> {props.body} </div>
       </div>

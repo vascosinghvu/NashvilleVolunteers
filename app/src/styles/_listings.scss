@@ -4,7 +4,7 @@
     padding: 36px 52px;
 
     &-search {
-        border: 1px solid var(--nash-color-dark-1000);
+        border: 1px solid var(--nash-color-dark-100);
     }
 }
 
@@ -12,8 +12,7 @@
     display: flex;
     flex-direction: column;
     border-radius: var(--nash-border-radius-8);
-    border: 2px solid var(--nash-color-gray-200);
-    box-shadow: var(--nash-box-shadow);
+    box-shadow: var(--nash-shadow-dark);
     overflow: hidden; // Prevents hover scaling from affecting layout
     transition: transform 0.3s ease; // Smooth hover effect
 
@@ -23,8 +22,17 @@
     }
 
     &-color {
-        background-color: var(--nash-color-blue-500);
-        height: 100px;
+        background-color: var(--nash-color-blue-1000);
+        height: 150px;
+        padding: 4px;
+        display: flex;
+        flex-direction: row;
+        justify-content: right;
+
+        // add a space between child divs of 4px
+        & > * {
+            margin-right: 4px;
+        }
     }
 
     &-text {
@@ -33,8 +41,39 @@
         padding: 10px 20px;
 
         &-title {
-            font-weight: bold;
+            font-weight: 1000;
             font-size: var(--nash-font-size-18);
+            color: var(--nash-color-dark-1000)
+        }
+    }
+
+    &-modal {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        gap: 12px;
+    
+        &-line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--nash-color-gray-300);
+            text-align: right;
+
+            span {
+                display: flex;
+                align-items: center;
+                min-width: 150px;  // Prevents weird wrapping
+                white-space: nowrap;  // Keeps label + icon together
+                flex-grow: 1;  // Ensures consistent spacing
+            }
+        }
+    
+        &-description {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
         }
     }
 }

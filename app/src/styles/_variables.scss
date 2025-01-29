@@ -2,18 +2,20 @@
 // this is where we define our colors used in the app
 
 //add spaces so that the hex codes are lined up
-$nash-color-pink:     #FCB0B3;
-$nash-color-red:      #F93943;
-$nash-color-blue:     #98DFEA;
-$nash-color-light:    #EAEAEA;
-$nash-color-gray:     #B0B0B0;
-$nash-color-dark:     #102B3F;
+$nash-color-yellow:     #FFC857;
+$nash-color-red:        #F93943;
+$nash-color-blue:       #92DCE5;
+$nash-color-royal:      #2A4494;
+$nash-color-light:      #FDFDFF;
+$nash-color-gray:       #B0B0B0;
+$nash-color-dark:       #101D42;
 
 // allow the colors to be used in inline styles
 $palette: (
-    "pink":     $nash-color-pink,
-    "blue":     $nash-color-blue,
+    "yellow":   $nash-color-yellow,
     "red":      $nash-color-red,
+    "blue":     $nash-color-blue,
+    "royal":    $nash-color-royal,
     "light":    $nash-color-light,
     "gray":     $nash-color-gray,
     "dark":     $nash-color-dark
@@ -67,8 +69,8 @@ $zIndex: -10 -5 0 5 10 50 100 1000;
     --nash-z-#{$zIndex}: #{$zIndex};
   }
 
-  --nash-shadow-dark: var(--nash-color-dark-25) 0px 7px 15px 0px;  
-  --nash-shadow-ambient: var(--nash-color-gray-100) 0px 15px 35px 0px;
+  --nash-shadow-dark: var(--nash-color-dark-100) 0px 5px 10px 0px;  
+  --nash-shadow-ambient: var(--nash-color-gray-100) 0px 15px 20px 0px;
 }
 
 // font weights
