@@ -30,11 +30,15 @@ const Listings = (): ReactElement => {
   const [orgMap, setOrgMap] = useState<{ [key: number]: string }>({}) // Lookup for org names
 
   // Handle form submission
-  const handleSubmit = async () => {
+  const handleSubmit = async (values: { search: string }) => {
     setLoading(true)
+    console.log("Search:", values.search)
 
     try {
-      const response = await api.get(`/event/get-events`)
+      // Updated GET request with query parameters
+      const response = await api.get(
+        `/event/search-events?query=${values.search}`
+      )
       setEvents(response.data)
 
       // Fetch organization names dynamically
@@ -72,7 +76,10 @@ const Listings = (): ReactElement => {
             <div>
               <div className="Event-modal-line">
                 <span>
-                  <Icon glyph="calendar" className="Margin-right--4" />
+                  <Icon
+                    glyph="calendar"
+                    className="Margin-right--8 Text-colorHover--yellow-1000"
+                  />
                   <strong>Date:</strong>
                 </span>
                 {selectedEvent.date}
@@ -152,6 +159,12 @@ const Listings = (): ReactElement => {
         </div>
 
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 Margin-top--20">
+          {/* if events are empty say no volunteer opportunities match your search */}
+          {events.length === 0 && !loading && (
+            <div className="Width--100 Text--center">
+              No volunteer opportunities match your search.
+            </div>
+          )}
           {events.map((event: Event) => (
             <div
               key={event.event_id}
