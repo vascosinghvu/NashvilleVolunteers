@@ -6,6 +6,7 @@ $nash-color-pink:     #FCB0B3;
 $nash-color-red:      #F93943;
 $nash-color-blue:     #98DFEA;
 $nash-color-light:    #EAEAEA;
+$nash-color-gray:     #B0B0B0;
 $nash-color-dark:     #102B3F;
 
 // allow the colors to be used in inline styles
@@ -14,6 +15,7 @@ $palette: (
     "blue":     $nash-color-blue,
     "red":      $nash-color-red,
     "light":    $nash-color-light,
+    "gray":     $nash-color-gray,
     "dark":     $nash-color-dark
 );
 
