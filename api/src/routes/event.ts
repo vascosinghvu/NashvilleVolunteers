@@ -13,4 +13,7 @@ router.route("/update-event/:event_id").put(eventController.updateEvent)
 
 router.route("/delete-event/:event_id").delete(eventController.deleteEvent)
 
+// ie http://localhost:8000/event/search-events?query=meal distribution
+router.route("/search-events").get(eventController.searchEvents)
+
 export default router

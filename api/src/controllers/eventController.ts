@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import sql from "../config/db"
+import supabase from "../config/supabase"
 
 export const getEvents = async (req: Request, res: Response) => {
   try {
@@ -30,10 +31,10 @@ export const getEvent = async (req: Request, res: Response) => {
 
 export const createEvent = async (req: Request, res: Response) => {
   try {
-    const { o_id, event_date, people_needed, location } = req.body
+    const { o_id, name, description, time, date, people_needed, location } = req.body
     const newEvent = await sql`
-      INSERT INTO events (o_id, event_date, people_needed, location)
-      VALUES (${o_id}, ${event_date}, ${people_needed}, ${location})
+      INSERT INTO events (o_id, name, description, time, date, people_needed, location)
+      VALUES (${o_id}, ${name}, ${description}, ${time}, ${date}, ${people_needed}, ${location})
       RETURNING *
     `
     res.status(201).json(newEvent[0])
@@ -63,7 +64,10 @@ export const updateEvent = async (req: Request, res: Response) => {
       UPDATE events 
       SET 
         o_id = ${updatedData.o_id},
-        event_date = ${updatedData.event_date},
+        name = ${updatedData.name},
+        description = ${updatedData.description},
+        time = ${updatedData.time},
+        date = ${updatedData.date},
         people_needed = ${updatedData.people_needed},
         location = ${updatedData.location}
       WHERE event_id = ${event_id}
@@ -93,10 +97,25 @@ export const deleteEvent = async (req: Request, res: Response) => {
   }
 }
 
+export const searchEvents = async (req: Request, res: Response) => {
+  console.log('Received query:', req.query)  // Debug log
+  
+  const { query } = req.query
+  const { data, error } = await supabase.rpc('search_events', {query});
+
+  if (error) {
+      console.error('Error searching events:', error);
+      return res.status(500).json({ error: 'Failed to search events' });
+  }
+
+  return res.status(200).json(data);  // Send the response back to the client
+}
+
 export default {
   getEvents,
   getEvent,
   createEvent,
   updateEvent,
   deleteEvent,
+  searchEvents,
 }
