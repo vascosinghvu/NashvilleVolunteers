@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar"
 import { api } from "../api"
 import Icon from "../components/Icon"
 import Modal from "../components/Modal"
+import MetaData from "../components/MetaData"
 
 // Define types
 interface Event {
@@ -67,6 +68,7 @@ const Listings = (): ReactElement => {
   return (
     <>
       <Navbar />
+      <MetaData title="Nashville Volunteers" description="Listings" />
       {selectedEvent && (
         <Modal
           header={selectedEvent.name}
@@ -78,7 +80,7 @@ const Listings = (): ReactElement => {
                 <span>
                   <Icon
                     glyph="calendar"
-                    className="Margin-right--8 Text-colorHover--yellow-1000"
+                    className="Margin-right--8 Text-color--royal-1000"
                   />
                   <strong>Date:</strong>
                 </span>
@@ -86,35 +88,50 @@ const Listings = (): ReactElement => {
               </div>
               <div className="Event-modal-line">
                 <span>
-                  <Icon glyph="clock" className="Margin-right--4" />
+                  <Icon
+                    glyph="clock"
+                    className="Margin-right--8 Text-color--royal-1000"
+                  />
                   <strong>Time:</strong>
                 </span>
                 {selectedEvent.time}
               </div>
               <div className="Event-modal-line">
                 <span>
-                  <Icon glyph="location" className="Margin-right--4" />
+                  <Icon
+                    glyph="location"
+                    className="Margin-right--8 Text-color--royal-1000"
+                  />
                   <strong>Location:</strong>
                 </span>
                 {selectedEvent.location}
               </div>
               <div className="Event-modal-line">
                 <span>
-                  <Icon glyph="users" className="Margin-right--4" />
+                  <Icon
+                    glyph="users"
+                    className="Margin-right--8 Text-color--royal-1000"
+                  />
                   <strong>Volunteers Needed:</strong>
                 </span>
                 {selectedEvent.people_needed}
               </div>
               <div className="Event-modal-line">
                 <span>
-                  <Icon glyph="info-circle" className="Margin-right--4" />
+                  <Icon
+                    glyph="info-circle"
+                    className="Margin-right--8 Text-color--royal-1000"
+                  />
                   <strong>Description:</strong>
                 </span>
                 {selectedEvent.description}
               </div>
               <div className="Event-modal-line">
                 <span>
-                  <Icon glyph="building" className="Margin-right--4" />
+                  <Icon
+                    glyph="building"
+                    className="Margin-right--8 Text-color--royal-1000"
+                  />
                   <strong>Organization:</strong>
                 </span>
                 {orgMap[selectedEvent.o_id] || "Loading..."}
@@ -174,7 +191,7 @@ const Listings = (): ReactElement => {
               <div className="Event">
                 <div className="Event-color">
                   {event.tags.map((tag: string) => (
-                    <div key={tag} className="Badge Badge-color--light-400">
+                    <div key={tag} className="Badge Badge-color--light-500">
                       {tag}
                     </div>
                   ))}
