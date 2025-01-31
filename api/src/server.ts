@@ -13,19 +13,16 @@ var cors = require("cors")
 const app = express()
 // CORS options
 const corsOptions = {
-  origin: "http://localhost:3000", // Allow only your React frontend
-  credentials: true, // Allow credentials (cookies, etc.)
+  origin: [
+    "http://localhost:3000",
+    "https://nashville-volunteers.vercel.app",
+  ],
+  credentials: true,
 }
 
 app.use(cors(corsOptions))
 
-app.options(
-  "*",
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-  })
-)
+app.options("*", cors(corsOptions))
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
