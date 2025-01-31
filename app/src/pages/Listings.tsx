@@ -6,7 +6,7 @@ import Icon from "../components/Icon"
 import Modal from "../components/Modal"
 import MetaData from "../components/MetaData"
 
-// Define types
+// Define types1
 interface Event {
   event_id: number
   o_id: number
@@ -33,7 +33,7 @@ const Listings = (): ReactElement => {
   // Handle form submission
   const handleSubmit = async (values: { search: string }) => {
     setLoading(true)
-    console.log("Search:", values.search)
+    console.log("Search: ", values.search)
 
     try {
       // Updated GET request with query parameters
