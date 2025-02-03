@@ -28,12 +28,28 @@ export const getVolunteer = async (req: Request, res: Response) => {
   }
 }
 
+export const getVolunteerByAuthId = async (req: Request, res: Response) => {
+  try {
+    const { auth_id } = req.params
+    const volunteer = await sql`
+      SELECT * FROM volunteers 
+      WHERE auth_id = ${auth_id}
+    `
+    if (volunteer.length === 0) {
+      return res.status(404).json({ error: "Volunteer not found" })
+    }
+    res.status(200).json(volunteer[0])
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch volunteer", details: error })
+  }
+}
+
 export const createVolunteer = async (req: Request, res: Response) => {
   try {
-    const { phone, first_name, last_name, email, age } = req.body
+    const { phone, first_name, last_name, email, age, auth_id } = req.body
     const newVolunteer = await sql`
-      INSERT INTO volunteers (first_name, last_name, email, phone, age)
-      VALUES (${first_name}, ${last_name}, ${email}, ${phone}, ${age})
+      INSERT INTO volunteers (first_name, last_name, email, phone, age, auth_id)
+      VALUES (${first_name}, ${last_name}, ${email}, ${phone}, ${age}, ${auth_id})
       RETURNING *
     `
     res.status(201).json(newVolunteer[0])
@@ -66,7 +82,8 @@ export const updateVolunteer = async (req: Request, res: Response) => {
         last_name = ${updatedData.last_name},
         email = ${updatedData.email},
         phone = ${updatedData.phone},
-        age = ${updatedData.age}
+        age = ${updatedData.age},
+        auth_id = ${updatedData.auth_id}
       WHERE v_id = ${v_id}
       RETURNING *
     `
@@ -97,6 +114,7 @@ export const deleteVolunteer = async (req: Request, res: Response) => {
 export default {
   getVolunteers,
   getVolunteer,
+  getVolunteerByAuthId,
   createVolunteer,
   updateVolunteer,
   deleteVolunteer,
