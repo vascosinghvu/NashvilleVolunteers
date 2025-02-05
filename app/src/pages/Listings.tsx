@@ -166,7 +166,7 @@ const Listings = (): ReactElement => {
                 />
                 <button
                   type="submit"
-                  className="Button Button--small Button-color--yellow-1000 Margin-left--10"
+                  className="Button Button-color--yellow-1000 Margin-left--10"
                 >
                   Search
                 </button>
