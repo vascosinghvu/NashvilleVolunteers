@@ -104,9 +104,15 @@ const Login = () => {
             </Formik>
 
             <div className="Text--center Margin-top--10">
-              <p>
-                Don't have an account? <Link to="/signup">Sign up</Link>
-              </p>
+              Don't have an account?{" "}
+              <span
+                className="Link"
+                onClick={() => {
+                  navigate("/signup")
+                }}
+              >
+                Sign up
+              </span>
             </div>
           </div>
         </div>
