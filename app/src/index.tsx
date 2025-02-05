@@ -1,6 +1,5 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import { BrowserRouter as Router } from "react-router-dom"
 import "./styles/main.scss"
 import App from "./App"
 import reportWebVitals from "./reportWebVitals"
@@ -8,9 +7,7 @@ import reportWebVitals from "./reportWebVitals"
 // get the root element
 ReactDOM.render(
   <React.StrictMode>
-    <Router>
-      <App />
-    </Router>
+    <App />
   </React.StrictMode>,
   document.getElementById("root")
 )

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, type ReactElement } from "react"
+import React, { useState, type ReactElement } from "react"
 import { Formik, Form, Field } from "formik"
 import Navbar from "../components/Navbar"
 import { api } from "../api"
@@ -7,8 +7,8 @@ import Modal from "../components/Modal"
 import MetaData from "../components/MetaData"
 import Event from "../components/Event"
 
-// Define types1
-interface Event {
+// Rename interface Event → EventData to avoid name clash with "Event" component
+interface EventData {
   event_id: number
   o_id: number
   date: string
@@ -20,33 +20,24 @@ interface Event {
   tags: string[]
 }
 
-interface Organization {
-  o_id: number
-  name: string
-}
-
 const Listings = (): ReactElement => {
   const [loading, setLoading] = useState(true)
-  const [events, setEvents] = useState<Event[]>([])
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
-  const [orgMap, setOrgMap] = useState<{ [key: number]: string }>({}) // Lookup for org names
+  const [events, setEvents] = useState<EventData[]>([])
+  const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null)
+  const [orgMap, setOrgMap] = useState<{ [key: number]: string }>({})
 
-  // Handle form submission
   const handleSubmit = async (values: { search: string }) => {
     setLoading(true)
-    console.log("Search: ", values.search)
-
     try {
-      // Updated GET request with query parameters
       const response = await api.get(
         `/event/search-events?query=${values.search}`
       )
       setEvents(response.data)
 
       // Fetch organization names dynamically
-      response.data.forEach((event: Event) => {
-        if (!orgMap[event.o_id]) {
-          fetchOrganization(event.o_id)
+      response.data.forEach((evt: EventData) => {
+        if (!orgMap[evt.o_id]) {
+          fetchOrganization(evt.o_id)
         }
       })
     } catch (error) {
@@ -56,7 +47,6 @@ const Listings = (): ReactElement => {
     }
   }
 
-  // Fetch organization name by ID and update state
   const fetchOrganization = async (o_id: number) => {
     try {
       const response = await api.get(`/organization/get-organization/${o_id}`)
@@ -150,7 +140,6 @@ const Listings = (): ReactElement => {
           Discover meaningful volunteering opportunities in and around
           Nashville. Make a difference in your community today.
         </div>
-
         <div className="Flex--center Margin-top--20 Align-items--center">
           <Formik initialValues={{ search: "" }} onSubmit={handleSubmit}>
             {({ errors, touched }) => (
@@ -175,23 +164,18 @@ const Listings = (): ReactElement => {
             )}
           </Formik>
         </div>
-
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 Margin-top--20">
-          {/* if events are empty say no volunteer opportunities match your search */}
           {events.length === 0 && !loading && (
             <div className="Width--100 Text--center">
               No volunteer opportunities match your search.
             </div>
           )}
-          {events.map((event: Event) => (
-            <div
-              key={event.event_id}
-              className="col"
-            >
-              <Event 
-                event={event}
-                organizationName={orgMap[event.o_id] || ""}
-                onClick={() => setSelectedEvent(event)}
+          {events.map((evt: EventData) => (
+            <div key={evt.event_id} className="col">
+              <Event
+                event={evt}
+                organizationName={orgMap[evt.o_id] || ""}
+                onClick={() => setSelectedEvent(evt)}
               />
             </div>
           ))}
