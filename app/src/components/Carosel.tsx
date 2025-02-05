@@ -1,4 +1,3 @@
-import styles from "./Carosel.module.css"
 import Icon from "./Icon"
 import React, { useEffect, useRef, useState } from "react"
 
@@ -70,18 +69,18 @@ const Carosel: React.FC<CaroselProps> = ({ images }) => {
   }
 
   return (
-    <div className={styles.CaroselContainer}>
+    <div className="Carosel">
       {scrollPosition > 0 && (
         <div
-          className={`${styles.arrow} ${styles.left}`}
+          className="Carosel-arrow Carosel-arrow-left"
           onClick={() => handleArrowClick("left")}
         >
-          <Icon glyph="arrow-left" />
+          <Icon glyph="chevron-left" />
         </div>
       )}
       <div
         ref={scrollRef}
-        className={styles.imageContainer}
+        className="Carosel-image"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -94,16 +93,16 @@ const Carosel: React.FC<CaroselProps> = ({ images }) => {
               key={index}
               src={image}
               alt={`Slide ${index}`}
-              className={styles.CaroselImage}
+              className="Carosel-img"
             />
           )
         )}
       </div>
       <div
-        className={`${styles.arrow} ${styles.right}`}
+        className="Carosel-arrow Carosel-arrow-right"
         onClick={() => handleArrowClick("right")}
       >
-        <Icon glyph="arrow-right" />
+        <Icon glyph="chevron-right" />
       </div>
     </div>
   )

@@ -118,3 +118,67 @@
     }
 }
 
+.Carosel {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+
+    &-image {
+        display: flex;
+        overflow-x: hidden;
+        white-space: nowrap;
+        transition: scroll-left 1s ease-in-out; /* Smoother transition for scrolling */
+    }
+
+    &-img {
+        width: 320px;
+        height: 180px;
+        flex-shrink: 0;
+        margin-right: 10px;
+        transition: transform 0.3s ease;    
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    &-arrow {
+        position: absolute;
+        height: 100%;
+        display: flex; /* Enable flexbox */
+        align-items: center; /* Center content vertically */
+        justify-content: center; /* Center content horizontally */
+        background-color: #fff;
+        border: none;
+        color: var(--nash-color-blue-1000);
+        cursor: pointer;
+        font-size: 24px;
+        padding: 10px;
+        z-index: 100;
+        transition: opacity 0.3s ease;
+
+        &-hover {
+            color: var(--nash-color-yellow-1000);
+        }
+
+        &-left {
+            background: linear-gradient(to left, rgba(255, 255, 255, 0), #fff);
+            padding-right: 50px;
+        }
+
+        &-right {
+            right: 0px;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0), #fff);
+            padding-left: 50px;
+        }
+    }
+
+    &-icon {
+        font-size: 24px;
+        top: 50%;
+        color: blue;
+    }
+}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
 import MetaData from "../components/MetaData"
 import { api } from "../api"
+import Carosel from "../components/Carosel"
 
 interface Event {
   event_id: number
@@ -144,30 +145,11 @@ function Landing() {
           <h2 className="Landing-carousel-title" style={{ marginTop: "20px" }}>
             Featured Opportunities
           </h2>
-          <div className="Landing-carousel-scroll">
-            <div className="Landing-carousel-track">
-              {featuredEvents.map((event, index) => (
-                <div
-                  key={`${event.event_id}-${index}`}
-                  className="Landing-carousel-item"
-                >
-                  <div className="Event">
-                    <div className="Event-color">
-                      {event.tags?.map((tag) => (
-                        <div key={tag} className="Badge Badge-color--light-500">
-                          {tag}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="Event-text">
-                      <div className="Event-text-title">{event.name}</div>
-                      <p>{event.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <Carosel
+            images={[
+              "https://images.unsplash.com/photo-1628717341663-0007b0ee2597?q=80&w=3542&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            ]}
+          />
         </div>
       </div>
     </>
