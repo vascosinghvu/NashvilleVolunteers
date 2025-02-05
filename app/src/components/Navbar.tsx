@@ -19,7 +19,7 @@ const Navbar = (): ReactElement => {
   return (
     <div className="Navbar">
       <div className="Navbar-body">
-        {/* Logo */}
+        {/* Clickable Logo (Navigates to Home) */}
         <div
           className="Navbar-body-logo"
           onClick={() => navigate("/")}
@@ -31,13 +31,6 @@ const Navbar = (): ReactElement => {
 
         {/* Navigation Links */}
         <div className="Flex-row Margin-left--auto Align-items--center">
-          <div
-            className="Navbar-body-link Margin-right--20"
-            onClick={() => navigate("/")}
-          >
-            Home
-          </div>
-
           {user ? (
             <>
               <div

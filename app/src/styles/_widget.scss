@@ -3,11 +3,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
 
     &-body {
         width: 30%;
         height: fit-content;
+        margin: 48px 0;
+        padding: 56px 48px;
+        box-shadow: var(--nash-shadow-ambient); 
+        background-color: var(--nash-color-light-1000);
+        border-radius: var(--nash-border-radius-8);      
     }
 
     &-icon {
@@ -30,7 +34,7 @@
 
         // &-logo {
         //     display: block;
-        //     background-image: url('../assets/Hextronics-Logo-White.png');
+        //     background-image: url('../assets/nash-Logo-White.png');
         //     background-size: contain;
         //     background-repeat: no-repeat;
         //     height: 60px;
@@ -40,9 +44,9 @@
 
         &-content {
             padding: 56px 48px;
-            box-shadow: var(--hextronics-shadow-ambient); 
-            background-color: var(--hextronics-color-dark-1000);
-            border-radius: var(--hextronics-border-radius-8);    
+            box-shadow: var(--nash-shadow-ambient); 
+            background-color: var(--nash-color-dark-1000);
+            border-radius: var(--nash-border-radius-8);    
         }
     }
 }
