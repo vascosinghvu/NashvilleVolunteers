@@ -7,6 +7,8 @@ router.route("/get-volunteers").get(volunteerController.getVolunteers)
 
 router.route("/get-volunteer/:v_id").get(volunteerController.getVolunteer)
 
+router.route("/get-volunteer-by-auth/:auth_id").get(volunteerController.getVolunteerByAuthId)
+
 router.route("/create-volunteer").post(volunteerController.createVolunteer)
 
 router.route("/update-volunteer/:v_id").put(volunteerController.updateVolunteer)
