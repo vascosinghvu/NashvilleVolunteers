@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
 import MetaData from "../components/MetaData"
 import { api } from "../api"
+import Event from "../components/Event"
 
 interface Event {
   event_id: number
@@ -34,7 +35,7 @@ function Landing() {
 
   return (
     <>
-      <MetaData title="NashvilleVolunteers | Landing" />
+      <MetaData title="Landing" />
       <Navbar />
 
       <div
@@ -151,19 +152,7 @@ function Landing() {
                   key={`${event.event_id}-${index}`}
                   className="Landing-carousel-item"
                 >
-                  <div className="Event">
-                    <div className="Event-color">
-                      {event.tags?.map((tag) => (
-                        <div key={tag} className="Badge Badge-color--light-500">
-                          {tag}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="Event-text">
-                      <div className="Event-text-title">{event.name}</div>
-                      <p>{event.description}</p>
-                    </div>
-                  </div>
+                  <Event event={event} />
                 </div>
               ))}
             </div>
