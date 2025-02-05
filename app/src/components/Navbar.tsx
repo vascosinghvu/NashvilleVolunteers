@@ -22,7 +22,7 @@ const Navbar = (): ReactElement => {
         {/* Clickable Logo (Navigates to Home) */}
         <div
           className="Navbar-body-logo"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/home")}
           style={{ cursor: "pointer" }}
         >
           <Icon glyph="heart" regular />
