@@ -5,6 +5,7 @@ import { api } from "../api"
 import Icon from "../components/Icon"
 import Modal from "../components/Modal"
 import MetaData from "../components/MetaData"
+import Event from "../components/Event"
 
 // Define types1
 interface Event {
@@ -186,21 +187,12 @@ const Listings = (): ReactElement => {
             <div
               key={event.event_id}
               className="col"
-              onClick={() => setSelectedEvent(event)}
             >
-              <div className="Event">
-                <div className="Event-color">
-                  {event.tags.map((tag: string) => (
-                    <div key={tag} className="Badge Badge-color--light-500">
-                      {tag}
-                    </div>
-                  ))}
-                </div>
-                <div className="Event-text">
-                  <div className="Event-text-title">{event.name}</div>
-                  <div className="Event-org">{orgMap[event.o_id] || ""}</div>
-                </div>
-              </div>
+              <Event 
+                event={event}
+                organizationName={orgMap[event.o_id] || ""}
+                onClick={() => setSelectedEvent(event)}
+              />
             </div>
           ))}
         </div>

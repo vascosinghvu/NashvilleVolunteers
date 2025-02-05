@@ -1,26 +1,16 @@
-import React, { type ReactElement } from "react"
+import React from "react"
 import { Route, Routes } from "react-router-dom"
 import Listings from "./pages/Listings"
-import Login from "./pages/Login"
-import Signup from "./pages/Signup"
-import { AuthProvider } from "./context/AuthContext"
-import { ProtectedRoute } from "./components/ProtectedRoute"
+import Landing from "./pages/Landing"
 
-function App(): ReactElement {
+function App() {
   return (
-    <AuthProvider>
-      <div className="App">
-        {/* app directory */}
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/" element={<Listings />} />
-          <Route path="/listings" element={<Listings />} />
-          {/* Protected routes will go here */}
-        </Routes>
-      </div>
-    </AuthProvider>
+    <div className="App">
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/listings" element={<Listings />} />
+      </Routes>
+    </div>
   )
 }
 
