@@ -1,4 +1,4 @@
-import react, { type ReactElement } from "react"
+import { type ReactElement } from "react"
 import { useNavigate } from "react-router-dom"
 import Icon from "./Icon"
 import { useAuth } from "../context/AuthContext"
@@ -69,9 +69,40 @@ const Navbar = (): ReactElement => {
               </>
             )}
           </div>
+          {user ? (
+            <>
+              <div
+                className="Navbar-body-link Margin-right--20"
+                onClick={() => navigate("/profile")}
+              >
+                Profile
+              </div>
+              <div
+                className="Navbar-body-link"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </div>
+            </>
+          ) : (
+            <>
+              <div
+                className="Navbar-body-link Margin-right--20"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </div>
+              <div
+                className="Navbar-body-link"
+                onClick={() => navigate("/signup")}
+              >
+                Sign Up
+              </div>
+            </>
+          )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
