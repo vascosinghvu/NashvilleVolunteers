@@ -16,7 +16,7 @@ const Navbar = (): ReactElement => {
             <div
               className="Navbar-body-link Margin-right--20"
               onClick={() => {
-                navigate("/home")
+                navigate("/")
               }}
             >
               Home
