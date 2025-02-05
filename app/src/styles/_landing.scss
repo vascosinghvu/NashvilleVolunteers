@@ -1,0 +1,95 @@
+.Landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  background-color: var(--nash-color-light-1000);
+
+  &-hero {
+    text-align: center;
+    margin: 40px 0;
+
+    h1 {
+      font-size: var(--nash-font-size-50);
+      color: var(--nash-color-dark-1000);
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: var(--nash-font-size-20);
+      color: var(--nash-color-dark-800);
+      margin-bottom: 40px;
+    }
+
+    &-button {
+      padding: 15px 40px;
+      font-size: var(--nash-font-size-20);
+      background-color: var(--nash-color-yellow-1000);
+      color: var(--nash-color-dark-1000);
+      border: none;
+      border-radius: var(--nash-border-radius-8);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      box-shadow: var(--nash-shadow-dark);
+
+      &:hover {
+        transform: translateY(-2px);
+        background-color: var(--nash-color-yellow-900);
+      }
+    }
+  }
+
+  &-carousel {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 60px;
+    overflow: hidden;
+
+    &-title {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: var(--nash-font-size-30);
+      color: var(--nash-color-dark-1000);
+    }
+
+    &-scroll {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    &-track {
+      display: flex;
+      animation: scroll 40s linear infinite;
+      
+      &:hover {
+        animation-play-state: paused;
+      }
+    }
+
+    &-item {
+      flex: 0 0 auto;
+      width: 400px;
+      padding: 0 20px;
+    }
+  }
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+// Make sure Event cards maintain their style
+.Event {
+  height: 100%;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+} 
