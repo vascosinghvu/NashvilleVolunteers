@@ -91,10 +91,10 @@
   
   .Link {
     text-decoration: none;
-    color: var(--nash-color-sky-1000);
+    color: var(--nash-color-blue-1000);
   
     &:hover {
-      color: var(--nash-color-pink-1000);
+      color: var(--nash-color-yellow-1000);
     }
   }
 
@@ -213,7 +213,7 @@
 
     &--small {
       font-size: 12px;
-      padding: 6px 12px;
+      padding: 2px 8px;
     }
   
     &:hover {

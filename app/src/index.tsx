@@ -1,17 +1,17 @@
-import React from "react"
 import ReactDOM from "react-dom"
-import { BrowserRouter as Router } from "react-router-dom"
+import { BrowserRouter } from "react-router-dom"
 import "./styles/main.scss"
 import App from "./App"
+import { AuthProvider } from "./context/AuthContext"
 import reportWebVitals from "./reportWebVitals"
 
 // get the root element
 ReactDOM.render(
-  <React.StrictMode>
-    <Router>
+  <AuthProvider>
+    <BrowserRouter>
       <App />
-    </Router>
-  </React.StrictMode>,
+    </BrowserRouter>
+  </AuthProvider>,
   document.getElementById("root")
 )
 

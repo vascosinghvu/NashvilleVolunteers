@@ -41,7 +41,9 @@ function Landing() {
       <div className="Hero">
         <div className="Hero__overlay">
           <h1>Make a Difference in Nashville</h1>
-          <p>Join our community of volunteers and help create positive change</p>
+          <p>
+            Join our community of volunteers and help create positive change
+          </p>
           <button
             className="Button Button-color--red-1000"
             onClick={() => navigate("/listings")}

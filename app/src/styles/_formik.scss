@@ -1,6 +1,6 @@
 // styles for the formik form
 .Form {
-    color: var(--nash-color-light-900);
+    color: var(--nash-color-dark-900);
 
     &-row {
         display: flex;
@@ -9,8 +9,8 @@
         align-items: center;
 
         label {
-            margin-bottom: 5px;
-            font-size: var(--nash-font-size-16);
+            margin-bottom: 3px;
+            font-size: var(--nash-font-size-12);
             color: var(--nash-color-dark-1000)
         }
 
@@ -55,16 +55,13 @@
 
         label {
             margin-bottom: 5px;
-            font-size: var(--nash-font-size-16);
-            color: var(--nash-color-dark-1000)
         }
 
         input {
             border-radius: var(--nash-border-radius-8);
-            border: 2px solid var(--nash-color-dark-100);
+            border: 1px solid var(--nash-color-dark-100);
             background-color: var(--nash-color-dark-50);
             color: var(--nash-color-dark-500);
-            font-size: var(--nash-font-size-16);
             padding: 5px 8px;
             width: 100%;  
             position: relative;

@@ -1,201 +1,245 @@
-import React, { useState } from 'react';
-import { Formik, Form, Field } from 'formik';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { api } from '../api';
-import Navbar from '../components/Navbar';
-import MetaData from '../components/MetaData';
+import React, { useState } from "react"
+import { Formik, Form, Field } from "formik"
+import { useNavigate, Link } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
+import { api } from "../api"
+import Navbar from "../components/Navbar"
+import MetaData from "../components/MetaData"
+import * as yup from "yup"
 
+// Define types for Formik
 interface SignupValues {
-  email: string;
-  password: string;
-  confirmPassword: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  age: number;
+  email: string
+  password: string
+  confirmPassword: string
+  firstName: string
+  lastName: string
+  phone: string
+  age: number
 }
 
+// Define initial values
+const initialValues: SignupValues = {
+  email: "",
+  password: "",
+  confirmPassword: "",
+  firstName: "",
+  lastName: "",
+  phone: "",
+  age: 18,
+}
+
+// Define validation schema using Yup
+const validationSchema = yup.object().shape({
+  firstName: yup.string().required("First name is required"),
+  lastName: yup.string().required("Last name is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
+  phone: yup
+    .string()
+    .matches(/^[0-9]{10}$/, "Phone number must be 10 digits")
+    .required("Phone number is required"),
+  age: yup
+    .number()
+    .min(18, "You must be at least 18 years old")
+    .required("Age is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password")], "Passwords must match")
+    .required("Confirm password is required"),
+})
+
 const Signup = () => {
-  const { signUp } = useAuth();
-  const navigate = useNavigate();
-  const [error, setError] = useState<string>('');
+  const { signUp } = useAuth()
+  const navigate = useNavigate()
+  const [error, setError] = useState<string>("")
 
   const handleSubmit = async (values: SignupValues) => {
     try {
-      // Validate passwords match
-      if (values.password !== values.confirmPassword) {
-        setError('Passwords do not match');
-        return;
-      }
-
-      console.log('Starting signup process...');
-
       // First, create the auth user
-      const { data: { user }, error: signUpError } = await signUp(values.email, values.password);
-      console.log('Supabase signup response:', { user, error: signUpError });
-      
-      if (signUpError) throw signUpError;
-      
+      const {
+        data: { user },
+        error: signUpError,
+      } = await signUp(values.email, values.password)
+      console.log("Supabase signup response:", { user, error: signUpError })
+
+      if (signUpError) throw signUpError
+
       if (!user?.id) {
-        throw new Error('Failed to create user account');
+        throw new Error("Failed to create user account")
       }
 
       // Then create the volunteer profile with auth_id
-      console.log('Creating volunteer with data:', {
+      console.log("Creating volunteer with data:", {
         first_name: values.firstName,
         last_name: values.lastName,
         email: values.email,
         phone: values.phone,
         age: values.age,
-        auth_id: user.id
-      });
+        auth_id: user.id,
+      })
 
-      const volunteerResponse = await api.post('/volunteer/create-volunteer', {
+      const volunteerResponse = await api.post("/volunteer/create-volunteer", {
         first_name: values.firstName,
         last_name: values.lastName,
         email: values.email,
         phone: values.phone,
         age: values.age,
-        auth_id: user.id
-      });
+        auth_id: user.id,
+      })
 
-      console.log('Volunteer creation response:', volunteerResponse);
+      console.log("Volunteer creation response:", volunteerResponse)
 
       // Redirect to login page after successful signup
-      navigate('/login');
+      navigate("/login")
     } catch (err) {
-      console.error('Signup error details:', err);
-      setError(err instanceof Error ? err.message : 'Failed to sign up');
+      console.error("Signup error details:", err)
+      setError(err instanceof Error ? err.message : "Failed to sign up")
     }
-  };
+  }
 
   return (
     <>
       <Navbar />
-      <MetaData title="Sign Up - Nashville Volunteers" description="Create your account" />
-      
-      <div className="container mt-5">
-        <div className="row justify-content-center">
-          <div className="col-md-6 col-lg-4">
-            <h2 className="text-center mb-4">Sign Up</h2>
-            
-            {error && (
-              <div className="alert alert-danger" role="alert">
-                {error}
-              </div>
-            )}
+      <MetaData
+        title="Sign Up - Nashville Volunteers"
+        description="Create your account"
+      />
+      <div className="FormWidget">
+        <div className="FormWidget-body animate__animated animate__slideInDown">
+          <div className="Block">
+            <div className="Block-header">Create Your Account</div>
+
+            {error && <div className="Form-error">{error}</div>}
 
             <Formik
-              initialValues={{
-                email: '',
-                password: '',
-                confirmPassword: '',
-                firstName: '',
-                lastName: '',
-                phone: '',
-                age: 18
-              }}
+              initialValues={initialValues}
+              validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
-              {({ isSubmitting }) => (
+              {({ errors, touched, isValid, dirty, isSubmitting }) => (
                 <Form>
-                  <div className="mb-3">
-                    <label htmlFor="firstName" className="form-label">First Name</label>
+                  <div className="Form-group">
+                    <label htmlFor="firstName">First Name</label>
                     <Field
                       type="text"
                       name="firstName"
-                      className="form-control"
+                      className="Form-input-box"
                       placeholder="Enter your first name"
-                      required
                     />
+                    {errors.firstName && touched.firstName && (
+                      <div className="Form-error">{errors.firstName}</div>
+                    )}
                   </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="lastName" className="form-label">Last Name</label>
+                  <div className="Form-group">
+                    <label htmlFor="lastName">Last Name</label>
                     <Field
                       type="text"
                       name="lastName"
-                      className="form-control"
+                      className="Form-input-box"
                       placeholder="Enter your last name"
-                      required
                     />
+                    {errors.lastName && touched.lastName && (
+                      <div className="Form-error">{errors.lastName}</div>
+                    )}
                   </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="email" className="form-label">Email</label>
+                  <div className="Form-group">
+                    <label htmlFor="email">Email</label>
                     <Field
                       type="email"
                       name="email"
-                      className="form-control"
-                      placeholder="Enter your email"
-                      required
+                      className="Form-input-box"
+                      placeholder="johndoe@gmail.com"
                     />
+                    {errors.email && touched.email && (
+                      <div className="Form-error">{errors.email}</div>
+                    )}
                   </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="phone" className="form-label">Phone</label>
+                  <div className="Form-group">
+                    <label htmlFor="phone">Phone</label>
                     <Field
                       type="tel"
                       name="phone"
-                      className="form-control"
+                      className="Form-input-box"
                       placeholder="Enter your phone number"
-                      required
                     />
+                    {errors.phone && touched.phone && (
+                      <div className="Form-error">{errors.phone}</div>
+                    )}
                   </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="age" className="form-label">Age</label>
+                  <div className="Form-group">
+                    <label htmlFor="age">Age</label>
                     <Field
                       type="number"
                       name="age"
-                      className="form-control"
+                      className="Form-input-box"
                       min="18"
-                      required
                     />
+                    {errors.age && touched.age && (
+                      <div className="Form-error">{errors.age}</div>
+                    )}
                   </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="password" className="form-label">Password</label>
+                  <div className="Form-group">
+                    <label htmlFor="password">Password</label>
                     <Field
                       type="password"
                       name="password"
-                      className="form-control"
+                      className="Form-input-box"
                       placeholder="Enter your password"
-                      required
                     />
+                    {errors.password && touched.password && (
+                      <div className="Form-error">{errors.password}</div>
+                    )}
                   </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+                  <div className="Form-group">
+                    <label htmlFor="confirmPassword">Confirm Password</label>
                     <Field
                       type="password"
                       name="confirmPassword"
-                      className="form-control"
+                      className="Form-input-box"
                       placeholder="Confirm your password"
-                      required
                     />
+                    {errors.confirmPassword && touched.confirmPassword && (
+                      <div className="Form-error">{errors.confirmPassword}</div>
+                    )}
                   </div>
 
                   <button
                     type="submit"
-                    className="Button Button-color--blue-1000 Width--100"
-                    disabled={isSubmitting}
+                    className="Button Button-color--blue-1000 Width--100 Margin-top--10"
+                    disabled={isSubmitting || !isValid || !dirty} // Disable button when form is incomplete
                   >
-                    {isSubmitting ? 'Creating Account...' : 'Sign Up'}
+                    {isSubmitting ? "Creating Account..." : "Sign Up"}
                   </button>
                 </Form>
               )}
             </Formik>
 
-            <div className="text-center mt-3">
-              <p>Already have an account? <Link to="/login">Login</Link></p>
+            <div className="Text--center Margin-top--10">
+              Already have an account?
+              <span
+                className="Link Margin-left--4"
+                onClick={() => {
+                  navigate("/login")
+                }}
+              >
+                Login
+              </span>
             </div>
           </div>
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Signup; 
+export default Signup
