@@ -18,3 +18,31 @@
         font-size: var(--nash-font-size-72);
     }
 }
+
+.FormWidget {
+    display: flex;
+    justify-content: center;
+    margin: 48px 0;
+
+    &-body {
+        width: 30%;
+        height: fit-content;
+
+        // &-logo {
+        //     display: block;
+        //     background-image: url('../assets/Hextronics-Logo-White.png');
+        //     background-size: contain;
+        //     background-repeat: no-repeat;
+        //     height: 60px;
+        //     width: auto;
+        //     margin: 56px 0 40px 20px;
+        // }
+
+        &-content {
+            padding: 56px 48px;
+            box-shadow: var(--hextronics-shadow-ambient); 
+            background-color: var(--hextronics-color-dark-1000);
+            border-radius: var(--hextronics-border-radius-8);    
+        }
+    }
+}

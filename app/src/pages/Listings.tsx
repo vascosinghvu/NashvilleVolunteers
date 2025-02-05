@@ -6,6 +6,7 @@ import Icon from "../components/Icon"
 import Modal from "../components/Modal"
 import MetaData from "../components/MetaData"
 import Event from "../components/Event"
+import { useNavigate } from "react-router-dom"
 
 // Rename interface Event → EventData to avoid name clash with "Event" component
 interface EventData {
@@ -26,6 +27,9 @@ const Listings = (): ReactElement => {
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null)
   const [orgMap, setOrgMap] = useState<{ [key: number]: string }>({})
 
+  const navigate = useNavigate()
+
+  // Handle form submission
   const handleSubmit = async (values: { search: string }) => {
     setLoading(true)
     try {
@@ -53,6 +57,12 @@ const Listings = (): ReactElement => {
       setOrgMap((prev) => ({ ...prev, [o_id]: response.data.name }))
     } catch (error) {
       console.error(`Error fetching organization ${o_id}`, error)
+    }
+  }
+
+  const handleRegisterClick = () => {
+    if (selectedEvent) {
+      navigate("/register", { state: { event: selectedEvent } })
     }
   }
 
@@ -127,7 +137,10 @@ const Listings = (): ReactElement => {
                 </span>
                 {orgMap[selectedEvent.o_id] || "Loading..."}
               </div>
-              <div className="Button Button-color--blue-1000 Margin-top--20">
+              <div
+                className="Button Button-color--blue-1000 Margin-top--20"
+                onClick={handleRegisterClick}
+              >
                 Register for Event
               </div>
             </div>

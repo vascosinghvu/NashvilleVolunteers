@@ -91,10 +91,10 @@
   
   .Link {
     text-decoration: none;
-    color: var(--nash-color-sky-1000);
+    color: var(--nash-color-blue-1000);
   
     &:hover {
-      color: var(--nash-color-pink-1000);
+      color: var(--nash-color-yellow-1000);
     }
   }
 
@@ -213,7 +213,7 @@
 
     &--small {
       font-size: 12px;
-      padding: 6px 12px;
+      padding: 2px 8px;
     }
   
     &:hover {
@@ -275,11 +275,13 @@
     padding: 56px 48px;
     box-shadow: var(--nash-shadow-ambient); 
     border-radius: var(--nash-border-radius-8);
+    background-color: var(--nash-color-light-1000);
 
     &-header {
       font-size: var(--nash-font-size-24);
       font-weight: bold;
       margin-bottom: 10px;
+      color: var(--nash-color-dark-1000)
     }
 
     &-subtitle {

@@ -69,7 +69,7 @@ $zIndex: -10 -5 0 5 10 50 100 1000;
     --nash-z-#{$zIndex}: #{$zIndex};
   }
 
-  --nash-shadow-dark: var(--nash-color-dark-100) 0px 5px 10px 0px;  
+  --nash-shadow-dark: var(--nash-color-dark-100) 3px 5px 10px 0px;  
   --nash-shadow-ambient: var(--nash-color-gray-100) 0px 15px 20px 0px;
 }
 
