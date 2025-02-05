@@ -32,22 +32,6 @@
       margin-bottom: 30px;
       color: white;
     }
-
-    .Button--hero {
-      background-color: #F93943; /* Red background */
-      color: white;
-      padding: 15px 30px;
-      font-size: 1.2rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-      font-weight: bold;
-
-      &:hover {
-        transform: translateY(-2px);
-      }
-    }
   }
 }
 
@@ -76,32 +60,6 @@
     justify-content: center;
     gap: 20px;
     flex-wrap: wrap;
-  }
-
-  .Button-volunteer,
-  .Button-organizer {
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-    font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-    &:hover {
-      transform: translateY(-2px);
-    }
-  }
-
-  .Button-volunteer {
-    background-color: #FFC857; /* Yellow */
-    color: var(--nash-color-dark-1000);
-  }
-
-  .Button-organizer {
-    background-color: #92DCE5; /* Blue */
-    color: var(--nash-color-dark-1000);
   }
 }
 
@@ -156,14 +114,5 @@
   }
   100% {
     transform: translateX(-50%);
-  }
-}
-
-/* Event card hover effect */
-.Event {
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: scale(1.05);
   }
 }
