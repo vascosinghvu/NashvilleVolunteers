@@ -4,7 +4,9 @@ export const api: any = {
 
     return await fetch(url, {
       method: "GET",
-      headers: { "Access-Control-Allow-Origin": "*", mode: "no-cors" },
+      headers: { 
+        "Content-Type": "application/json",
+      },
     })
       .then(async (res) => {
         if (!res.ok) {
@@ -31,12 +33,13 @@ export const api: any = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        mode: "no-cors",
       },
-      body: payload,
+      body: JSON.stringify(payload),
     })
       .then(async (res) => {
+        if (!res.ok) {
+          throw new Error("Network response was not ok")
+        }
         const json = await res.json()
         const response = {
           data: json,
@@ -57,12 +60,13 @@ export const api: any = {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        mode: "no-cors",
       },
-      body: data,
+      body: JSON.stringify(data),
     })
       .then(async (res) => {
+        if (!res.ok) {
+          throw new Error("Network response was not ok")
+        }
         const json = await res.json()
         const response = {
           data: json,
@@ -82,10 +86,9 @@ export const api: any = {
     return await fetch(url, {
       method: "DELETE",
       headers: {
-        "Access-Control-Allow-Origin": "*",
-        mode: "no-cors",
+        "Content-Type": "application/json",
       },
-      body: data,
+      body: JSON.stringify(data),
     })
       .then(async (res) => {
         if (!res.ok) {

@@ -46,17 +46,29 @@ export const getVolunteerByAuthId = async (req: Request, res: Response) => {
 
 export const createVolunteer = async (req: Request, res: Response) => {
   try {
-    const { phone, first_name, last_name, email, age, auth_id } = req.body
+    console.log('Received volunteer creation request with body:', req.body);
+    
+    const { phone, first_name, last_name, email, age, auth_id } = req.body;
+    
+    console.log('Extracted values:', { phone, first_name, last_name, email, age, auth_id });
+
     const newVolunteer = await sql`
       INSERT INTO volunteers (first_name, last_name, email, phone, age, auth_id)
       VALUES (${first_name}, ${last_name}, ${email}, ${phone}, ${age}, ${auth_id})
       RETURNING *
-    `
-    res.status(201).json(newVolunteer[0])
+    `;
+    
+    console.log('Created volunteer:', newVolunteer);
+    
+    res.status(201).json(newVolunteer[0]);
   } catch (error) {
-    res.status(500).json({ error: "Failed to create volunteer", details: error })
+    console.error('Error creating volunteer:', error);
+    res.status(500).json({ 
+      error: "Failed to create volunteer", 
+      details: error instanceof Error ? error.message : String(error)
+    });
   }
-}
+};
 
 export const updateVolunteer = async (req: Request, res: Response) => {
   try {

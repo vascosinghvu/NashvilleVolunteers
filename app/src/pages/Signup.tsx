@@ -29,8 +29,12 @@ const Signup = () => {
         return;
       }
 
+      console.log('Starting signup process...');
+
       // First, create the auth user
       const { data: { user }, error: signUpError } = await signUp(values.email, values.password);
+      console.log('Supabase signup response:', { user, error: signUpError });
+      
       if (signUpError) throw signUpError;
       
       if (!user?.id) {
@@ -38,18 +42,30 @@ const Signup = () => {
       }
 
       // Then create the volunteer profile with auth_id
-      await api.post('/volunteer', {
+      console.log('Creating volunteer with data:', {
         first_name: values.firstName,
         last_name: values.lastName,
         email: values.email,
         phone: values.phone,
         age: values.age,
-        auth_id: user.id // Include the auth_id from Supabase
+        auth_id: user.id
       });
+
+      const volunteerResponse = await api.post('/volunteer/create-volunteer', {
+        first_name: values.firstName,
+        last_name: values.lastName,
+        email: values.email,
+        phone: values.phone,
+        age: values.age,
+        auth_id: user.id
+      });
+
+      console.log('Volunteer creation response:', volunteerResponse);
 
       // Redirect to login page after successful signup
       navigate('/login');
     } catch (err) {
+      console.error('Signup error details:', err);
       setError(err instanceof Error ? err.message : 'Failed to sign up');
     }
   };
