@@ -28,19 +28,47 @@ export const getVolunteer = async (req: Request, res: Response) => {
   }
 }
 
-export const createVolunteer = async (req: Request, res: Response) => {
+export const getVolunteerByAuthId = async (req: Request, res: Response) => {
   try {
-    const { phone, first_name, last_name, email, age } = req.body
-    const newVolunteer = await sql`
-      INSERT INTO volunteers (first_name, last_name, email, phone, age)
-      VALUES (${first_name}, ${last_name}, ${email}, ${phone}, ${age})
-      RETURNING *
+    const { auth_id } = req.params
+    const volunteer = await sql`
+      SELECT * FROM volunteers 
+      WHERE auth_id = ${auth_id}
     `
-    res.status(201).json(newVolunteer[0])
+    if (volunteer.length === 0) {
+      return res.status(404).json({ error: "Volunteer not found" })
+    }
+    res.status(200).json(volunteer[0])
   } catch (error) {
-    res.status(500).json({ error: "Failed to create volunteer", details: error })
+    res.status(500).json({ error: "Failed to fetch volunteer", details: error })
   }
 }
+
+export const createVolunteer = async (req: Request, res: Response) => {
+  try {
+    console.log('Received volunteer creation request with body:', req.body);
+    
+    const { phone, first_name, last_name, email, age, auth_id } = req.body;
+    
+    console.log('Extracted values:', { phone, first_name, last_name, email, age, auth_id });
+
+    const newVolunteer = await sql`
+      INSERT INTO volunteers (first_name, last_name, email, phone, age, auth_id)
+      VALUES (${first_name}, ${last_name}, ${email}, ${phone}, ${age}, ${auth_id})
+      RETURNING *
+    `;
+    
+    console.log('Created volunteer:', newVolunteer);
+    
+    res.status(201).json(newVolunteer[0]);
+  } catch (error) {
+    console.error('Error creating volunteer:', error);
+    res.status(500).json({ 
+      error: "Failed to create volunteer", 
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+};
 
 export const updateVolunteer = async (req: Request, res: Response) => {
   try {
@@ -66,7 +94,8 @@ export const updateVolunteer = async (req: Request, res: Response) => {
         last_name = ${updatedData.last_name},
         email = ${updatedData.email},
         phone = ${updatedData.phone},
-        age = ${updatedData.age}
+        age = ${updatedData.age},
+        auth_id = ${updatedData.auth_id}
       WHERE v_id = ${v_id}
       RETURNING *
     `
@@ -97,6 +126,7 @@ export const deleteVolunteer = async (req: Request, res: Response) => {
 export default {
   getVolunteers,
   getVolunteer,
+  getVolunteerByAuthId,
   createVolunteer,
   updateVolunteer,
   deleteVolunteer,
