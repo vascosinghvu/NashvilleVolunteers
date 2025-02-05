@@ -275,11 +275,13 @@
     padding: 56px 48px;
     box-shadow: var(--nash-shadow-ambient); 
     border-radius: var(--nash-border-radius-8);
+    background-color: var(--nash-color-light-1000);
 
     &-header {
       font-size: var(--nash-font-size-24);
       font-weight: bold;
       margin-bottom: 10px;
+      color: var(--nash-color-dark-1000)
     }
 
     &-subtitle {

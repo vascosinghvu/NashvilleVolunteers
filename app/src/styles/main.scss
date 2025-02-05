@@ -15,6 +15,7 @@
 @import 'formik';
 @import 'listings';
 @import 'landing';
+@import 'register';
 
 :root {
   // define colors
@@ -43,7 +44,7 @@
   body {
     font-size: var(--nash-font-size-4);
     background-color: var(--nash-color-dark-25);
-    color: var(--nash-color-dark-800);
+    color: var(--nash-color-dark-900);
     font-weight: 400;
   }
   

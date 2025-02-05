@@ -6,6 +6,7 @@ import Icon from "../components/Icon"
 import Modal from "../components/Modal"
 import MetaData from "../components/MetaData"
 import Event from "../components/Event"
+import { useNavigate } from "react-router-dom"
 
 // Define types
 interface Event {
@@ -30,6 +31,8 @@ const Listings = (): ReactElement => {
   const [events, setEvents] = useState<Event[]>([])
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [orgMap, setOrgMap] = useState<{ [key: number]: string }>({}) // Lookup for org names
+
+  const navigate = useNavigate()
 
   // Handle form submission
   const handleSubmit = async (values: { search: string }) => {
@@ -63,6 +66,12 @@ const Listings = (): ReactElement => {
       setOrgMap((prev) => ({ ...prev, [o_id]: response.data.name }))
     } catch (error) {
       console.error(`Error fetching organization ${o_id}`, error)
+    }
+  }
+
+  const handleRegisterClick = () => {
+    if (selectedEvent) {
+      navigate("/register", { state: { event: selectedEvent } })
     }
   }
 
@@ -137,7 +146,10 @@ const Listings = (): ReactElement => {
                 </span>
                 {orgMap[selectedEvent.o_id] || "Loading..."}
               </div>
-              <div className="Button Button-color--blue-1000 Margin-top--20">
+              <div
+                className="Button Button-color--blue-1000 Margin-top--20"
+                onClick={handleRegisterClick}
+              >
                 Register for Event
               </div>
             </div>
@@ -184,11 +196,8 @@ const Listings = (): ReactElement => {
             </div>
           )}
           {events.map((event: Event) => (
-            <div
-              key={event.event_id}
-              className="col"
-            >
-              <Event 
+            <div key={event.event_id} className="col">
+              <Event
                 event={event}
                 organizationName={orgMap[event.o_id] || ""}
                 onClick={() => setSelectedEvent(event)}
