@@ -8,6 +8,8 @@ import MetaData from "../components/MetaData"
 import Event from "../components/Event"
 import { useNavigate } from "react-router-dom"
 import TagFilter from "../components/TagFilter"
+import DateFilter from "../components/DateFilter"
+import { formatDate, formatTime } from "../utils/formatters"
 
 // Rename interface Event → EventData to avoid name clash with "Event" component
 interface EventData {
@@ -29,6 +31,13 @@ const Listings: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null)
   const [orgMap, setOrgMap] = useState<{ [key: number]: string }>({})
   const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [selectedDates, setSelectedDates] = useState<{
+    start: string | null
+    end: string | null
+  }>({
+    start: null,
+    end: null
+  })
 
   const navigate = useNavigate()
 
@@ -103,13 +112,27 @@ const Listings: React.FC = () => {
   // Filter events based on selected tags and search
   const filteredEvents = React.useMemo(() => {
     return events.filter((event) => {
-      // Filter by tags if any are selected
+      // Filter by tags
       if (selectedTags.length > 0) {
-        return selectedTags.every((tag) => event.tags?.includes(tag))
+        if (!selectedTags.every((tag) => event.tags?.includes(tag))) {
+          return false
+        }
       }
+
+      // Filter by date
+      if (selectedDates.start || selectedDates.end) {
+        const eventDate = new Date(event.date)
+        if (selectedDates.start && eventDate < new Date(selectedDates.start)) {
+          return false
+        }
+        if (selectedDates.end && eventDate > new Date(selectedDates.end)) {
+          return false
+        }
+      }
+
       return true
     })
-  }, [events, selectedTags])
+  }, [events, selectedTags, selectedDates])
 
   if (loading) {
     return <div>Loading...</div>
@@ -126,6 +149,11 @@ const Listings: React.FC = () => {
           large
           body={
             <div>
+              {selectedEvent.image_url && (
+                <div className="Event-modal-image">
+                  <img src={selectedEvent.image_url} alt={selectedEvent.name} />
+                </div>
+              )}
               <div className="Event-modal-line">
                 <span>
                   <Icon
@@ -134,7 +162,7 @@ const Listings: React.FC = () => {
                   />
                   <strong>Date:</strong>
                 </span>
-                {selectedEvent.date}
+                {formatDate(selectedEvent.date)}
               </div>
               <div className="Event-modal-line">
                 <span>
@@ -144,7 +172,7 @@ const Listings: React.FC = () => {
                   />
                   <strong>Time:</strong>
                 </span>
-                {selectedEvent.time}
+                {formatTime(selectedEvent.time)}
               </div>
               <div className="Event-modal-line">
                 <span>
@@ -223,17 +251,23 @@ const Listings: React.FC = () => {
                 </Form>
               )}
             </Formik>
-            <TagFilter
-              availableTags={availableTags}
-              selectedTags={selectedTags}
-              onTagSelect={(tag) => {
-                setSelectedTags((prev) =>
-                  prev.includes(tag)
-                    ? prev.filter((t) => t !== tag)
-                    : [...prev, tag]
-                )
-              }}
-            />
+            <div className="Filter-row">
+              <TagFilter
+                availableTags={availableTags}
+                selectedTags={selectedTags}
+                onTagSelect={(tag) => {
+                  setSelectedTags((prev) =>
+                    prev.includes(tag)
+                      ? prev.filter((t) => t !== tag)
+                      : [...prev, tag]
+                  )
+                }}
+              />
+              <DateFilter
+                selectedDates={selectedDates}
+                onDateChange={setSelectedDates}
+              />
+            </div>
           </div>
         </div>
 
