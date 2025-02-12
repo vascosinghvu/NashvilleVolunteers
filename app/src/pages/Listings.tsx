@@ -1,4 +1,4 @@
-import React, { useState, type ReactElement } from "react"
+import React, { useEffect, useState } from "react"
 import { Formik, Form, Field } from "formik"
 import Navbar from "../components/Navbar"
 import { api } from "../api"
@@ -7,6 +7,9 @@ import Modal from "../components/Modal"
 import MetaData from "../components/MetaData"
 import Event from "../components/Event"
 import { useNavigate } from "react-router-dom"
+import TagFilter from "../components/TagFilter"
+import DateFilter from "../components/DateFilter"
+import { formatDate, formatTime } from "../utils/formatters"
 
 // Rename interface Event → EventData to avoid name clash with "Event" component
 interface EventData {
@@ -19,15 +22,55 @@ interface EventData {
   time: string
   description: string
   tags: string[]
+  image_url?: string
 }
 
-const Listings = (): ReactElement => {
-  const [loading, setLoading] = useState(true)
+const Listings: React.FC = () => {
   const [events, setEvents] = useState<EventData[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null)
   const [orgMap, setOrgMap] = useState<{ [key: number]: string }>({})
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [selectedDates, setSelectedDates] = useState<{
+    start: string | null
+    end: string | null
+  }>({
+    start: null,
+    end: null
+  })
 
   const navigate = useNavigate()
+
+  // Get unique tags from all events
+  const availableTags = React.useMemo(() => {
+    const tags = new Set<string>()
+    events.forEach((event) => {
+      event.tags?.forEach((tag) => tags.add(tag))
+    })
+    return Array.from(tags)
+  }, [events])
+
+  useEffect(() => {
+    fetchEvents()
+  }, [])
+
+  const fetchEvents = async () => {
+    setLoading(true)
+    try {
+      const response = await api.get("/event/get-events")
+      setEvents(response.data)
+      // Fetch organization names
+      response.data.forEach((evt: EventData) => {
+        if (!orgMap[evt.o_id]) {
+          fetchOrganization(evt.o_id)
+        }
+      })
+    } catch (error) {
+      console.error("Failed to fetch events:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Handle form submission
   const handleSubmit = async (values: { search: string }) => {
@@ -66,6 +109,35 @@ const Listings = (): ReactElement => {
     }
   }
 
+  // Filter events based on selected tags and search
+  const filteredEvents = React.useMemo(() => {
+    return events.filter((event) => {
+      // Filter by tags
+      if (selectedTags.length > 0) {
+        if (!selectedTags.every((tag) => event.tags?.includes(tag))) {
+          return false
+        }
+      }
+
+      // Filter by date
+      if (selectedDates.start || selectedDates.end) {
+        const eventDate = new Date(event.date)
+        if (selectedDates.start && eventDate < new Date(selectedDates.start)) {
+          return false
+        }
+        if (selectedDates.end && eventDate > new Date(selectedDates.end)) {
+          return false
+        }
+      }
+
+      return true
+    })
+  }, [events, selectedTags, selectedDates])
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
   return (
     <>
       <Navbar />
@@ -77,6 +149,11 @@ const Listings = (): ReactElement => {
           large
           body={
             <div>
+              {selectedEvent.image_url && (
+                <div className="Event-modal-image">
+                  <img src={selectedEvent.image_url} alt={selectedEvent.name} />
+                </div>
+              )}
               <div className="Event-modal-line">
                 <span>
                   <Icon
@@ -85,7 +162,7 @@ const Listings = (): ReactElement => {
                   />
                   <strong>Date:</strong>
                 </span>
-                {selectedEvent.date}
+                {formatDate(selectedEvent.date)}
               </div>
               <div className="Event-modal-line">
                 <span>
@@ -95,7 +172,7 @@ const Listings = (): ReactElement => {
                   />
                   <strong>Time:</strong>
                 </span>
-                {selectedEvent.time}
+                {formatTime(selectedEvent.time)}
               </div>
               <div className="Event-modal-line">
                 <span>
@@ -154,36 +231,53 @@ const Listings = (): ReactElement => {
           Nashville. Make a difference in your community today.
         </div>
         <div className="Flex--center Margin-top--20 Align-items--center">
-          <Formik initialValues={{ search: "" }} onSubmit={handleSubmit}>
-            {({ errors, touched }) => (
-              <Form className="Form-row Width--100">
-                <Field
-                  className="Form-input-box"
-                  type="text"
-                  id="keyword"
-                  name="search"
-                  placeholder="Soup Kitchen, Animal Shelter, etc."
-                />
-                <button
-                  type="submit"
-                  className="Button Button-color--yellow-1000 Margin-left--10"
-                >
-                  Search
-                </button>
-                {errors.search && touched.search && (
-                  <div className="Form-error">{errors.search}</div>
-                )}
-              </Form>
-            )}
-          </Formik>
+          <div className="Search-container">
+            <Formik initialValues={{ search: "" }} onSubmit={handleSubmit}>
+              {({ errors, touched }) => (
+                <Form className="Form-row">
+                  <Field
+                    className="Form-input-box"
+                    type="text"
+                    id="keyword"
+                    name="search"
+                    placeholder="Soup Kitchen, Animal Shelter, etc."
+                  />
+                  <button
+                    type="submit"
+                    className="Button Button-color--yellow-1000 Margin-left--10"
+                  >
+                    Search
+                  </button>
+                </Form>
+              )}
+            </Formik>
+            <div className="Filter-row">
+              <TagFilter
+                availableTags={availableTags}
+                selectedTags={selectedTags}
+                onTagSelect={(tag) => {
+                  setSelectedTags((prev) =>
+                    prev.includes(tag)
+                      ? prev.filter((t) => t !== tag)
+                      : [...prev, tag]
+                  )
+                }}
+              />
+              <DateFilter
+                selectedDates={selectedDates}
+                onDateChange={setSelectedDates}
+              />
+            </div>
+          </div>
         </div>
+
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 Margin-top--20">
-          {events.length === 0 && !loading && (
+          {filteredEvents.length === 0 && !loading && (
             <div className="Width--100 Text--center">
-              No volunteer opportunities match your search.
+              No volunteer opportunities match your criteria.
             </div>
           )}
-          {events.map((evt: EventData) => (
+          {filteredEvents.map((evt: EventData) => (
             <div key={evt.event_id} className="col">
               <Event
                 event={evt}
