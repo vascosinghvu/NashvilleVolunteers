@@ -1,3 +1,5 @@
+import { UserRole } from "./types/auth"
+
 export const api: any = {
   get: async (route: string): Promise<any> => {
     const url = `${process.env.REACT_APP_API_URL as string}${route}`
@@ -107,4 +109,25 @@ export const api: any = {
         throw err
       })
   },
+}
+
+export const checkUserRole = async (authId: string) => {
+  try {
+    // First check volunteers table
+    const volunteerResponse = await api.get(`/volunteer/get-volunteer-by-auth/${authId}`)
+    if (volunteerResponse.status === 200) {
+      return UserRole.VOLUNTEER
+    }
+
+    // Then check organizations table
+    const orgResponse = await api.get(`/organization/get-organization-by-auth/${authId}`)
+    if (orgResponse.status === 200) {
+      return UserRole.ORGANIZATION
+    }
+
+    throw new Error('User not found in either table')
+  } catch (error) {
+    console.error('Error checking user role:', error)
+    throw error
+  }
 }

@@ -55,7 +55,7 @@ const Profile = () => {
                 {userData.last_name}
               </p>
               <p>
-                <strong>Email:</strong> {user.email}
+                <strong>Email:</strong> {user?.email}
               </p>
               <p>
                 <strong>Phone:</strong> {userData.phone || "Not provided"}
@@ -63,10 +63,12 @@ const Profile = () => {
               <p>
                 <strong>Age:</strong> {userData.age}
               </p>
-              <p>
-                <strong>Joined:</strong>{" "}
-                {new Date(user.created_at).toLocaleDateString()}
-              </p>
+              {user?.created_at && (
+                <p>
+                  <strong>Joined:</strong>{" "}
+                  {new Date(user.created_at).toLocaleDateString()}
+                </p>
+              )}
             </div>
           ) : (
             <p>No additional user data found.</p>

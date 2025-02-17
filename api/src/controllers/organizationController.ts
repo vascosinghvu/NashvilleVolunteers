@@ -33,43 +33,40 @@ export const getOrganization = async (req: Request, res: Response) => {
 
 export const createOrganization = async (req: Request, res: Response) => {
   try {
-    const { name, description, email, website } = req.body
-    let image_url = null;
-
-    // Handle image upload if a file was sent
-    if (req.file) {
-      try {
-        const fileName = `org-${Date.now()}${path.extname(req.file.originalname)}`;
-        image_url = await uploadImageToSupabase(
-          req.file.buffer,
-          fileName,
-          'images'
-        );
-      } catch (uploadError) {
-        console.error('Error uploading image:', uploadError);
-      }
-    }
+    const { 
+      name, 
+      description, 
+      email, 
+      website,
+      auth_id 
+    } = req.body
 
     const newOrganization = await sql`
       INSERT INTO organizations (
-        name, 
-        description, 
-        email, 
+        name,
+        description,
+        email,
         website,
-        image_url
-      )
-      VALUES (
-        ${name}, 
-        ${description}, 
-        ${email}, 
+        auth_id
+      ) VALUES (
+        ${name},
+        ${description},
+        ${email},
         ${website},
-        ${image_url}
+        ${auth_id}
       )
       RETURNING *
     `
+
     res.status(201).json(newOrganization[0])
-  } catch (error) {
-    res.status(500).json({ error: "Failed to create organization", details: error })
+  } catch (err) {
+    const error = err as Error
+    console.error('Error creating organization:', error)
+    res.status(500).json({ 
+      error: 'Failed to create organization', 
+      message: error.message || 'Unknown error occurred',
+      details: error 
+    })
   }
 }
 

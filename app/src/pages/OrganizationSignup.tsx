@@ -1,47 +1,35 @@
 import React, { useState } from "react"
 import { Formik, Form, Field } from "formik"
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { api } from "../api"
 import Navbar from "../components/Navbar"
 import MetaData from "../components/MetaData"
 import * as yup from "yup"
 
-// Define types for Formik
-interface SignupValues {
+interface OrganizationSignupValues {
   email: string
   password: string
   confirmPassword: string
-  firstName: string
-  lastName: string
-  phone: string
-  age: number
+  name: string
+  description: string
+  website: string
 }
 
-// Define initial values
-const initialValues: SignupValues = {
+const initialValues: OrganizationSignupValues = {
   email: "",
   password: "",
   confirmPassword: "",
-  firstName: "",
-  lastName: "",
-  phone: "",
-  age: 18,
+  name: "",
+  description: "",
+  website: "",
 }
 
-// Define validation schema using Yup
 const validationSchema = yup.object().shape({
-  firstName: yup.string().required("First name is required"),
-  lastName: yup.string().required("Last name is required"),
+  name: yup.string().required("Organization name is required"),
+  description: yup.string().required("Description is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
-  phone: yup
-    .string()
-    .matches(/^[0-9]{10}$/, "Phone number must be 10 digits")
-    .required("Phone number is required"),
-  age: yup
-    .number()
-    .min(18, "You must be at least 18 years old")
-    .required("Age is required"),
+  website: yup.string().url("Invalid URL").required("Website is required"),
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
@@ -52,19 +40,27 @@ const validationSchema = yup.object().shape({
     .required("Confirm password is required"),
 })
 
-const Signup = () => {
+const handleSignupError = (error: any) => {
+  if (error.message?.includes('security purposes')) {
+    return 'Please wait a moment before trying again'
+  }
+  return error.message || 'Failed to sign up'
+}
+
+const OrganizationSignup = () => {
   const { signUp } = useAuth()
   const navigate = useNavigate()
   const [error, setError] = useState<string>("")
 
-  const handleSubmit = async (values: SignupValues) => {
+  const handleSubmit = async (values: OrganizationSignupValues) => {
     try {
       // First, create the auth user
       const {
         data: { user },
         error: signUpError,
       } = await signUp(values.email, values.password)
-      console.log("Supabase signup response:", { user, error: signUpError })
+
+      console.log("Auth user creation response:", { user, error: signUpError })
 
       if (signUpError) throw signUpError
 
@@ -72,32 +68,37 @@ const Signup = () => {
         throw new Error("Failed to create user account")
       }
 
-      // Then create the volunteer profile with auth_id
-      console.log("Creating volunteer with data:", {
-        first_name: values.firstName,
-        last_name: values.lastName,
+      // Add a longer delay to ensure auth user is fully created in Supabase
+      console.log("Waiting for auth user creation...")
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      console.log("Proceeding with organization creation for auth_id:", user.id)
+
+      // Then create the organization profile
+      const organizationResponse = await api.post("/organization/create-organization", {
+        name: values.name,
+        description: values.description,
         email: values.email,
-        phone: values.phone,
-        age: values.age,
+        website: values.website,
         auth_id: user.id,
       })
 
-      const volunteerResponse = await api.post("/volunteer/create-volunteer", {
-        first_name: values.firstName,
-        last_name: values.lastName,
-        email: values.email,
-        phone: values.phone,
-        age: values.age,
-        auth_id: user.id,
+      console.log("Organization creation attempt:", {
+        request: {
+          name: values.name,
+          email: values.email,
+          auth_id: user.id
+        },
+        response: organizationResponse
       })
 
-      console.log("Volunteer creation response:", volunteerResponse)
+      if (organizationResponse.status !== 201) {
+        throw new Error('Failed to create organization profile')
+      }
 
-      // Redirect to login page after successful signup
       navigate("/login")
     } catch (err) {
       console.error("Signup error details:", err)
-      setError(err instanceof Error ? err.message : "Failed to sign up")
+      setError(handleSignupError(err))
     }
   }
 
@@ -105,22 +106,13 @@ const Signup = () => {
     <>
       <Navbar />
       <MetaData
-        title="Sign Up - Nashville Volunteers"
-        description="Create your account"
+        title="Organization Sign Up - Nashville Volunteers"
+        description="Create your organization account"
       />
       <div className="FormWidget">
         <div className="FormWidget-body animate__animated animate__slideInDown">
           <div className="Block">
-            <div className="Block-header">Create Your Account</div>
-            <div className="Text--center Margin-bottom--20">
-              <span>Are you an organization? </span>
-              <span
-                className="Link"
-                onClick={() => navigate("/organizer-signup")}
-              >
-                Register here
-              </span>
-            </div>
+            <div className="Block-header">Register Your Organization</div>
 
             {error && <div className="Form-error">{error}</div>}
 
@@ -132,28 +124,28 @@ const Signup = () => {
               {({ errors, touched, isValid, dirty, isSubmitting }) => (
                 <Form>
                   <div className="Form-group">
-                    <label htmlFor="firstName">First Name</label>
+                    <label htmlFor="name">Organization Name</label>
                     <Field
                       type="text"
-                      name="firstName"
+                      name="name"
                       className="Form-input-box"
-                      placeholder="Enter your first name"
+                      placeholder="Enter your organization name"
                     />
-                    {errors.firstName && touched.firstName && (
-                      <div className="Form-error">{errors.firstName}</div>
+                    {errors.name && touched.name && (
+                      <div className="Form-error">{errors.name}</div>
                     )}
                   </div>
 
                   <div className="Form-group">
-                    <label htmlFor="lastName">Last Name</label>
+                    <label htmlFor="description">Description</label>
                     <Field
-                      type="text"
-                      name="lastName"
+                      as="textarea"
+                      name="description"
                       className="Form-input-box"
-                      placeholder="Enter your last name"
+                      placeholder="Describe your organization"
                     />
-                    {errors.lastName && touched.lastName && (
-                      <div className="Form-error">{errors.lastName}</div>
+                    {errors.description && touched.description && (
+                      <div className="Form-error">{errors.description}</div>
                     )}
                   </div>
 
@@ -163,7 +155,7 @@ const Signup = () => {
                       type="email"
                       name="email"
                       className="Form-input-box"
-                      placeholder="johndoe@gmail.com"
+                      placeholder="organization@example.com"
                     />
                     {errors.email && touched.email && (
                       <div className="Form-error">{errors.email}</div>
@@ -171,28 +163,15 @@ const Signup = () => {
                   </div>
 
                   <div className="Form-group">
-                    <label htmlFor="phone">Phone</label>
+                    <label htmlFor="website">Website</label>
                     <Field
-                      type="tel"
-                      name="phone"
+                      type="url"
+                      name="website"
                       className="Form-input-box"
-                      placeholder="Enter your phone number"
+                      placeholder="https://www.example.com"
                     />
-                    {errors.phone && touched.phone && (
-                      <div className="Form-error">{errors.phone}</div>
-                    )}
-                  </div>
-
-                  <div className="Form-group">
-                    <label htmlFor="age">Age</label>
-                    <Field
-                      type="number"
-                      name="age"
-                      className="Form-input-box"
-                      min="18"
-                    />
-                    {errors.age && touched.age && (
-                      <div className="Form-error">{errors.age}</div>
+                    {errors.website && touched.website && (
+                      <div className="Form-error">{errors.website}</div>
                     )}
                   </div>
 
@@ -202,7 +181,7 @@ const Signup = () => {
                       type="password"
                       name="password"
                       className="Form-input-box"
-                      placeholder="Enter your password"
+                      placeholder="Enter password"
                     />
                     {errors.password && touched.password && (
                       <div className="Form-error">{errors.password}</div>
@@ -215,7 +194,7 @@ const Signup = () => {
                       type="password"
                       name="confirmPassword"
                       className="Form-input-box"
-                      placeholder="Confirm your password"
+                      placeholder="Confirm password"
                     />
                     {errors.confirmPassword && touched.confirmPassword && (
                       <div className="Form-error">{errors.confirmPassword}</div>
@@ -225,9 +204,9 @@ const Signup = () => {
                   <button
                     type="submit"
                     className="Button Button-color--blue-1000 Width--100 Margin-top--10"
-                    disabled={isSubmitting || !isValid || !dirty} // Disable button when form is incomplete
+                    disabled={isSubmitting || !isValid || !dirty}
                   >
-                    {isSubmitting ? "Creating Account..." : "Sign Up"}
+                    {isSubmitting ? "Creating Account..." : "Register Organization"}
                   </button>
                 </Form>
               )}
@@ -237,9 +216,7 @@ const Signup = () => {
               Already have an account?
               <span
                 className="Link Margin-left--4"
-                onClick={() => {
-                  navigate("/login")
-                }}
+                onClick={() => navigate("/login")}
               >
                 Login
               </span>
@@ -251,4 +228,4 @@ const Signup = () => {
   )
 }
 
-export default Signup
+export default OrganizationSignup 
