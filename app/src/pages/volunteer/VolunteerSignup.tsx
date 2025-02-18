@@ -1,10 +1,10 @@
 import React, { useState } from "react"
 import { Formik, Form, Field } from "formik"
 import { useNavigate, Link } from "react-router-dom"
-import { useAuth } from "../context/AuthContext"
-import { api } from "../api"
-import Navbar from "../components/Navbar"
-import MetaData from "../components/MetaData"
+import { useAuth } from "../../context/AuthContext"
+import { api } from "../../api"
+import Navbar from "../../components/Navbar"
+import MetaData from "../../components/MetaData"
 import * as yup from "yup"
 
 // Define types for Formik

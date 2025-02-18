@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react"
 import { Formik, Form, Field } from "formik"
-import Navbar from "../components/Navbar"
-import { api } from "../api"
-import Icon from "../components/Icon"
-import Modal from "../components/Modal"
-import MetaData from "../components/MetaData"
-import Event from "../components/Event"
+import Navbar from "../../components/Navbar"
+import { api } from "../../api"
+import Icon from "../../components/Icon"
+import Modal from "../../components/Modal"
+import MetaData from "../../components/MetaData"
+import Event from "../../components/Event"
 import { useNavigate } from "react-router-dom"
-import TagFilter from "../components/TagFilter"
-import DateFilter from "../components/DateFilter"
-import { formatDate, formatTime } from "../utils/formatters"
+import TagFilter from "../../components/TagFilter"
+import DateFilter from "../../components/DateFilter"
+import { formatDate, formatTime } from "../../utils/formatters"
 
 // Rename interface Event → EventData to avoid name clash with "Event" component
 interface EventData {
@@ -36,7 +36,7 @@ const Listings: React.FC = () => {
     end: string | null
   }>({
     start: null,
-    end: null
+    end: null,
   })
 
   const navigate = useNavigate()
