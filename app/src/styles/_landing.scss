@@ -1,0 +1,118 @@
+/* Hero Section */
+.Hero {
+  position: relative;
+  background-image: url("https://images.unsplash.com/photo-1628717341663-0007b0ee2597?q=80&w=3542&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdl");
+  background-size: cover;
+  background-position: center;
+  height: 500px;
+  width: 100%;
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+
+    h1 {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    p {
+      font-size: 1.5rem;
+      margin-bottom: 30px;
+      color: white;
+    }
+  }
+}
+
+/* CTA Section */
+.Landing-cta {
+  padding: 60px 20px;
+  text-align: center;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+
+  h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: var(--nash-color-dark-1000);
+  }
+
+  p {
+    font-size: 1.2rem;
+    color: var(--nash-color-dark-1000);
+    max-width: 800px;
+    margin: 0 auto 40px;
+  }
+
+  &-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+}
+
+/* Landing Container and Carousel */
+.Landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--nash-color-light-1000);
+
+  &-carousel {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 40px;
+    overflow: hidden;
+
+    &-title {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: var(--nash-font-size-30);
+      color: var(--nash-color-dark-1000);
+    }
+
+    &-scroll {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    &-track {
+      display: flex;
+      animation: scroll 40s linear infinite;
+
+      &:hover {
+        animation-play-state: paused;
+      }
+    }
+
+    &-item {
+      flex: 0 0 auto;
+      width: 400px;
+      padding: 0 20px;
+    }
+  }
+}
+
+/* Keyframe for infinite horizontal scrolling */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
