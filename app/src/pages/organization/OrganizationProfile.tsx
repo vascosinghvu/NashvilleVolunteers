@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
-import Navbar from "../components/Navbar"
-import { useAuth } from "../context/AuthContext"
-import { api } from "../api"
+import Navbar from "../../components/Navbar"
+import { useAuth } from "../../context/AuthContext"
+import { api } from "../../api"
 
 const Profile = () => {
   const { user, signOut } = useAuth()

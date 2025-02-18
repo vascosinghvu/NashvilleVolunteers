@@ -69,11 +69,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password,
     })
+
     if (error) throw error
 
     if (data.user) {
-      setUser(data.user)
-      await fetchUserProfile(data.user.id)
+      // Save user ID in local storage
+      localStorage.setItem("user_id", data.user.id)
+
+      // Fetch user profile to get role
+      const { data: userProfile } = await api.get(
+        `/user/get-user/${data.user.id}`
+      )
+
+      if (!userProfile) throw new Error("User profile not found")
+
+      // Save role in local storage
+      localStorage.setItem("user_role", userProfile.role)
+
+      // Store user in state
+      setUser(userProfile)
+
+      return userProfile.role // Return role for navigation
     }
   }
 

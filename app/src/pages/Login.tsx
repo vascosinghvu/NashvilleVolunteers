@@ -35,7 +35,17 @@ const Login = () => {
   const handleSubmit = async (values: LoginValues) => {
     try {
       await signIn(values.email, values.password)
-      navigate("/listings") // Redirect to listings page after successful login
+
+      // Get role from localStorage
+      const role = localStorage.getItem("user_role")
+
+      if (role === "volunteer") {
+        navigate("/volunteer-dashboard")
+      } else if (role === "organization") {
+        navigate("/organization-dashboard")
+      } else {
+        navigate("/listings") // Fallback
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to sign in")
     }
