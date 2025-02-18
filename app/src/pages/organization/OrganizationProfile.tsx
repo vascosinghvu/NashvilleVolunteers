@@ -3,27 +3,29 @@ import Navbar from "../../components/Navbar"
 import { useAuth } from "../../context/AuthContext"
 import { api } from "../../api"
 
-const Profile = () => {
+const OrganizationProfile = () => {
   const { user, signOut } = useAuth()
-  const [userData, setUserData] = useState<any>(null)
+  const [orgData, setOrgData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchOrgData = async () => {
       if (!user) return
       try {
-        console.log("Fetching user profile for:", user.id)
+        console.log("Fetching organization profile for:", user.id)
 
-        const response = await api.get(`/user/get-user/${user.id}`)
-        setUserData(response.data)
+        const response = await api.get(
+          `/organization/get-organization/${user.id}`
+        )
+        setOrgData(response.data)
       } catch (error) {
-        console.error("Error fetching user data:", error)
+        console.error("Error fetching organization data:", error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchUserData()
+    fetchOrgData()
   }, [user]) // Fetch data when `user` changes
 
   if (!user) {
@@ -32,7 +34,7 @@ const Profile = () => {
         <Navbar />
         <div className="Widget">
           <div className="Widget-body Text--center">
-            <p>Please log in to view your profile.</p>
+            <p>Please log in to view your organization profile.</p>
           </div>
         </div>
       </>
@@ -44,35 +46,40 @@ const Profile = () => {
       <Navbar />
       <div className="Widget">
         <div className="Widget-body">
-          <h2 className="Text--bold">Profile</h2>
+          <h2 className="Text--bold">Organization Profile</h2>
 
           {loading ? (
             <p>Loading profile...</p>
-          ) : userData ? (
+          ) : orgData ? (
             <div className="Profile-info">
               <p>
-                <strong>Name:</strong> {userData.first_name}{" "}
-                {userData.last_name}
+                <strong>Organization Name:</strong> {orgData.org_name}
+              </p>
+              <p>
+                <strong>Description:</strong> {orgData.description}
               </p>
               <p>
                 <strong>Email:</strong> {user?.email}
               </p>
               <p>
-                <strong>Phone:</strong> {userData.phone || "Not provided"}
+                <strong>Website:</strong>{" "}
+                <a
+                  href={orgData.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {orgData.website}
+                </a>
               </p>
               <p>
-                <strong>Age:</strong> {userData.age}
-              </p>
-              <p>
-                <strong>Joined:</strong>{" "}
-                {new Date(user.created_at).toLocaleDateString()}
+                <strong>Phone:</strong> {orgData.phone || "Not provided"}
               </p>
               <div className="Button Button-color--blue-1000" onClick={signOut}>
                 Sign Out
               </div>
             </div>
           ) : (
-            <p>No additional user data found.</p>
+            <p>No organization data found.</p>
           )}
         </div>
       </div>
@@ -80,4 +87,4 @@ const Profile = () => {
   )
 }
 
-export default Profile
+export default OrganizationProfile

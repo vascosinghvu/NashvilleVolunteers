@@ -13,6 +13,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute"
 import { UserRole } from "./types/auth"
 import VolunteerDashboard from "./pages/volunteer/VolunteerDashboard"
 import OrganizationDashboard from "./pages/organization/OrganizationDashboard"
+import OrganizationProfile from "./pages/organization/OrganizationProfile"
 
 function App() {
   const { user } = useAuth()
