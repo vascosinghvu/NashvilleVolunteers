@@ -5,22 +5,9 @@
     align-items: center;
     margin: 48px 0;
 
-    &-body {
-        width: 30%;
-        height: fit-content;
-        margin: 48px 0;
-        padding: 56px 48px;
-        box-shadow: var(--nash-shadow-ambient); 
-        background-color: var(--nash-color-light-1000);
-        border-radius: var(--nash-border-radius-8);      
-    }
-
-    &-icon {
-        width: 100;
-        display: flex;
-        justify-content: center;
-        color: var(--nash-color-pink-1000);
-        font-size: var(--nash-font-size-72);
+    &-block {
+        width: 40%;
+        height: fit-content;     
     }
 }
 

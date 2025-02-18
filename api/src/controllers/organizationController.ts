@@ -20,15 +20,22 @@ export const getOrganizations = async (req: Request, res: Response) => {
 export const getOrganization = async (req: Request, res: Response) => {
   try {
     const { o_id } = req.params
+
     const organization = await sql`
-      SELECT * FROM organizations 
-      WHERE o_id = ${o_id}
+      SELECT 
+      *
+      FROM organizations o
+      JOIN user_profiles u ON o.o_id = u.user_id
+      WHERE o.o_id = ${o_id}
     `
+
     if (organization.length === 0) {
       return res.status(404).json({ error: "Organization not found" })
     }
+
     res.status(200).json(organization[0])
   } catch (error) {
+    console.error("Error fetching organization:", error)
     res
       .status(500)
       .json({ error: "Failed to fetch organization", details: error })

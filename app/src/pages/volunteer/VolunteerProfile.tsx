@@ -2,10 +2,20 @@ import React, { useEffect, useState } from "react"
 import Navbar from "../../components/Navbar"
 import { useAuth } from "../../context/AuthContext"
 import { api } from "../../api"
+import Icon from "../../components/Icon"
+
+interface ProfileProps {
+  first_name: string
+  last_name: string
+  phone_number: string
+  image_url: string
+  age: number
+  email: string
+}
 
 const Profile = () => {
   const { user, signOut } = useAuth()
-  const [userData, setUserData] = useState<any>(null)
+  const [userData, setUserData] = useState<ProfileProps>()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -14,8 +24,9 @@ const Profile = () => {
       try {
         console.log("Fetching user profile for:", user.id)
 
-        const response = await api.get(`/user/get-user/${user.id}`)
+        const response = await api.get(`/volunteer/get-volunteer/${user.id}`)
         setUserData(response.data)
+        console.log("User data:", response.data)
       } catch (error) {
         console.error("Error fetching user data:", error)
       } finally {
@@ -43,30 +54,81 @@ const Profile = () => {
     <>
       <Navbar />
       <div className="Widget">
-        <div className="Widget-body">
-          <h2 className="Text--bold">Profile</h2>
+        <div className="Block Widget-block">
+          <div className="Block-header">Volunteer Profile</div>
+          <div className="Block-subtitle">Update your profile details</div>
 
           {loading ? (
             <p>Loading profile...</p>
           ) : userData ? (
             <div className="Profile-info">
-              <p>
-                <strong>Name:</strong> {userData.first_name}{" "}
-                {userData.last_name}
-              </p>
-              <p>
-                <strong>Email:</strong> {user?.email}
-              </p>
-              <p>
-                <strong>Phone:</strong> {userData.phone || "Not provided"}
-              </p>
-              <p>
-                <strong>Age:</strong> {userData.age}
-              </p>
-              <p>
-                <strong>Joined:</strong>{" "}
-                {new Date(user.created_at).toLocaleDateString()}
-              </p>
+              {userData.image_url && (
+                <div className="Profile-image">
+                  <img
+                    src={userData.image_url}
+                    alt="Profile Avatar"
+                    className="Profile-avatar"
+                  />
+                </div>
+              )}
+
+              <div className="Event-modal-line">
+                <Icon
+                  glyph="user"
+                  className="Margin-right--8 Text-color--royal-1000"
+                />
+                <strong>Name:</strong>
+                <div className="Margin-left--auto">
+                  {userData.first_name} {userData.last_name}
+                </div>
+              </div>
+
+              <div className="Event-modal-line">
+                <Icon
+                  glyph="envelope"
+                  className="Margin-right--8 Text-color--royal-1000"
+                />
+                <strong>Email:</strong>
+                <div className="Margin-left--auto">
+                  {user?.email || "No email provided"}
+                </div>
+              </div>
+
+              <div className="Event-modal-line">
+                <Icon
+                  glyph="phone"
+                  className="Margin-right--8 Text-color--royal-1000"
+                />
+                <strong>Phone:</strong>
+                <div className="Margin-left--auto">
+                  {userData.phone_number || "Not provided"}
+                </div>
+              </div>
+
+              <div className="Event-modal-line">
+                <Icon
+                  glyph="calendar"
+                  className="Margin-right--8 Text-color--royal-1000"
+                />
+                <strong>Age:</strong>
+                <div className="Margin-left--auto">
+                  {userData.age || "Not provided"}
+                </div>
+              </div>
+
+              <div className="Event-modal-line">
+                <Icon
+                  glyph="clock"
+                  className="Margin-right--8 Text-color--royal-1000"
+                />
+                <strong>Joined:</strong>
+                <div className="Margin-left--auto">
+                  {user?.created_at
+                    ? new Date(user.created_at).toLocaleDateString()
+                    : "Unknown"}
+                </div>
+              </div>
+
               <div className="Button Button-color--blue-1000" onClick={signOut}>
                 Sign Out
               </div>
