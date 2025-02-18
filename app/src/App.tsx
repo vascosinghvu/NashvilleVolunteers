@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate } from "react-router-dom"
+import { Route, Routes, Navigate, useNavigate } from "react-router-dom"
 import { useEffect } from "react"
 import { useAuth } from "./context/AuthContext"
 import Listings from "./pages/volunteer/VolunteerListings"
@@ -28,29 +28,61 @@ function App() {
   return (
     <AuthProvider>
       <Routes>
+        {/* Public Routes */}
         <Route path="/home" element={<Landing />} />
         <Route path="/listings" element={<Listings />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/volunteer-signup" element={<VolunteerSignup />} />
         <Route path="/organization-signup" element={<OrganizationSignup />} />
-        <Route path="/profile" element={<VolunteerProfile />} />
+
+        {/* Volunteer-Specific Routes */}
         <Route
-          path="/volunteer-dashboard"
+          path="/volunteer/profile"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.VOLUNTEER]}>
+              <VolunteerProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/volunteer/dashboard"
           element={
             <ProtectedRoute allowedRoles={[UserRole.VOLUNTEER]}>
               <VolunteerDashboard />
             </ProtectedRoute>
           }
         />
+
         <Route
-          path="/organization-dashboard"
+          path="/volunteer/listings"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.VOLUNTEER]}>
+              <Listings />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Organization-Specific Routes */}
+        <Route
+          path="/organization/profile"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.ORGANIZATION]}>
+              <OrganizationProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organization/dashboard"
           element={
             <ProtectedRoute allowedRoles={[UserRole.ORGANIZATION]}>
               <OrganizationDashboard />
             </ProtectedRoute>
           }
         />
+
+        {/* Catch-All: Redirect to Listings if Route Not Found */}
+        <Route path="*" element={<Navigate to="/listings" />} />
       </Routes>
     </AuthProvider>
   )

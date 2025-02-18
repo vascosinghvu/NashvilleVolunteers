@@ -12,14 +12,15 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   allowedRoles,
 }) => {
   const { user } = useAuth()
+  const userRole = localStorage.getItem("user_role") as UserRole | null
 
   if (!user) {
     return <Navigate to="/login" replace />
   }
 
-  // if (!allowedRoles.includes(user.role)) {
-  //   return <Navigate to="/unauthorized" replace />;
-  // }
+  if (!userRole || !allowedRoles.includes(userRole)) {
+    return <Navigate to="/listings" replace />
+  }
 
   return <>{children}</>
 }

@@ -2,10 +2,12 @@ import { type ReactElement } from "react"
 import { useNavigate } from "react-router-dom"
 import Icon from "./Icon"
 import { useAuth } from "../context/AuthContext"
+import { UserRole } from "../types/auth"
 
 const Navbar = (): ReactElement => {
   const navigate = useNavigate()
   const { user, signOut } = useAuth()
+  const userRole = localStorage.getItem("user_role") as UserRole | null // Get role from storage
 
   const handleSignOut = async () => {
     try {
@@ -31,21 +33,45 @@ const Navbar = (): ReactElement => {
 
         {/* Navigation Links */}
         <div className="Flex-row Margin-left--auto Align-items--center">
-          {/* <div
-            className="Navbar-body-link Margin-right--20"
-            onClick={() => navigate("/")}
-          >
-            Home
-          </div> */}
-
           {user ? (
             <>
-              <div
-                className="Navbar-body-link Margin-right--20"
-                onClick={() => navigate("/profile")}
-              >
-                Profile
-              </div>
+              {/* Show dashboard link based on role */}
+              {userRole === UserRole.VOLUNTEER && (
+                <div
+                  className="Navbar-body-link Margin-right--20"
+                  onClick={() => navigate("/volunteer/dashboard")}
+                >
+                  Dashboard
+                </div>
+              )}
+              {userRole === UserRole.ORGANIZATION && (
+                <div
+                  className="Navbar-body-link Margin-right--20"
+                  onClick={() => navigate("/organization/dashboard")}
+                >
+                  Dashboard
+                </div>
+              )}
+
+              {/* Show profile link based on role */}
+              {userRole === UserRole.VOLUNTEER && (
+                <div
+                  className="Navbar-body-link Margin-right--20"
+                  onClick={() => navigate("/volunteer/profile")}
+                >
+                  Profile
+                </div>
+              )}
+              {userRole === UserRole.ORGANIZATION && (
+                <div
+                  className="Navbar-body-link Margin-right--20"
+                  onClick={() => navigate("/organization/profile")}
+                >
+                  Profile
+                </div>
+              )}
+
+              {/* Logout Button */}
               <div
                 className="Button Button--small Button-color--blue-1000"
                 onClick={handleSignOut}
@@ -55,6 +81,7 @@ const Navbar = (): ReactElement => {
             </>
           ) : (
             <>
+              {/* If not logged in, show login & signup */}
               <div
                 className="Button Button-color--blue-1000 Button--small Margin-right--20"
                 onClick={() => navigate("/login")}

@@ -20,15 +20,21 @@ export const getVolunteers = async (req: Request, res: Response) => {
 export const getVolunteer = async (req: Request, res: Response) => {
   try {
     const { v_id } = req.params
+
     const volunteer = await sql`
-      SELECT * FROM volunteers 
-      WHERE v_id = ${v_id}
+      SELECT *
+      FROM volunteers v
+      JOIN user_profiles u ON v.v_id = u.user_id
+      WHERE v.v_id = ${v_id}
     `
+
     if (volunteer.length === 0) {
       return res.status(404).json({ error: "Volunteer not found" })
     }
+
     res.status(200).json(volunteer[0])
   } catch (error) {
+    console.error("Error fetching volunteer:", error)
     res.status(500).json({ error: "Failed to fetch volunteer", details: error })
   }
 }
