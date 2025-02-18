@@ -55,7 +55,7 @@ const Profile = () => {
                 {userData.last_name}
               </p>
               <p>
-                <strong>Email:</strong> {user.email}
+                <strong>Email:</strong> {user?.email}
               </p>
               <p>
                 <strong>Phone:</strong> {userData.phone || "Not provided"}

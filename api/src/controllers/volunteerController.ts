@@ -112,9 +112,9 @@ export const createVolunteer = async (req: Request, res: Response) => {
 
     await sql`
       INSERT INTO user_profiles (
-        user_id, first_name, last_name, phone_number, image_url, role
+        user_id, first_name, last_name, phone_number, email, image_url, role
       ) VALUES (
-        ${auth_id}, ${first_name}, ${last_name}, ${phone}, ${profile_pic_url}, 'volunteer'
+        ${auth_id}, ${first_name}, ${last_name}, ${phone}, ${email}, ${profile_pic_url}, 'volunteer'
       )
       ON CONFLICT (user_id) DO UPDATE 
       SET role = 'volunteer'
