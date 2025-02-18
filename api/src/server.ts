@@ -13,10 +13,7 @@ var cors = require("cors")
 const app = express()
 // CORS options
 const corsOptions = {
-  origin: [
-    "http://localhost:3000",
-    "https://nashville-volunteers.vercel.app",
-  ],
+  origin: ["http://localhost:3000", "https://nashville-volunteers.vercel.app"],
   credentials: true,
 }
 
@@ -34,6 +31,7 @@ app.use("/event", routes.event)
 app.use("/organization", routes.organization)
 app.use("/volunteer", routes.volunteer)
 app.use("/registration", routes.registration)
+app.use("/user", routes.user)
 
 const PORT = process.env.PORT || 8000
 app.listen(PORT, () => console.log(`Server running on port ${PORT}...`))

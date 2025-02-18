@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
 import { useAuth } from "../context/AuthContext"
-import { api } from "../api" // Ensure this is correctly pointing to your backend
+import { api } from "../api"
 
 const Profile = () => {
-  const { user } = useAuth() // Get user from AuthContext
-  const [userData, setUserData] = useState<any>(null) // State for user details
+  const { user, signOut } = useAuth()
+  const [userData, setUserData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!user) return
-
-    // Fetch additional user data from the backend
     const fetchUserData = async () => {
+      if (!user) return
       try {
-        const response = await api.get(`/volunteer/get-volunteer/${user.id}`) // Adjust endpoint based on your backend
+        console.log("Fetching user profile for:", user.id)
+
+        const response = await api.get(`/user/get-user/${user.id}`)
         setUserData(response.data)
       } catch (error) {
         console.error("Error fetching user data:", error)
@@ -24,7 +24,7 @@ const Profile = () => {
     }
 
     fetchUserData()
-  }, [user])
+  }, [user]) // Fetch data when `user` changes
 
   if (!user) {
     return (
@@ -67,6 +67,9 @@ const Profile = () => {
                 <strong>Joined:</strong>{" "}
                 {new Date(user.created_at).toLocaleDateString()}
               </p>
+              <div className="Button Button-color--blue-1000" onClick={signOut}>
+                Sign Out
+              </div>
             </div>
           ) : (
             <p>No additional user data found.</p>

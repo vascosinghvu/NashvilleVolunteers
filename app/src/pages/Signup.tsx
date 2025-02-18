@@ -59,12 +59,11 @@ const Signup = () => {
 
   const handleSubmit = async (values: SignupValues) => {
     try {
-      // First, create the auth user
+      // Create the auth user in Supabase
       const {
         data: { user },
         error: signUpError,
       } = await signUp(values.email, values.password)
-      console.log("Supabase signup response:", { user, error: signUpError })
 
       if (signUpError) throw signUpError
 
@@ -72,16 +71,7 @@ const Signup = () => {
         throw new Error("Failed to create user account")
       }
 
-      // Then create the volunteer profile with auth_id
-      console.log("Creating volunteer with data:", {
-        first_name: values.firstName,
-        last_name: values.lastName,
-        email: values.email,
-        phone: values.phone,
-        age: values.age,
-        auth_id: user.id,
-      })
-
+      // Send a request to create the volunteer profile
       const volunteerResponse = await api.post("/volunteer/create-volunteer", {
         first_name: values.firstName,
         last_name: values.lastName,
@@ -89,6 +79,7 @@ const Signup = () => {
         phone: values.phone,
         age: values.age,
         auth_id: user.id,
+        role: "volunteer", // Explicitly setting the role
       })
 
       console.log("Volunteer creation response:", volunteerResponse)
