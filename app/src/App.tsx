@@ -33,8 +33,8 @@ function App() {
         <Route path="/listings" element={<Listings />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path="/volunteer-signup" element={<VolunteerSignup />} />
-        <Route path="/organization-signup" element={<OrganizationSignup />} />
+        <Route path="/volunteer/signup" element={<VolunteerSignup />} />
+        <Route path="/organization/signup" element={<OrganizationSignup />} />
 
         {/* Volunteer-Specific Routes */}
         <Route
