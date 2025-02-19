@@ -15,9 +15,27 @@ interface EventProps {
   }
   organizationName?: string
   onClick?: () => void
+  isCreateButton?: boolean
 }
 
-const Event: React.FC<EventProps> = ({ event, organizationName, onClick }) => {
+const Event: React.FC<EventProps> = ({ event, organizationName, onClick, isCreateButton }) => {
+  if (isCreateButton) {
+    return (
+      <div className="Event cursor-pointer" onClick={onClick}>
+        <div className="Event-color border-2 border-dotted border-gray-300 hover:border-blue-500 transition-colors bg-white">
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <span className="text-xl font-medium text-gray-600">Create New Event</span>
+            </div>
+          </div>
+        </div>
+        <div className="Event-text">
+          <div className="Event-text-title">Create New Event</div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="Event" onClick={onClick}>
       {event.image_url ? (

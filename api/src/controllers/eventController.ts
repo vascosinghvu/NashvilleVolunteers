@@ -34,24 +34,15 @@ export const getEvent = async (req: Request, res: Response) => {
 export const createEvent = async (req: Request, res: Response) => {
   try {
     const { o_id, name, description, time, date, people_needed, location } = req.body
-    let image_url = null;
 
-    // Handle image upload if a file was sent
-    if (req.file) {
-      try {
-        const fileName = `event-${Date.now()}${path.extname(req.file.originalname)}`;
-        image_url = await uploadImageToSupabase(
-          req.file.buffer,
-          fileName,
-          'images'
-        );
-      } catch (uploadError) {
-        console.error('Error uploading image:', uploadError);
-      }
-    }
+    // Get next available event_id
+    const maxIdResult = await sql`
+      SELECT COALESCE(MAX(event_id), 0) + 1 as next_id FROM events
+    `
 
     const newEvent = await sql`
       INSERT INTO events (
+        event_id,
         o_id, 
         name, 
         description, 
@@ -59,23 +50,29 @@ export const createEvent = async (req: Request, res: Response) => {
         date, 
         people_needed, 
         location,
-        image_url
+        image_url,
+        tags,
+        search_text
       )
       VALUES (
+        ${maxIdResult[0].next_id},
         ${o_id}, 
         ${name}, 
         ${description}, 
-        ${time}, 
-        ${date}, 
-        ${people_needed}, 
+        ${time}::time, 
+        ${date}::date, 
+        ${people_needed}::integer, 
         ${location},
-        ${image_url}
+        ${null},
+        ${[]},
+        ${null}
       )
       RETURNING *
     `
     res.status(201).json(newEvent[0])
   } catch (error) {
-    res.status(500).json({ error: "Failed to create event", details: error })
+    console.error("Error creating event:", error)
+    res.status(500).json({ error: "Failed to create event" })
   }
 }
 
@@ -217,6 +214,20 @@ export const searchEvents = async (req: Request, res: Response) => {
   return res.status(200).json(data);  // Send the response back to the client
 }
 
+export const getOrganizationEvents = async (req: Request, res: Response) => {
+  try {
+    const { o_id } = req.params
+    const events = await sql`
+      SELECT * FROM events 
+      WHERE o_id = ${o_id}
+      ORDER BY date ASC, time ASC
+    `
+    res.status(200).json(events)
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch organization events", details: error })
+  }
+}
+
 export default {
   getEvents,
   getEvent,
@@ -224,4 +235,5 @@ export default {
   updateEvent,
   deleteEvent,
   searchEvents,
+  getOrganizationEvents,
 }

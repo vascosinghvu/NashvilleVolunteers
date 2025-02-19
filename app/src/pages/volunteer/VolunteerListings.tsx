@@ -39,6 +39,7 @@ const Listings: React.FC = () => {
     start: null,
     end: null,
   })
+  const [searchQuery, setSearchQuery] = useState("")
 
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -76,24 +77,7 @@ const Listings: React.FC = () => {
 
   // Handle form submission
   const handleSubmit = async (values: { search: string }) => {
-    setLoading(true)
-    try {
-      const response = await api.get(
-        `/event/search-events?query=${values.search}`
-      )
-      setEvents(response.data)
-
-      // Fetch organization names dynamically
-      response.data.forEach((evt: EventData) => {
-        if (!orgMap[evt.o_id]) {
-          fetchOrganization(evt.o_id)
-        }
-      })
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setLoading(false)
-    }
+    setSearchQuery(values.search)
   }
 
   const fetchOrganization = async (o_id: number) => {
@@ -128,9 +112,21 @@ const Listings: React.FC = () => {
     }
   }
 
-  // Filter events based on selected tags and search
+  // Filter events based on selected tags, search and dates
   const filteredEvents = React.useMemo(() => {
     return events.filter((event) => {
+      // Filter by search query
+      if (searchQuery) {
+        const searchLower = searchQuery.toLowerCase()
+        const matchesSearch = 
+          event.name.toLowerCase().includes(searchLower) ||
+          event.description.toLowerCase().includes(searchLower) ||
+          event.location.toLowerCase().includes(searchLower) ||
+          event.tags.some(tag => tag.toLowerCase().includes(searchLower))
+        
+        if (!matchesSearch) return false
+      }
+
       // Filter by tags
       if (selectedTags.length > 0) {
         if (!selectedTags.every((tag) => event.tags?.includes(tag))) {
@@ -151,7 +147,14 @@ const Listings: React.FC = () => {
 
       return true
     })
-  }, [events, selectedTags, selectedDates])
+  }, [events, selectedTags, selectedDates, searchQuery])
+
+  // Update the "See All" button handler
+  const handleSeeAll = () => {
+    setSearchQuery("")
+    setSelectedTags([])
+    setSelectedDates({ start: null, end: null })
+  }
 
   if (loading) {
     return <div>Loading...</div>
@@ -268,8 +271,9 @@ const Listings: React.FC = () => {
                     Search
                   </button>
                   <button
-                    type="submit"
+                    type="button"
                     className="Button Button-color--yellow-1000 Button--hollow Margin-left--10"
+                    onClick={handleSeeAll}
                   >
                     See All
                   </button>
