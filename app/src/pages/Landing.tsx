@@ -69,7 +69,7 @@ function Landing() {
           </button>
           <button
             className="Button Button-color--blue-1000"
-            onClick={() => navigate("/organizer-signup")}
+            onClick={() => navigate("/organization/signup")}
           >
             Sign Up as an Organizer
           </button>

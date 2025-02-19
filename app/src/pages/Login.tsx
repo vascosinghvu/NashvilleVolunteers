@@ -38,11 +38,12 @@ const Login = () => {
 
       // Get role from localStorage
       const role = localStorage.getItem("user_role")
+      console.log("Role:", role)
 
       if (role === "volunteer") {
-        navigate("/volunteer-dashboard")
+        navigate("/volunteer/dashboard")
       } else if (role === "organization") {
-        navigate("/organization-dashboard")
+        navigate("/organization/dashboard")
       } else {
         navigate("/listings") // Fallback
       }
