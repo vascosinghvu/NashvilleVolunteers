@@ -20,10 +20,10 @@ function Landing() {
   useEffect(() => {
     const loadInitialEvents = async () => {
       try {
-        const response = await api.get("/event/search-events?query=community")
+        const response = await api.get("/event/get-events")
         if (response.data && Array.isArray(response.data)) {
-          // Duplicate the events to create seamless loop
-          setFeaturedEvents([...response.data, ...response.data])
+          const initialEvents = response.data.slice(0, 5)
+          setFeaturedEvents([...initialEvents, ...initialEvents])
         }
       } catch (error) {
         console.error("Error loading initial events:", error)

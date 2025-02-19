@@ -14,6 +14,7 @@ import { UserRole } from "./types/auth"
 import VolunteerDashboard from "./pages/volunteer/VolunteerDashboard"
 import OrganizationDashboard from "./pages/organization/OrganizationDashboard"
 import OrganizationProfile from "./pages/organization/OrganizationProfile"
+import CreateEvent from "./pages/organization/CreateEvent"
 
 function App() {
   const { user } = useAuth()
@@ -79,6 +80,16 @@ function App() {
               <OrganizationDashboard />
             </ProtectedRoute>
           }
+        />
+
+        {/* Add the new route for creating events */}
+        <Route 
+          path="/organization/create-event" 
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.ORGANIZATION]}>
+              <CreateEvent />
+            </ProtectedRoute>
+          } 
         />
 
         {/* Catch-All: Redirect to Listings if Route Not Found */}
