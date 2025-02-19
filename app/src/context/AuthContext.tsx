@@ -86,9 +86,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Save role in local storage
       localStorage.setItem("user_role", userProfile.role)
 
-      // Store user in state
-      setUser(userProfile)
-
       return userProfile.role // Return role for navigation
     }
   }
