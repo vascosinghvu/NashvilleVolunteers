@@ -21,17 +21,42 @@
         cursor: pointer;
     }
 
+    &-media {
+        position: relative;
+        height: 150px;  // Same as Event-color height
+    }
+
+    &-image {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
     &-color {
         background-color: var(--nash-color-blue-1000);
-        height: 150px;
-        padding: 4px;
-        display: flex;
-        flex-direction: row;
-        justify-content: right;
+        height: 100%;
+        width: 100%;
+    }
 
-        // add a space between child divs of 4px
-        & > * {
-            margin-right: 4px;
+    &-tags {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        max-width: 70%;  // Prevent tags from stretching too wide
+
+        .Badge {
+            background-color: rgba(255, 255, 255, 0.7);  // Changed from 0.9 to 0.7 for more transparency
+            backdrop-filter: blur(4px);  // Optional: adds a slight blur effect
         }
     }
 

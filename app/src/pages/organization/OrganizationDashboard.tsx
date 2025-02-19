@@ -95,7 +95,7 @@ const OrganizationDashboard: React.FC = () => {
               </button>
               <button
                 onClick={() => navigate("/organization/profile")}
-                className="Button Button-color--gray-1000"
+                className="Button Button-color--blue-1000"
               >
                 Manage Profile
               </button>

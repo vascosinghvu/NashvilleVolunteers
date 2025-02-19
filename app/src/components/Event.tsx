@@ -38,19 +38,22 @@ const Event: React.FC<EventProps> = ({ event, organizationName, onClick, isCreat
 
   return (
     <div className="Event" onClick={onClick}>
-      {event.image_url ? (
-        <div className="Event-image">
-          <img src={event.image_url} alt={event.name} />
-        </div>
-      ) : (
-        <div className="Event-color">
+      <div className="Event-media">
+        {event.image_url ? (
+          <div className="Event-image">
+            <img src={event.image_url} alt={event.name} />
+          </div>
+        ) : (
+          <div className="Event-color" />
+        )}
+        <div className="Event-tags">
           {event.tags?.map((tag) => (
             <div key={tag} className="Badge Badge-color--light-500">
               {tag}
             </div>
           ))}
         </div>
-      )}
+      </div>
       <div className="Event-text">
         <div className="Event-text-title">{event.name}</div>
         {organizationName && <div className="Event-org">{organizationName}</div>}
