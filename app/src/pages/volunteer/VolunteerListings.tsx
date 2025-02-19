@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom"
 import TagFilter from "../../components/TagFilter"
 import DateFilter from "../../components/DateFilter"
 import { formatDate, formatTime } from "../../utils/formatters"
+import { useAuth } from "../../context/AuthContext"
 
 // Rename interface Event → EventData to avoid name clash with "Event" component
 interface EventData {
@@ -39,6 +40,7 @@ const Listings: React.FC = () => {
     end: null,
   })
 
+  const { user } = useAuth()
   const navigate = useNavigate()
 
   // Get unique tags from all events
@@ -103,9 +105,26 @@ const Listings: React.FC = () => {
     }
   }
 
-  const handleRegisterClick = () => {
+  const handleRegisterClick = async () => {
     if (selectedEvent) {
-      navigate("/register", { state: { event: selectedEvent } })
+      if (!user) {
+        console.error("User not logged in")
+        navigate("/login")
+      }
+      try {
+        // Send a request to create the volunteer profile
+        const regstrationResponse = await api.post("/registration/create-registration", {
+          v_id: user?.id,
+          event_id: selectedEvent.event_id,
+        })
+  
+        console.log("Regstration response:", regstrationResponse)
+  
+        // Redirect to register page after successful registration
+        navigate("/register")
+      } catch (err) {
+        console.error("Registration error details:", err)
+      }
     }
   }
 
