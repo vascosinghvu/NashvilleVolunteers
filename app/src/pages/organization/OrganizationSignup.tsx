@@ -98,7 +98,7 @@ const OrganizationSignup = () => {
         throw new Error("Failed to create organization profile")
       }
 
-      navigate("/dashboard")
+      navigate("/organization/dashboard")
     } catch (err) {
       console.error("Signup error details:", err)
       setError(handleSignupError(err))

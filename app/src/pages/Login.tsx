@@ -40,9 +40,9 @@ const Login = () => {
       const role = localStorage.getItem("user_role")
 
       if (role === "volunteer") {
-        navigate("/volunteer-dashboard")
+        navigate("/volunteer/dashboard")
       } else if (role === "organization") {
-        navigate("/organization-dashboard")
+        navigate("/organization/dashboard")
       } else {
         navigate("/listings") // Fallback
       }
@@ -118,10 +118,20 @@ const Login = () => {
               <span
                 className="Link"
                 onClick={() => {
-                  navigate("/signup")
+                  navigate("/volunteer-signup")
                 }}
               >
                 Sign up
+              </span>
+            </div>
+
+            <div className="Text--center Margin-bottom--20">
+              <span>Are you an organization? </span>
+              <span
+                className="Link"
+                onClick={() => navigate("/organization-signup")}
+              >
+                Register here
               </span>
             </div>
           </div>

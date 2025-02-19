@@ -100,8 +100,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // 🔹 Reset state on logout
     setUser(null)
     setSession(null)
-    // set location to /login after signout
-    window.location.href = "/logout-success"
+    // set location to /logout after signout
+    window.location.href = "/logout"
   }
 
   // Function to fetch user profile after login

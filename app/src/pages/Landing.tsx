@@ -63,13 +63,13 @@ function Landing() {
         <div className="Landing-cta-buttons">
           <button
             className="Button Button-color--yellow-1000"
-            onClick={() => navigate("/signup")}
+            onClick={() => navigate("/volunteer-signup")}
           >
             Sign Up as a Volunteer
           </button>
           <button
             className="Button Button-color--blue-1000"
-            onClick={() => navigate("/organizer-signup")}
+            onClick={() => navigate("/organization-signup")}
           >
             Sign Up as an Organizer
           </button>
