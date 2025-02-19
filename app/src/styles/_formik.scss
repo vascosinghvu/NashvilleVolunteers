@@ -67,6 +67,17 @@
             position: relative;
         }
 
+        textarea { /* Apply styles to both input and textarea */
+            border-radius: var(--nash-border-radius-8);
+            border: 1px solid var(--nash-color-dark-100);
+            background-color: var(--nash-color-dark-50);
+            color: var(--nash-color-dark-800);
+            padding: 5px 8px;
+            width: 100%;
+            position: relative;
+            font-size: var(--nash-font-size-16);
+        }
+
         &-toggle {
             cursor: pointer;  
             margin: -30px 10px 0 auto;

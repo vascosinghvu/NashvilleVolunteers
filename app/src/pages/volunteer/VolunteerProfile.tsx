@@ -3,6 +3,7 @@ import Navbar from "../../components/Navbar"
 import { useAuth } from "../../context/AuthContext"
 import { api } from "../../api"
 import Icon from "../../components/Icon"
+import { Spinner } from "react-bootstrap"
 
 interface ProfileProps {
   first_name: string
@@ -58,8 +59,10 @@ const Profile = () => {
           <div className="Block-header">Volunteer Profile</div>
           <div className="Block-subtitle">Update your profile details</div>
 
-          {loading ? (
-            <p>Loading profile...</p>
+          {loading || userData === null ? (
+            <div className="Flex--center">
+              <Spinner color="primary" style={{ width: 18, height: 18 }} />
+            </div>
           ) : userData ? (
             <div className="Profile-info">
               {userData.image_url && (
@@ -134,7 +137,7 @@ const Profile = () => {
               </div>
             </div>
           ) : (
-            <p>No additional user data found.</p>
+            <div className="Text--center">No user data found.</div>
           )}
         </div>
       </div>

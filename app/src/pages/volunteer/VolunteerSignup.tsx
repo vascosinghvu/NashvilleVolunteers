@@ -103,7 +103,7 @@ const Signup = () => {
         <div className="FormWidget-body animate__animated animate__slideInDown">
           <div className="Block">
             <div className="Block-header">Create Your Account</div>
-            <div className="Text--center Margin-bottom--20">
+            <div className="Margin-bottom--20">
               <span>Are you an organization? </span>
               <span
                 className="Link"
