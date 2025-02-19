@@ -21,6 +21,7 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
+      setLoading(true)
       if (!user) return
       try {
         console.log("Fetching user profile for:", user.id)
@@ -137,7 +138,9 @@ const Profile = () => {
               </div>
             </div>
           ) : (
-            <div className="Text--center">No user data found.</div>
+            <div className="Flex--center">
+              <Spinner color="primary" style={{ width: 18, height: 18 }} />
+            </div>
           )}
         </div>
       </div>
