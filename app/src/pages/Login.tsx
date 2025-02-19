@@ -122,7 +122,7 @@ const Login = () => {
               <span
                 className="Link"
                 onClick={() => {
-                  navigate("/signup")
+                  navigate("/volunteer/signup")
                 }}
               >
                 Sign up
