@@ -36,25 +36,25 @@ const DateFilter: React.FC<DateFilterProps> = ({
   }, [])
 
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onDateChange({ 
-      ...selectedDates, 
-      end: e.target.value || null 
+    onDateChange({
+      ...selectedDates,
+      end: e.target.value || null,
     })
     setIsOpen(false)
   }
 
   return (
     <div className="DateFilter">
-      <div 
+      <div
         ref={buttonRef}
-        className="Button Button-color--yellow-1000 DateFilter-button"
+        className="Button Button-color--royal-1000 DateFilter-button"
         onClick={() => setIsOpen(!isOpen)}
       >
         <Icon glyph="calendar" className="DateFilter-icon" />
         Filter by Date
         {(selectedDates.start || selectedDates.end) && " (Active)"}
       </div>
-      
+
       {isOpen && (
         <div ref={dropdownRef} className="DateFilter-dropdown">
           <div className="DateFilter-item">
@@ -62,10 +62,12 @@ const DateFilter: React.FC<DateFilterProps> = ({
             <input
               type="date"
               value={selectedDates.start || ""}
-              onChange={(e) => onDateChange({ 
-                ...selectedDates, 
-                start: e.target.value || null 
-              })}
+              onChange={(e) =>
+                onDateChange({
+                  ...selectedDates,
+                  start: e.target.value || null,
+                })
+              }
               className="DateFilter-input"
             />
           </div>
@@ -78,7 +80,7 @@ const DateFilter: React.FC<DateFilterProps> = ({
               className="DateFilter-input"
             />
           </div>
-          <button 
+          <button
             className="Button Button-color--blue-1000 DateFilter-clear"
             onClick={() => {
               onDateChange({ start: null, end: null })
@@ -93,4 +95,4 @@ const DateFilter: React.FC<DateFilterProps> = ({
   )
 }
 
-export default DateFilter 
+export default DateFilter

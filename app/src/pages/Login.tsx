@@ -40,6 +40,9 @@ const Login = () => {
       const role = localStorage.getItem("user_role")
       console.log("Role:", role)
 
+      // add slight delay
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
       if (role === "volunteer") {
         navigate("/volunteer/dashboard")
       } else if (role === "organization") {

@@ -21,8 +21,8 @@
             color: var(--nash-color-dark-800);
             font-size: var(--nash-font-size-16);
             padding: 5px 8px;
-            width: 100%;  
             position: relative;
+            flex-grow: 1;
         }
 
         &-toggle {

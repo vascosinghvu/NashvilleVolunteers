@@ -248,6 +248,12 @@ const Listings: React.FC = () => {
                   >
                     Search
                   </button>
+                  <button
+                    type="submit"
+                    className="Button Button-color--yellow-1000 Button--hollow Margin-left--10"
+                  >
+                    See All
+                  </button>
                 </Form>
               )}
             </Formik>

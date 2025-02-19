@@ -36,22 +36,19 @@ const TagFilter: React.FC<TagFilterProps> = ({
 
   return (
     <div className="TagFilter">
-      <div 
+      <div
         ref={buttonRef}
-        className="Button Button-color--yellow-1000 TagFilter-button"
+        className="Button Button-color--royal-1000 TagFilter-button"
         onClick={() => setIsOpen(!isOpen)}
       >
         <Icon glyph="tag" className="TagFilter-icon" />
         Filter by Tags {selectedTags.length > 0 && `(${selectedTags.length})`}
       </div>
-      
+
       {isOpen && (
         <div ref={dropdownRef} className="TagFilter-dropdown">
           {availableTags.map((tag) => (
-            <label
-              key={tag}
-              className="TagFilter-item"
-            >
+            <label key={tag} className="TagFilter-item">
               <input
                 type="checkbox"
                 checked={selectedTags.includes(tag)}
@@ -67,4 +64,4 @@ const TagFilter: React.FC<TagFilterProps> = ({
   )
 }
 
-export default TagFilter 
+export default TagFilter

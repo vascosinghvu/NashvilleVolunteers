@@ -53,6 +53,15 @@ const Navbar = (): ReactElement => {
                 </div>
               )}
 
+              {userRole === UserRole.VOLUNTEER && (
+                <div
+                  className="Navbar-body-link Margin-right--20"
+                  onClick={() => navigate("/listings")}
+                >
+                  Listings
+                </div>
+              )}
+
               {/* Show profile link based on role */}
               {userRole === UserRole.VOLUNTEER && (
                 <div
