@@ -107,7 +107,7 @@ const Signup = () => {
               <span>Are you an organization? </span>
               <span
                 className="Link"
-                onClick={() => navigate("/organizer-signup")}
+                onClick={() => navigate("/organization/signup")}
               >
                 Register here
               </span>

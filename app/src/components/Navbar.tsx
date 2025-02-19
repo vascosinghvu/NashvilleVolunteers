@@ -90,7 +90,7 @@ const Navbar = (): ReactElement => {
               </div>
               <div
                 className="Button Button-color--yellow-1000 Button--small"
-                onClick={() => navigate("/signup")}
+                onClick={() => navigate("/volunteer/signup")}
               >
                 Sign Up
               </div>
