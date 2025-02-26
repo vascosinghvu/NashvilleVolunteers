@@ -57,13 +57,19 @@ export const api: any = {
 
   put: async (route: string, data: any): Promise<any> => {
     const url = `${process.env.REACT_APP_API_URL as string}${route}`
+    
+    // Determine if we're sending FormData or JSON
+    const isFormData = data instanceof FormData
+    const headers: Record<string, string> = isFormData 
+      ? {} // Let the browser set the correct Content-Type for FormData
+      : { "Content-Type": "application/json" }
+    
+    const body = isFormData ? data : JSON.stringify(data)
 
     return await fetch(url, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+      headers,
+      body,
     })
       .then(async (res) => {
         if (!res.ok) {
@@ -77,7 +83,7 @@ export const api: any = {
         return response
       })
       .catch((err) => {
-        console.error("Error posting data: ", err)
+        console.error("Error updating data: ", err)
         throw err
       })
   },

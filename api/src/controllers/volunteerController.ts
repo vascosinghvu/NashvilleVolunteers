@@ -149,83 +149,118 @@ export const createVolunteer = async (req: Request, res: Response) => {
 export const updateVolunteer = async (req: Request, res: Response) => {
   try {
     const { v_id } = req.params
+    console.log("⭐ Update request received for volunteer:", v_id)
+    console.log("⭐ Request body:", req.body)
+    console.log("⭐ Request file:", req.file)
+    console.log("⭐ Request headers:", req.headers)
 
-    // First, get the existing volunteer
+    const { first_name, last_name, phone, email, age } = req.body
+
+    if (!first_name || !last_name || !phone || !email || !age) {
+      console.log("❌ Missing required fields:", { first_name, last_name, phone, email, age })
+      return res.status(400).json({ error: "Missing required fields" })
+    }
+
+    // First, check if volunteer exists
     const existingVolunteer = await sql`
-      SELECT * FROM volunteers WHERE v_id = ${v_id}
+      SELECT v.*, up.image_url 
+      FROM volunteers v
+      JOIN user_profiles up ON v.v_id = up.user_id
+      WHERE v.v_id = ${v_id}
     `
 
     if (existingVolunteer.length === 0) {
+      console.log("❌ Volunteer not found:", v_id)
       return res.status(404).json({ error: "Volunteer not found" })
     }
 
+    console.log("✅ Found existing volunteer:", existingVolunteer[0])
+
     // Handle new image upload if provided
-    let profile_pic_url = existingVolunteer[0].profile_pic_url
+    let image_url = existingVolunteer[0].image_url
     if (req.file) {
       try {
-        // Upload new image
-        const fileName = `volunteer-${
-          existingVolunteer[0].auth_id
-        }-${Date.now()}${path.extname(req.file.originalname)}`
-        profile_pic_url = await uploadImageToSupabase(
-          req.file.buffer,
-          fileName,
-          "images"
-        )
+        console.log("📸 Processing new image upload")
+        const fileName = `volunteer-${v_id}-${Date.now()}${path.extname(req.file.originalname)}`
+        image_url = await uploadImageToSupabase(req.file.buffer, fileName, "images")
+        console.log("✅ New image uploaded:", image_url)
 
         // Delete old image if it exists
-        if (existingVolunteer[0].profile_pic_url) {
+        if (existingVolunteer[0].image_url) {
           try {
-            const url = new URL(existingVolunteer[0].profile_pic_url)
+            const url = new URL(existingVolunteer[0].image_url)
             const oldFilePath = url.pathname.split("/").pop()
-
             if (oldFilePath) {
-              const { error } = await supabase.storage
-                .from("images")
-                .remove([oldFilePath])
-
-              if (error) {
-                console.error("Failed to delete old image:", error)
-              }
+              console.log("🗑️ Deleting old image:", oldFilePath)
+              const { error } = await supabase.storage.from("images").remove([oldFilePath])
+              if (error) console.error("❌ Failed to delete old image:", error)
+              else console.log("✅ Old image deleted successfully")
             }
           } catch (error) {
-            console.error("Error deleting old image from storage:", error)
-            // Continue with update even if old image deletion fails
+            console.error("❌ Error deleting old image from storage:", error)
           }
         }
       } catch (uploadError) {
-        console.error("Error uploading new image:", uploadError)
-        // Continue with existing image if upload fails
+        console.error("❌ Error uploading new image:", uploadError)
       }
     }
 
-    // Merge existing data with updates
-    const updatedData = {
-      ...existingVolunteer[0],
-      ...req.body,
-      profile_pic_url,
+    console.log("📝 Updating user_profiles with data:", {
+      first_name,
+      last_name,
+      phone,
+      email,
+      image_url
+    })
+
+    try {
+      // Update user_profiles table
+      await sql`
+        UPDATE user_profiles 
+        SET 
+          first_name = ${first_name},
+          last_name = ${last_name},
+          phone_number = ${phone},
+          email = ${email},
+          image_url = ${image_url}
+        WHERE user_id = ${v_id}
+      `
+    } catch (error) {
+      console.error("❌ Error updating user_profiles:", error)
+      throw error
     }
 
-    // Perform update with all fields
-    const updatedVolunteer = await sql`
-      UPDATE volunteers 
-      SET 
-        first_name = ${updatedData.first_name},
-        last_name = ${updatedData.last_name},
-        email = ${updatedData.email},
-        phone = ${updatedData.phone},
-        age = ${updatedData.age},
-        auth_id = ${updatedData.auth_id},
-        profile_pic_url = ${profile_pic_url}
-      WHERE v_id = ${v_id}
-      RETURNING *
+    console.log("📝 Updating volunteers table with age:", age)
+
+    try {
+      // Update volunteers table
+      const updatedVolunteer = await sql`
+        UPDATE volunteers 
+        SET age = ${age}
+        WHERE v_id = ${v_id}
+        RETURNING *
+      `
+    } catch (error) {
+      console.error("❌ Error updating volunteers:", error)
+      throw error
+    }
+
+    // Fetch complete updated profile
+    const completeProfile = await sql`
+      SELECT v.*, up.first_name, up.last_name, up.phone_number, up.email, up.image_url
+      FROM volunteers v
+      JOIN user_profiles up ON v.v_id = up.user_id
+      WHERE v.v_id = ${v_id}
     `
 
-    res.status(200).json(updatedVolunteer[0])
+    console.log("✅ Profile update complete:", completeProfile[0])
+    res.status(200).json(completeProfile[0])
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Failed to update volunteer", details: error })
+    console.error("❌ Error updating volunteer:", error)
+    res.status(500).json({ 
+      error: "Failed to update volunteer", 
+      details: error instanceof Error ? error.message : String(error)
+    })
   }
 }
 
