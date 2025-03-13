@@ -32,6 +32,8 @@ const Listings: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null)
   const [orgMap, setOrgMap] = useState<{ [key: number]: string }>({})
   const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [registrationSuccess, setRegistrationSuccess] = useState(false)
+  const [registrationError, setRegistrationError] = useState<string | null>(null)
   const [selectedDates, setSelectedDates] = useState<{
     start: string | null
     end: string | null
@@ -94,20 +96,27 @@ const Listings: React.FC = () => {
       if (!user) {
         console.error("User not logged in")
         navigate("/login")
+        return
       }
+      
       try {
-        // Send a request to create the volunteer profile
-        const regstrationResponse = await api.post("/registration/create-registration", {
-          v_id: user?.id,
+        setRegistrationError(null)
+        const registrationResponse = await api.post("/registration/create-registration", {
+          v_id: user.id,
           event_id: selectedEvent.event_id,
         })
-  
-        console.log("Regstration response:", regstrationResponse)
-  
-        // Redirect to register page after successful registration
-        navigate("/register")
+
+        if (registrationResponse.status === 201) {
+          setRegistrationSuccess(true)
+          // Reset success message after 3 seconds
+          setTimeout(() => {
+            setRegistrationSuccess(false)
+            setSelectedEvent(null)
+          }, 3000)
+        }
       } catch (err) {
         console.error("Registration error details:", err)
+        setRegistrationError("Failed to register for the event. Please try again.")
       }
     }
   }
@@ -167,81 +176,106 @@ const Listings: React.FC = () => {
       {selectedEvent && (
         <Modal
           header={selectedEvent.name}
-          action={() => setSelectedEvent(null)}
+          action={() => {
+            setSelectedEvent(null)
+            setRegistrationSuccess(false)
+            setRegistrationError(null)
+          }}
           large
           body={
             <div>
-              {selectedEvent.image_url && (
-                <div className="Event-modal-image">
-                  <img src={selectedEvent.image_url} alt={selectedEvent.name} />
+              {registrationSuccess ? (
+                <div className="Registration-success">
+                  <div className="Registration-success-icon">
+                    <Icon
+                      glyph="check-circle"
+                      className="Text-color--green-1000"
+                      size="48"
+                    />
+                  </div>
+                  <h3>Successfully Registered!</h3>
+                  <p>You have been registered for {selectedEvent.name}</p>
                 </div>
+              ) : (
+                <>
+                  {selectedEvent.image_url && (
+                    <div className="Event-modal-image">
+                      <img src={selectedEvent.image_url} alt={selectedEvent.name} />
+                    </div>
+                  )}
+                  <div className="Event-modal-line">
+                    <span>
+                      <Icon
+                        glyph="calendar"
+                        className="Margin-right--8 Text-color--royal-1000"
+                      />
+                      <strong>Date:</strong>
+                    </span>
+                    {formatDate(selectedEvent.date)}
+                  </div>
+                  <div className="Event-modal-line">
+                    <span>
+                      <Icon
+                        glyph="clock"
+                        className="Margin-right--8 Text-color--royal-1000"
+                      />
+                      <strong>Time:</strong>
+                    </span>
+                    {formatTime(selectedEvent.time)}
+                  </div>
+                  <div className="Event-modal-line">
+                    <span>
+                      <Icon
+                        glyph="location"
+                        className="Margin-right--8 Text-color--royal-1000"
+                      />
+                      <strong>Location:</strong>
+                    </span>
+                    {selectedEvent.location}
+                  </div>
+                  <div className="Event-modal-line">
+                    <span>
+                      <Icon
+                        glyph="users"
+                        className="Margin-right--8 Text-color--royal-1000"
+                      />
+                      <strong>Volunteers Needed:</strong>
+                    </span>
+                    {selectedEvent.people_needed}
+                  </div>
+                  <div className="Event-modal-line">
+                    <span>
+                      <Icon
+                        glyph="info-circle"
+                        className="Margin-right--8 Text-color--royal-1000"
+                      />
+                      <strong>Description:</strong>
+                    </span>
+                    {selectedEvent.description}
+                  </div>
+                  <div className="Event-modal-line">
+                    <span>
+                      <Icon
+                        glyph="building"
+                        className="Margin-right--8 Text-color--royal-1000"
+                      />
+                      <strong>Organization:</strong>
+                    </span>
+                    {orgMap[selectedEvent.o_id] || "Loading..."}
+                  </div>
+                  {registrationError && (
+                    <div className="Alert Alert--error Margin-top--16">
+                      {registrationError}
+                    </div>
+                  )}
+                  <div
+                    className="Button Button-color--blue-1000 Margin-top--20"
+                    onClick={handleRegisterClick}
+                  >
+                    Register for Event
+                  </div>
+                </>
               )}
-              <div className="Event-modal-line">
-                <span>
-                  <Icon
-                    glyph="calendar"
-                    className="Margin-right--8 Text-color--royal-1000"
-                  />
-                  <strong>Date:</strong>
-                </span>
-                {formatDate(selectedEvent.date)}
-              </div>
-              <div className="Event-modal-line">
-                <span>
-                  <Icon
-                    glyph="clock"
-                    className="Margin-right--8 Text-color--royal-1000"
-                  />
-                  <strong>Time:</strong>
-                </span>
-                {formatTime(selectedEvent.time)}
-              </div>
-              <div className="Event-modal-line">
-                <span>
-                  <Icon
-                    glyph="location"
-                    className="Margin-right--8 Text-color--royal-1000"
-                  />
-                  <strong>Location:</strong>
-                </span>
-                {selectedEvent.location}
-              </div>
-              <div className="Event-modal-line">
-                <span>
-                  <Icon
-                    glyph="users"
-                    className="Margin-right--8 Text-color--royal-1000"
-                  />
-                  <strong>Volunteers Needed:</strong>
-                </span>
-                {selectedEvent.people_needed}
-              </div>
-              <div className="Event-modal-line">
-                <span>
-                  <Icon
-                    glyph="info-circle"
-                    className="Margin-right--8 Text-color--royal-1000"
-                  />
-                  <strong>Description:</strong>
-                </span>
-                {selectedEvent.description}
-              </div>
-              <div className="Event-modal-line">
-                <span>
-                  <Icon
-                    glyph="building"
-                    className="Margin-right--8 Text-color--royal-1000"
-                  />
-                  <strong>Organization:</strong>
-                </span>
-                {orgMap[selectedEvent.o_id] || "Loading..."}
-              </div>
-              <div
-                className="Button Button-color--blue-1000 Margin-top--20"
-                onClick={handleRegisterClick}
-              >
-                Register for Event
-              </div>
             </div>
           }
         />
