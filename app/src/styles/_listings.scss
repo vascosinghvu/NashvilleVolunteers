@@ -8,6 +8,62 @@
     }
 }
 
+.Registration-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    text-align: center;
+    animation: fadeInScale 0.3s ease-out;
+
+    &-icon {
+        margin-bottom: 16px;
+        animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    h3 {
+        color: var(--nash-color-green-1000);
+        margin-bottom: 8px;
+        font-size: var(--nash-font-size-24);
+    }
+
+    p {
+        color: var(--nash-color-dark-700);
+        font-size: var(--nash-font-size-16);
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 0.9;
+        transform: scale(1.1);
+    }
+    80% {
+        opacity: 1;
+        transform: scale(0.89);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 .Event {
     display: flex;
     flex-direction: column;
@@ -15,6 +71,7 @@
     box-shadow: var(--nash-shadow-dark);
     overflow: hidden; // Prevents hover scaling from affecting layout
     transition: transform 0.3s ease; // Smooth hover effect
+    position: relative; // Added for status positioning
 
     &:hover {
         transform: scale(1.05); // Slightly enlarge, but not too much
@@ -28,11 +85,30 @@
         display: flex;
         flex-direction: row;
         justify-content: right;
+        position: relative; // Added for status positioning
 
         // add a space between child divs of 4px
         & > * {
             margin-right: 4px;
         }
+    }
+
+    &-image {
+        position: relative; // Added for status positioning
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &-status {
+        z-index: 1;
+        box-shadow: var(--nash-shadow-dark);
     }
 
     &-text {
@@ -76,4 +152,40 @@
             gap: 5px;
         }
     }
+}
+
+.Profile {
+  &-image {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  &-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: var(--nash-shadow-dark);
+  }
+
+  &-image-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &-image-container {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  &-image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
