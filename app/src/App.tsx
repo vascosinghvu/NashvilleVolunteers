@@ -15,6 +15,7 @@ import VolunteerDashboard from "./pages/volunteer/VolunteerDashboard"
 import OrganizationDashboard from "./pages/organization/OrganizationDashboard"
 import OrganizationProfile from "./pages/organization/OrganizationProfile"
 import CreateEvent from "./pages/organization/CreateEvent"
+import OrganizationDetails from "./pages/organization/OrganizationDetails"
 
 function App() {
   const { user } = useAuth()
@@ -91,6 +92,8 @@ function App() {
             </ProtectedRoute>
           } 
         />
+
+        <Route path="/organization/:id" element={<OrganizationDetails />} />
 
         {/* Catch-All: Redirect to Listings if Route Not Found */}
         <Route path="*" element={<Navigate to="/listings" />} />
