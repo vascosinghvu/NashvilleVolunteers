@@ -15,10 +15,13 @@ interface EventProps {
   }
   organizationName?: string
   onClick?: () => void
+  onOrganizationClick?: () => void
   isCreateButton?: boolean
 }
 
-const Event: React.FC<EventProps> = ({ event, organizationName, onClick, isCreateButton }) => {
+const Event: React.FC<EventProps> = ({ event, organizationName, onClick, onOrganizationClick, isCreateButton }) => {
+  const defaultImage = "https://static.vecteezy.com/system/resources/previews/020/794/577/non_2x/palm-of-hand-and-heart-line-icon-symbol-of-volunteering-linear-pictogram-charity-and-donation-concept-shape-of-heart-and-hand-outline-icon-editable-stroke-isolated-illustration-vector.jpg"
+
   if (isCreateButton) {
     return (
       <div className="Event cursor-pointer" onClick={onClick}>
@@ -38,22 +41,52 @@ const Event: React.FC<EventProps> = ({ event, organizationName, onClick, isCreat
 
   return (
     <div className="Event" onClick={onClick}>
-      {event.image_url ? (
-        <div className="Event-image">
-          <img src={event.image_url} alt={event.name} />
-        </div>
-      ) : (
-        <div className="Event-color">
+      <div className="Event-image" style={{ position: 'relative' }}>
+        <img 
+          src={event.image_url || defaultImage} 
+          alt={event.name}
+          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+        />
+        <div className="Event-tags" style={{ 
+          position: 'absolute', 
+          bottom: '8px', 
+          left: '8px', 
+          right: '8px',
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '4px',
+          zIndex: 1
+        }}>
           {event.tags?.map((tag) => (
-            <div key={tag} className="Badge Badge-color--light-500">
+            <div 
+              key={tag} 
+              className="Badge Badge-color--light-500"
+              style={{
+                background: 'rgba(255, 255, 255, 0.9)',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontSize: '0.875rem'
+              }}
+            >
               {tag}
             </div>
           ))}
         </div>
-      )}
+      </div>
       <div className="Event-text">
         <div className="Event-text-title">{event.name}</div>
-        {organizationName && <div className="Event-org">{organizationName}</div>}
+        {organizationName && (
+          <div 
+            className="Event-org" 
+            onClick={(e) => {
+              e.stopPropagation();
+              onOrganizationClick?.();
+            }}
+            style={{ cursor: 'pointer', color: '#0066cc' }}
+          >
+            {organizationName}
+          </div>
+        )}
         {!organizationName && <p>{event.description}</p>}
       </div>
     </div>

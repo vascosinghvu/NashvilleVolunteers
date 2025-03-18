@@ -85,7 +85,7 @@ const Listings: React.FC = () => {
   const fetchOrganization = async (o_id: number) => {
     try {
       const response = await api.get(`/organization/get-organization/${o_id}`)
-      setOrgMap((prev) => ({ ...prev, [o_id]: response.data.name }))
+      setOrgMap((prev) => ({ ...prev, [o_id]: response.data.org_name }))
     } catch (error) {
       console.error(`Error fetching organization ${o_id}`, error)
     }
@@ -346,6 +346,7 @@ const Listings: React.FC = () => {
                 event={evt}
                 organizationName={orgMap[evt.o_id] || ""}
                 onClick={() => setSelectedEvent(evt)}
+                onOrganizationClick={() => navigate(`/organization/${evt.o_id}`)}
               />
             </div>
           ))}
