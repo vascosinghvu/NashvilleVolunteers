@@ -15,6 +15,7 @@ import VolunteerDashboard from "./pages/volunteer/VolunteerDashboard"
 import OrganizationDashboard from "./pages/organization/OrganizationDashboard"
 import OrganizationProfile from "./pages/organization/OrganizationProfile"
 import CreateEvent from "./pages/organization/CreateEvent"
+import EditEvent from "./pages/organization/EditEvent"
 import OrganizationDetails from "./pages/organization/OrganizationDetails"
 
 function App() {
@@ -91,6 +92,15 @@ function App() {
               <CreateEvent />
             </ProtectedRoute>
           } 
+        />
+
+        <Route
+          path="/organization/edit-event/:eventId"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.ORGANIZATION]}>
+              <EditEvent />
+            </ProtectedRoute>
+          }
         />
 
         <Route path="/organization/:id" element={<OrganizationDetails />} />
