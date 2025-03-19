@@ -111,9 +111,18 @@ export const updateOrganization = async (req: Request, res: Response) => {
   try {
     const { o_id } = req.params
 
-    // First, get the existing organization
+    // First, get the existing organization data from both tables
     const existingOrganization = await sql`
-      SELECT * FROM organizations WHERE o_id = ${o_id}
+      SELECT 
+        o.*,
+        u.first_name,
+        u.last_name,
+        u.phone_number,
+        u.email,
+        u.image_url
+      FROM organizations o
+      JOIN user_profiles u ON o.o_id = u.user_id
+      WHERE o.o_id = ${o_id}
     `
 
     if (existingOrganization.length === 0) {
@@ -161,21 +170,46 @@ export const updateOrganization = async (req: Request, res: Response) => {
     // Merge existing data with updates
     const updatedData = { ...existingOrganization[0], ...req.body, image_url }
 
-    // Perform update with all fields
+    // Update user_profiles table
+    await sql`
+      UPDATE user_profiles 
+      SET 
+        first_name = ${updatedData.first_name},
+        last_name = ${updatedData.last_name},
+        phone_number = ${updatedData.phone_number},
+        email = ${updatedData.email},
+        image_url = ${image_url}
+      WHERE user_id = ${o_id}
+    `
+
+    // Update organizations table
     const updatedOrganization = await sql`
       UPDATE organizations 
       SET 
-        name = ${updatedData.name},
+        org_name = ${updatedData.org_name},
         description = ${updatedData.description},
-        email = ${updatedData.email},
-        website = ${updatedData.website},
-        image_url = ${image_url}
+        website = ${updatedData.website}
       WHERE o_id = ${o_id}
       RETURNING *
     `
 
-    res.status(200).json(updatedOrganization[0])
+    // Fetch and return the complete updated organization data
+    const finalOrganization = await sql`
+      SELECT 
+        o.*,
+        u.first_name,
+        u.last_name,
+        u.phone_number,
+        u.email,
+        u.image_url
+      FROM organizations o
+      JOIN user_profiles u ON o.o_id = u.user_id
+      WHERE o.o_id = ${o_id}
+    `
+
+    res.status(200).json(finalOrganization[0])
   } catch (error) {
+    console.error("Error updating organization:", error)
     res
       .status(500)
       .json({ error: "Failed to update organization", details: error })
