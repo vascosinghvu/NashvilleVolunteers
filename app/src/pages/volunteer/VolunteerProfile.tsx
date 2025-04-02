@@ -15,6 +15,19 @@ interface ProfileProps {
   image_url: string
   age: number
   email: string
+  skills: string[]
+  interests: string[]
+  availability: {
+    weekdays: boolean
+    weekends: boolean
+    mornings: boolean
+    afternoons: boolean
+    evenings: boolean
+  }
+  experience: {
+    years: number
+    description: string
+  }
 }
 
 // Validation schema
@@ -26,9 +39,61 @@ const ProfileSchema = Yup.object().shape({
     .min(18, "Must be at least 18 years old")
     .required("Age is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
+  skills: Yup.array().of(Yup.string()),
+  interests: Yup.array().of(Yup.string()),
+  availability: Yup.object().shape({
+    weekdays: Yup.boolean(),
+    weekends: Yup.boolean(),
+    mornings: Yup.boolean(),
+    afternoons: Yup.boolean(),
+    evenings: Yup.boolean(),
+  }),
+  experience: Yup.object().shape({
+    years: Yup.number().min(0, "Years must be 0 or greater"),
+    description: Yup.string(),
+  }),
 })
 
 const MAX_IMAGE_SIZE = 400 // Reduced maximum width/height in pixels for better file size
+
+// Add these constants after the ProfileSchema
+const SKILLS_OPTIONS = [
+  "First Aid/CPR",
+  "Teaching/Tutoring",
+  "Construction",
+  "Cooking",
+  "Event Planning",
+  "Fundraising",
+  "Graphic Design",
+  "Marketing",
+  "Photography",
+  "Public Speaking",
+  "Social Media",
+  "Translation",
+  "Web Development",
+  "Writing/Editing",
+  "Other"
+]
+
+const INTERESTS_OPTIONS = [
+  "Animal Welfare",
+  "Arts & Culture",
+  "Children & Youth",
+  "Community Development",
+  "Education",
+  "Environment",
+  "Food Security",
+  "Health & Wellness",
+  "Homelessness",
+  "Human Rights",
+  "Immigration",
+  "LGBTQ+ Rights",
+  "Mental Health",
+  "Poverty Alleviation",
+  "Senior Care",
+  "Veterans",
+  "Other"
+]
 
 const Profile = () => {
   const { user } = useAuth()
@@ -48,8 +113,28 @@ const Profile = () => {
       try {
         console.log("Fetching user profile for:", user.id)
         const response = await api.get(`/volunteer/get-volunteer/${user.id}`)
-        setUserData(response.data)
-        console.log("User data:", response.data)
+        const data = response.data
+        
+        // Parse JSONB fields if they exist
+        const parsedData = {
+          ...data,
+          skills: data.skills ? JSON.parse(data.skills) : [],
+          interests: data.interests ? JSON.parse(data.interests) : [],
+          availability: data.availability ? JSON.parse(data.availability) : {
+            weekdays: false,
+            weekends: false,
+            mornings: false,
+            afternoons: false,
+            evenings: false
+          },
+          experience: data.experience ? JSON.parse(data.experience) : {
+            years: 0,
+            description: ""
+          }
+        }
+        
+        setUserData(parsedData)
+        console.log("User data:", parsedData)
       } catch (error) {
         console.error("Error fetching user data:", error)
       } finally {
@@ -90,7 +175,20 @@ const Profile = () => {
         last_name: values.last_name.trim(),
         phone: values.phone_number.trim(),
         email: values.email.trim(),
-        age: Number(values.age)
+        age: Number(values.age),
+        skills: JSON.stringify(values.skills || []),
+        interests: JSON.stringify(values.interests || []),
+        availability: JSON.stringify(values.availability || {
+          weekdays: false,
+          weekends: false,
+          mornings: false,
+          afternoons: false,
+          evenings: false
+        }),
+        experience: JSON.stringify(values.experience || {
+          years: 0,
+          description: ""
+        })
       }
       
       // Validate required fields
@@ -116,11 +214,34 @@ const Profile = () => {
       
       const response = await api.put(
         `/volunteer/update-volunteer/${user?.id}`,
-        formData
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
       )
       
       if (response.status === 200) {
-        setUserData(response.data)
+        // Parse the response data
+        const responseData = response.data
+        const parsedData = {
+          ...responseData,
+          skills: responseData.skills ? JSON.parse(responseData.skills) : [],
+          interests: responseData.interests ? JSON.parse(responseData.interests) : [],
+          availability: responseData.availability ? JSON.parse(responseData.availability) : {
+            weekdays: false,
+            weekends: false,
+            mornings: false,
+            afternoons: false,
+            evenings: false
+          },
+          experience: responseData.experience ? JSON.parse(responseData.experience) : {
+            years: 0,
+            description: ""
+          }
+        }
+        setUserData(parsedData)
         setUpdateSuccess(true)
         setIsEditing(false)
         setSelectedImage(null)
@@ -180,12 +301,25 @@ const Profile = () => {
                     phone_number: userData?.phone_number || "",
                     email: userData?.email || "",
                     age: userData?.age || 18,
-                    image_url: userData?.image_url || ""
+                    image_url: userData?.image_url || "",
+                    skills: Array.isArray(userData?.skills) ? userData.skills : [],
+                    interests: Array.isArray(userData?.interests) ? userData.interests : [],
+                    availability: userData?.availability || {
+                      weekdays: false,
+                      weekends: false,
+                      mornings: false,
+                      afternoons: false,
+                      evenings: false,
+                    },
+                    experience: userData?.experience || {
+                      years: 0,
+                      description: "",
+                    },
                   }}
                   validationSchema={ProfileSchema}
                   onSubmit={handleSubmit}
                 >
-                  {({ errors, touched, isSubmitting }) => (
+                  {({ errors, touched, isSubmitting, values, setFieldValue }) => (
                     <Form>
                       <div className="Form-group">
                         <label>Profile Image</label>
@@ -276,6 +410,96 @@ const Profile = () => {
                         )}
                       </div>
 
+                      <div className="Form-group">
+                        <label>Skills</label>
+                        <div className="Skills-container">
+                          {SKILLS_OPTIONS.map((skill) => (
+                            <label key={skill} className="Checkbox-label">
+                              <Field
+                                type="checkbox"
+                                name="skills"
+                                value={skill}
+                                className="Checkbox-input"
+                              />
+                              <span className="Checkbox-text">{skill}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="Form-group">
+                        <label>Interests</label>
+                        <div className="Interests-container">
+                          {INTERESTS_OPTIONS.map((interest) => (
+                            <label key={interest} className="Checkbox-label">
+                              <Field
+                                type="checkbox"
+                                name="interests"
+                                value={interest}
+                                className="Checkbox-input"
+                              />
+                              <span className="Checkbox-text">{interest}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="Form-group">
+                        <label>Availability</label>
+                        <div className="Availability-container">
+                          <div className="Availability-section">
+                            <h4>Days</h4>
+                            <label className="Checkbox-label">
+                              <Field type="checkbox" name="availability.weekdays" />
+                              <span className="Checkbox-text">Weekdays</span>
+                            </label>
+                            <label className="Checkbox-label">
+                              <Field type="checkbox" name="availability.weekends" />
+                              <span className="Checkbox-text">Weekends</span>
+                            </label>
+                          </div>
+                          <div className="Availability-section">
+                            <h4>Times</h4>
+                            <label className="Checkbox-label">
+                              <Field type="checkbox" name="availability.mornings" />
+                              <span className="Checkbox-text">Mornings</span>
+                            </label>
+                            <label className="Checkbox-label">
+                              <Field type="checkbox" name="availability.afternoons" />
+                              <span className="Checkbox-text">Afternoons</span>
+                            </label>
+                            <label className="Checkbox-label">
+                              <Field type="checkbox" name="availability.evenings" />
+                              <span className="Checkbox-text">Evenings</span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="Form-group">
+                        <label>Volunteer Experience</label>
+                        <div className="Experience-container">
+                          <div className="Form-group">
+                            <label htmlFor="experience.years">Years of Experience</label>
+                            <Field
+                              name="experience.years"
+                              type="number"
+                              min="0"
+                              className="Form-input-box"
+                            />
+                          </div>
+                          <div className="Form-group">
+                            <label htmlFor="experience.description">Experience Description</label>
+                            <Field
+                              name="experience.description"
+                              as="textarea"
+                              className="Form-textarea"
+                              placeholder="Describe your previous volunteer experience..."
+                            />
+                          </div>
+                        </div>
+                      </div>
+
                       <div className="Flex-row Margin-top--20">
                         <button
                           type="submit"
@@ -357,6 +581,67 @@ const Profile = () => {
                       {user?.created_at
                         ? new Date(user.created_at).toLocaleDateString()
                         : "Unknown"}
+                    </div>
+                  </div>
+
+                  <div className="Profile-section">
+                    <h3>Skills & Expertise</h3>
+                    <div className="Skills-tags">
+                      {Array.isArray(userData.skills) && userData.skills.length > 0 ? (
+                        userData.skills.map((skill) => (
+                          <span key={skill} className="Tag">
+                            {skill}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="Text-color--gray-600">No skills listed</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="Profile-section">
+                    <h3>Interests & Causes</h3>
+                    <div className="Interests-tags">
+                      {Array.isArray(userData.interests) && userData.interests.length > 0 ? (
+                        userData.interests.map((interest) => (
+                          <span key={interest} className="Tag">
+                            {interest}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="Text-color--gray-600">No interests listed</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="Profile-section">
+                    <h3>Availability</h3>
+                    <div className="Availability-display">
+                      <div className="Availability-days">
+                        <strong>Days:</strong>
+                        {userData.availability?.weekdays && <span>Weekdays</span>}
+                        {userData.availability?.weekends && <span>Weekends</span>}
+                      </div>
+                      <div className="Availability-times">
+                        <strong>Times:</strong>
+                        {userData.availability?.mornings && <span>Mornings</span>}
+                        {userData.availability?.afternoons && <span>Afternoons</span>}
+                        {userData.availability?.evenings && <span>Evenings</span>}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="Profile-section">
+                    <h3>Volunteer Experience</h3>
+                    <div className="Experience-display">
+                      <p>
+                        <strong>Years of Experience:</strong> {userData.experience?.years || 0}
+                      </p>
+                      {userData.experience?.description && (
+                        <p>
+                          <strong>Description:</strong> {userData.experience.description}
+                        </p>
+                      )}
                     </div>
                   </div>
 

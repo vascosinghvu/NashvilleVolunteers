@@ -154,7 +154,20 @@ export const updateVolunteer = async (req: Request, res: Response) => {
     console.log("⭐ Request file:", req.file)
     console.log("⭐ Request headers:", req.headers)
 
-    const { first_name, last_name, phone, email, age } = req.body
+    // Parse the form data
+    const { first_name, last_name, phone, email, age, skills, interests, availability, experience } = req.body
+
+    console.log("📝 Parsed form data:", {
+      first_name,
+      last_name,
+      phone,
+      email,
+      age,
+      skills,
+      interests,
+      availability,
+      experience
+    })
 
     if (!first_name || !last_name || !phone || !email || !age) {
       console.log("❌ Missing required fields:", { first_name, last_name, phone, email, age })
@@ -205,16 +218,16 @@ export const updateVolunteer = async (req: Request, res: Response) => {
       }
     }
 
-    console.log("📝 Updating user_profiles with data:", {
-      first_name,
-      last_name,
-      phone,
-      email,
-      image_url
-    })
-
     try {
       // Update user_profiles table
+      console.log("📝 Updating user_profiles with data:", {
+        first_name,
+        last_name,
+        phone,
+        email,
+        image_url
+      })
+
       await sql`
         UPDATE user_profiles 
         SET 
@@ -230,16 +243,29 @@ export const updateVolunteer = async (req: Request, res: Response) => {
       throw error
     }
 
-    console.log("📝 Updating volunteers table with age:", age)
-
     try {
-      // Update volunteers table
+      // Update volunteers table with all fields
+      console.log("📝 Updating volunteers table with data:", {
+        age,
+        skills,
+        interests,
+        availability,
+        experience
+      })
+
       const updatedVolunteer = await sql`
         UPDATE volunteers 
-        SET age = ${age}
+        SET 
+          age = ${age},
+          skills = ${skills},
+          interests = ${interests},
+          availability = ${availability},
+          experience = ${experience}
         WHERE v_id = ${v_id}
         RETURNING *
       `
+
+      console.log("✅ Updated volunteer data:", updatedVolunteer[0])
     } catch (error) {
       console.error("❌ Error updating volunteers:", error)
       throw error
