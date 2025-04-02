@@ -24,6 +24,7 @@ interface EventData {
   description: string
   tags: string[]
   image_url?: string
+  link?: string
 }
 
 const Listings: React.FC = () => {
@@ -112,6 +113,12 @@ const Listings: React.FC = () => {
 
   const handleRegisterClick = async () => {
     if (selectedEvent) {
+      // For external events, redirect to their link
+      if (selectedEvent.tags?.includes("External")) {
+        window.open(selectedEvent.link, '_blank');
+        return;
+      }
+
       if (!user) {
         console.error("User not logged in")
         navigate("/login")
@@ -337,7 +344,9 @@ const Listings: React.FC = () => {
                       className="Button Button-color--blue-1000 Margin-top--20"
                       onClick={handleRegisterClick}
                     >
-                      Register for Event
+                      {selectedEvent.tags?.includes("External") 
+                        ? "Register on HandsOn Nashville" 
+                        : "Register for Event"}
                     </div>
                   )}
                 </>
