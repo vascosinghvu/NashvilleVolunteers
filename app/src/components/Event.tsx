@@ -60,12 +60,18 @@ const Event: React.FC<EventProps> = ({ event, organizationName, onClick, onOrgan
           {event.tags?.map((tag) => (
             <div 
               key={tag} 
-              className="Badge Badge-color--light-500"
+              className={`Badge ${
+                tag === "External" 
+                  ? "Badge-color--green-1000" 
+                  : tag === "Hands On" 
+                    ? "Badge-color--royal-1000"
+                    : "Badge-color--light-500"
+              }`}
               style={{
-                background: 'rgba(255, 255, 255, 0.9)',
                 padding: '2px 8px',
                 borderRadius: '4px',
-                fontSize: '0.875rem'
+                fontSize: '0.875rem',
+                background: tag !== "External" && tag !== "Hands On" ? 'rgba(255, 255, 255, 0.9)' : undefined
               }}
             >
               {tag}
