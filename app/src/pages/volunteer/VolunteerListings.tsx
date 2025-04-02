@@ -34,6 +34,7 @@ const Listings: React.FC = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [registrationSuccess, setRegistrationSuccess] = useState(false)
   const [registrationError, setRegistrationError] = useState<string | null>(null)
+  const [userRegistrations, setUserRegistrations] = useState<number[]>([]) // Array of event IDs the user is registered for
   const [selectedDates, setSelectedDates] = useState<{
     start: string | null
     end: string | null
@@ -58,6 +59,24 @@ const Listings: React.FC = () => {
   useEffect(() => {
     fetchEvents()
   }, [])
+
+  useEffect(() => {
+    // Fetch user's registrations when user is logged in
+    if (user?.id) {
+      fetchUserRegistrations()
+    }
+  }, [user])
+
+  const fetchUserRegistrations = async () => {
+    if (!user?.id) return
+    try {
+      const response = await api.get(`/registration/get-user-registrations/${user.id}`)
+      const registeredEventIds = response.data.map((reg: any) => reg.event_id)
+      setUserRegistrations(registeredEventIds)
+    } catch (error) {
+      console.error("Failed to fetch user registrations:", error)
+    }
+  }
 
   const fetchEvents = async () => {
     setLoading(true)
@@ -98,6 +117,12 @@ const Listings: React.FC = () => {
         navigate("/login")
         return
       }
+
+      // Check if already registered
+      if (userRegistrations.includes(selectedEvent.event_id)) {
+        setRegistrationError("You are already registered for this event.")
+        return
+      }
       
       try {
         setRegistrationError(null)
@@ -108,11 +133,8 @@ const Listings: React.FC = () => {
 
         if (registrationResponse.status === 201) {
           setRegistrationSuccess(true)
-          // Reset success message after 3 seconds
-          setTimeout(() => {
-            setRegistrationSuccess(false)
-            setSelectedEvent(null)
-          }, 3000)
+          // Add the event to userRegistrations
+          setUserRegistrations(prev => [...prev, selectedEvent.event_id])
         }
       } catch (err) {
         console.error("Registration error details:", err)
@@ -195,6 +217,44 @@ const Listings: React.FC = () => {
                   </div>
                   <h3>Successfully Registered!</h3>
                   <p>You have been registered for {selectedEvent.name}</p>
+                  {selectedEvent && (
+                    <a
+                      href={(() => {
+                        // Parse the date and time
+                        const [year, month, day] = selectedEvent.date.split('-');
+                        const [hours, minutes] = selectedEvent.time.split(':');
+                        
+                        // Create start date
+                        const startDate = new Date(
+                          parseInt(year),
+                          parseInt(month) - 1, // Month is 0-based
+                          parseInt(day),
+                          parseInt(hours),
+                          parseInt(minutes)
+                        );
+                        
+                        // End date (1 hour later by default)
+                        const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+                        
+                        // Format dates for Google Calendar
+                        const formatDate = (date: Date) => {
+                          return date.toISOString().replace(/-|:|\.\d+/g, '');
+                        };
+                        
+                        const startDateStr = formatDate(startDate);
+                        const endDateStr = formatDate(endDate);
+                        
+                        return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(selectedEvent.name)}&details=${encodeURIComponent(selectedEvent.description)}&location=${encodeURIComponent(selectedEvent.location)}&dates=${startDateStr}/${endDateStr}`;
+                      })()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="Button Button-color--yellow-1000 Margin-top--16"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                    >
+                      <Icon glyph="calendar" size="16" />
+                      Add to Google Calendar
+                    </a>
+                  )}
                 </div>
               ) : (
                 <>
@@ -268,12 +328,18 @@ const Listings: React.FC = () => {
                       {registrationError}
                     </div>
                   )}
-                  <div
-                    className="Button Button-color--blue-1000 Margin-top--20"
-                    onClick={handleRegisterClick}
-                  >
-                    Register for Event
-                  </div>
+                  {userRegistrations.includes(selectedEvent.event_id) ? (
+                    <div className="Button Button-color--gray-500 Margin-top--20 Cursor--not-allowed">
+                      Already Registered
+                    </div>
+                  ) : (
+                    <div
+                      className="Button Button-color--blue-1000 Margin-top--20"
+                      onClick={handleRegisterClick}
+                    >
+                      Register for Event
+                    </div>
+                  )}
                 </>
               )}
             </div>
