@@ -24,13 +24,14 @@ interface EventData {
   description: string
   tags: string[]
   image_url?: string
+  org_name: string
 }
 
 const Listings: React.FC = () => {
   const [events, setEvents] = useState<EventData[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null)
-  const [orgMap, setOrgMap] = useState<{ [key: number]: string }>({})
+  const [orgMap, setOrgMap] = useState<Record<number, string>>({})
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [selectedDates, setSelectedDates] = useState<{
     start: string | null
@@ -61,11 +62,17 @@ const Listings: React.FC = () => {
     setLoading(true)
     try {
       const response = await api.get("/event/get-events")
+      const data: EventData[] = response.data
+      setEvents(data)
       setEvents(response.data)
-      // Fetch organization names
-      response.data.forEach((evt: EventData) => {
-        if (!orgMap[evt.o_id]) {
-          fetchOrganization(evt.o_id)
+
+      // Fetch organization names only if not already stored
+      const uniqueOrgIds: Set<number> = new Set<number>(
+        response.data.map((evt: EventData) => evt.o_id)
+      ) // Ensure o_id is a number
+      uniqueOrgIds.forEach((o_id) => {
+        if (!orgMap[o_id]) {
+          fetchOrganization(o_id)
         }
       })
     } catch (error) {
@@ -84,6 +91,7 @@ const Listings: React.FC = () => {
     try {
       const response = await api.get(`/organization/get-organization/${o_id}`)
       setOrgMap((prev) => ({ ...prev, [o_id]: response.data.name }))
+      console.log(orgMap)
     } catch (error) {
       console.error(`Error fetching organization ${o_id}`, error)
     }
@@ -97,13 +105,16 @@ const Listings: React.FC = () => {
       }
       try {
         // Send a request to create the volunteer profile
-        const regstrationResponse = await api.post("/registration/create-registration", {
-          v_id: user?.id,
-          event_id: selectedEvent.event_id,
-        })
-  
+        const regstrationResponse = await api.post(
+          "/registration/create-registration",
+          {
+            v_id: user?.id,
+            event_id: selectedEvent.event_id,
+          }
+        )
+
         console.log("Regstration response:", regstrationResponse)
-  
+
         // Redirect to register page after successful registration
         navigate("/register")
       } catch (err) {
@@ -118,12 +129,12 @@ const Listings: React.FC = () => {
       // Filter by search query
       if (searchQuery) {
         const searchLower = searchQuery.toLowerCase()
-        const matchesSearch = 
+        const matchesSearch =
           event.name.toLowerCase().includes(searchLower) ||
           event.description.toLowerCase().includes(searchLower) ||
           event.location.toLowerCase().includes(searchLower) ||
-          event.tags.some(tag => tag.toLowerCase().includes(searchLower))
-        
+          event.tags.some((tag) => tag.toLowerCase().includes(searchLower))
+
         if (!matchesSearch) return false
       }
 
@@ -234,7 +245,9 @@ const Listings: React.FC = () => {
                   />
                   <strong>Organization:</strong>
                 </span>
-                {orgMap[selectedEvent.o_id] || "Loading..."}
+                {selectedEvent.org_name ||
+                  orgMap[selectedEvent.o_id] ||
+                  "Loading..."}
               </div>
               <div
                 className="Button Button-color--blue-1000 Margin-top--20"

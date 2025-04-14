@@ -52,8 +52,8 @@
 .Event-modal-line {
   display: flex;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--color-gray-200);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--nash-color-gray-200);
 }
 
 .Event-modal-line:last-child {
@@ -69,3 +69,10 @@
   margin-left: auto;
   color: var(--color-gray-900);
 } 
+
+.Event-modal-image {
+  height: 200px;
+  overflow: hidden;
+  border-radius: 8px;
+  width: auto;
+}
