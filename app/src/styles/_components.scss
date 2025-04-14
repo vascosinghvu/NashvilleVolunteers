@@ -57,28 +57,35 @@
     background-color: var(--nash-color-light-1000);
     border-radius: var(--nash-border-radius-8);
     border: 1px solid rgba(var(--dark), var(--opacity-tint));
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
 
     &-large {
         width: 500px;
         margin-left: -250px;
-        max-height: 700px;
-    }
-
-    &-header {
-        border-bottom: 2px solid var(--nash-color-dark-200);
-        font-size: var(--nash-font-size-24);
-        padding: 5px 0 10px 0;
-        margin-top: -10px;
-        margin-bottom: 10px;
+        max-height: 80vh;
     }
 
     &-close {
         display: flex;
         justify-content: right;
+        flex-shrink: 0;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        z-index: var(--nash-z-1000);
 
         .Icon {
             font-size: var(--nash-font-size-16);
             margin-left: auto;
+            background-color: var(--nash-color-light-1000);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
     
             &:hover {
                 cursor: pointer;
@@ -87,14 +94,27 @@
         }
     }
 
+    &-header {
+        border-bottom: 2px solid var(--nash-color-dark-200);
+        font-size: var(--nash-font-size-24);
+        padding: 5px 0 10px 0;
+        margin-top: -10px;
+        margin-bottom: 10px;
+        flex-shrink: 0;
+        padding-right: 30px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     &-content {
         border-radius: var(--nash-border-radius-16);
         color: var(--nash-color-dark-800);
         z-index: 5;
-        height: fit-content;
-        max-height: 600px;
+        flex: 1;
         overflow-y: auto;
         padding: 10px;
+        display: flex;
+        flex-direction: column;
     }
 
     &-tab {
@@ -133,7 +153,7 @@
 .TagFilter {
     position: relative;
     display: block;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
     width: fit-content;
     
     &-button {
@@ -182,7 +202,7 @@
 .DateFilter {
     position: relative;
     display: block;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
     width: fit-content;
     margin-left: 1rem;
     
@@ -260,6 +280,7 @@
     overflow: hidden;
     border-top-left-radius: var(--nash-border-radius-8);
     border-top-right-radius: var(--nash-border-radius-8);
+    flex-shrink: 0;
 
     img {
       width: 100%;
@@ -276,5 +297,17 @@
       align-items: center;
       min-width: 150px;
     }
+  }
+}
+
+.Alert {
+  padding: 10px;
+  border-radius: var(--nash-border-radius-4);
+  margin-bottom: 10px;
+  
+  &--error {
+    background-color: rgba(var(--nash-color-red), 0.1);
+    color: var(--nash-color-red-1000);
+    border: 1px solid var(--nash-color-red-500);
   }
 }
