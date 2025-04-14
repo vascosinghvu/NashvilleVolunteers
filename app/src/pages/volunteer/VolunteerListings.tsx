@@ -202,6 +202,86 @@ const Listings: React.FC = () => {
     <>
       <Navbar />
       <MetaData title="Nashville Volunteers" description="Listings" />
+      <div className="Listings">
+        <div className="Flex--center Margin-top--16">
+          <Icon 
+            glyph="heart" 
+            regular={true}
+            size="72" 
+            className="Text-color--red-1000 Margin-bottom--16" 
+          />
+        </div>
+        <h1 className="Flex--center">Nashville Volunteers</h1>
+        <div className="Flex--center">
+          Discover meaningful volunteering opportunities in and around
+          Nashville. Make a difference in your community today.
+        </div>
+        <div className="Flex--center Margin-top--20 Align-items--center">
+          <div className="Search-container">
+            <Formik initialValues={{ search: "" }} onSubmit={handleSubmit}>
+              {({ errors, touched }) => (
+                <Form className="Form-row">
+                  <Field
+                    className="Form-input-box"
+                    type="text"
+                    id="keyword"
+                    name="search"
+                    placeholder="Soup Kitchen, Animal Shelter, etc."
+                  />
+                  <button
+                    type="submit"
+                    className="Button Button-color--yellow-1000 Margin-left--10"
+                  >
+                    Search
+                  </button>
+                  <button
+                    type="button"
+                    className="Button Button-color--yellow-1000 Button--hollow Margin-left--10"
+                    onClick={handleSeeAll}
+                  >
+                    See All
+                  </button>
+                </Form>
+              )}
+            </Formik>
+            <div className="Filter-row">
+              <TagFilter
+                availableTags={availableTags}
+                selectedTags={selectedTags}
+                onTagSelect={(tag) => {
+                  setSelectedTags((prev) =>
+                    prev.includes(tag)
+                      ? prev.filter((t) => t !== tag)
+                      : [...prev, tag]
+                  )
+                }}
+              />
+              <DateFilter
+                selectedDates={selectedDates}
+                onDateChange={setSelectedDates}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 Margin-top--20">
+          {filteredEvents.length === 0 && !loading && (
+            <div className="Width--100 Text--center">
+              No volunteer opportunities match your criteria.
+            </div>
+          )}
+          {filteredEvents.map((evt: EventData) => (
+            <div key={evt.event_id} className="col">
+              <Event
+                event={evt}
+                organizationName={orgMap[evt.o_id] || ""}
+                onClick={() => setSelectedEvent(evt)}
+                onOrganizationClick={() => navigate(`/organization/${evt.o_id}`)}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
       {selectedEvent && (
         <Modal
           header={selectedEvent.name}
@@ -335,98 +415,28 @@ const Listings: React.FC = () => {
                       {registrationError}
                     </div>
                   )}
-                  {userRegistrations.includes(selectedEvent.event_id) ? (
-                    <div className="Button Button-color--gray-500 Margin-top--20 Cursor--not-allowed">
-                      Already Registered
-                    </div>
-                  ) : (
-                    <div
-                      className="Button Button-color--blue-1000 Margin-top--20"
-                      onClick={handleRegisterClick}
-                    >
-                      {selectedEvent.tags?.includes("External") 
-                        ? "Register on HandsOn Nashville" 
-                        : "Register for Event"}
-                    </div>
-                  )}
+                  <div className="Margin-top--20">
+                    {userRegistrations.includes(selectedEvent.event_id) ? (
+                      <div className="Button Button-color--gray-500 Cursor--not-allowed">
+                        Already Registered
+                      </div>
+                    ) : (
+                      <div
+                        className="Button Button-color--blue-1000"
+                        onClick={handleRegisterClick}
+                      >
+                        {selectedEvent.tags?.includes("External") 
+                          ? `Register on ${orgMap[selectedEvent.o_id] || "External Site"}` 
+                          : "Register for Event"}
+                      </div>
+                    )}
+                  </div>
                 </>
               )}
             </div>
           }
         />
       )}
-      <div className="Listings">
-        <h1 className="Flex--center Margin-top--40">Nashville Volunteers</h1>
-        <div className="Flex--center">
-          Discover meaningful volunteering opportunities in and around
-          Nashville. Make a difference in your community today.
-        </div>
-        <div className="Flex--center Margin-top--20 Align-items--center">
-          <div className="Search-container">
-            <Formik initialValues={{ search: "" }} onSubmit={handleSubmit}>
-              {({ errors, touched }) => (
-                <Form className="Form-row">
-                  <Field
-                    className="Form-input-box"
-                    type="text"
-                    id="keyword"
-                    name="search"
-                    placeholder="Soup Kitchen, Animal Shelter, etc."
-                  />
-                  <button
-                    type="submit"
-                    className="Button Button-color--yellow-1000 Margin-left--10"
-                  >
-                    Search
-                  </button>
-                  <button
-                    type="button"
-                    className="Button Button-color--yellow-1000 Button--hollow Margin-left--10"
-                    onClick={handleSeeAll}
-                  >
-                    See All
-                  </button>
-                </Form>
-              )}
-            </Formik>
-            <div className="Filter-row">
-              <TagFilter
-                availableTags={availableTags}
-                selectedTags={selectedTags}
-                onTagSelect={(tag) => {
-                  setSelectedTags((prev) =>
-                    prev.includes(tag)
-                      ? prev.filter((t) => t !== tag)
-                      : [...prev, tag]
-                  )
-                }}
-              />
-              <DateFilter
-                selectedDates={selectedDates}
-                onDateChange={setSelectedDates}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 Margin-top--20">
-          {filteredEvents.length === 0 && !loading && (
-            <div className="Width--100 Text--center">
-              No volunteer opportunities match your criteria.
-            </div>
-          )}
-          {filteredEvents.map((evt: EventData) => (
-            <div key={evt.event_id} className="col">
-              <Event
-                event={evt}
-                organizationName={orgMap[evt.o_id] || ""}
-                onClick={() => setSelectedEvent(evt)}
-                onOrganizationClick={() => navigate(`/organization/${evt.o_id}`)}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
     </>
   )
 }
