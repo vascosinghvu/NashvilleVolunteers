@@ -19,11 +19,11 @@ interface ProfileProps {
   skills: string[]
   interests: string[]
   availability: {
-    weekdays: boolean
-    weekends: boolean
-    mornings: boolean
-    afternoons: boolean
-    evenings: boolean
+    [day: string]: {
+      mornings: boolean
+      afternoons: boolean
+      evenings: boolean
+    }
   }
   experience: {
     years: number
@@ -106,6 +106,7 @@ const Profile = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string>("")
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showSkillsModal, setShowSkillsModal] = useState(false)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -457,6 +458,57 @@ const Profile = () => {
         />
       )}
 
+      {showSkillsModal && (
+        <Modal
+          header="Add Skills"
+          action={() => setShowSkillsModal(false)}
+          body={
+            <Formik
+              initialValues={{ skills: userData.skills || [] }}
+              onSubmit={(values) => {
+                setUserData({ ...userData, skills: values.skills })
+                setShowSkillsModal(false)
+              }}
+            >
+              {({ values, setFieldValue }) => (
+                <Form>
+                  <div className="Flex-wrap--tags">
+                    {SKILLS_OPTIONS.map((skill) => {
+                      const isSelected = values.skills.includes(skill)
+
+                      return (
+                        <span
+                          key={skill}
+                          className={`Badge ${
+                            isSelected
+                              ? "Badge-color--blue-1000"
+                              : "Badge--hollow"
+                          } Cursor--pointer Margin--4`}
+                          onClick={() => {
+                            const updated = isSelected
+                              ? values.skills.filter((s) => s !== skill)
+                              : [...values.skills, skill]
+                            setFieldValue("skills", updated)
+                          }}
+                        >
+                          {skill}
+                        </span>
+                      )
+                    })}
+                  </div>
+                  <button
+                    type="submit"
+                    className="Button Button-color--blue-1000 Margin-top--10"
+                  >
+                    Save Skills
+                  </button>
+                </Form>
+              )}
+            </Formik>
+          }
+        />
+      )}
+
       <div className="container">
         <div className="row py-4">
           <div className="col-lg-4">
@@ -464,7 +516,7 @@ const Profile = () => {
               <div className="Block-header">Volunteer Profile</div>
               <div className="Block-subtitle">Your profile details</div>
 
-              <div className="Profile-info">
+              <div className="Block-body">
                 <div className="Profile-image">
                   <img
                     src={userData.image_url || "/default-avatar.png"}
@@ -529,155 +581,161 @@ const Profile = () => {
                 Your listed abilities and passions
               </div>
 
-              <div className="Profile-info">
+              <div className="Block-body">
                 {/* Skills */}
-                <div className="Profile-header">
+                <div className="Profile-header ">
+                  <div>
+                    <Icon
+                      glyph="check-circle"
+                      className="Margin-right--8 Text-color--royal-1000"
+                    />
+                    <strong>Skills:</strong>
+                  </div>
                   <Icon
-                    glyph="check-circle"
+                    glyph="plus"
+                    className="Margin-left--auto Text-colorHover--yellow-1000"
+                    onClick={() => setShowSkillsModal(true)}
+                  />
+                </div>
+
+                {userData.skills?.length ? (
+                  <div className="Flex-row">
+                    {userData.skills.map((skill) => (
+                      <span key={skill} className="Filter-tag">
+                        {skill}
+                        <span
+                          className="Filter-tag-close"
+                          onClick={() => console.log("Remove skill:", skill)}
+                        >
+                          &nbsp;×
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="Text-color--gray-600 Flex Justify-content--center">
+                    No skills listed
+                  </div>
+                )}
+
+                {/* Interests */}
+                <div className="Profile-header ">
+                  <div>
+                    <Icon
+                      glyph="check-circle"
+                      className="Margin-right--8 Text-color--royal-1000"
+                    />
+                    <strong>Interests:</strong>
+                  </div>
+                  <Icon
+                    glyph="plus"
+                    className="Margin-left--auto Text-colorHover--yellow-1000"
+                  />
+                </div>
+                {userData.interests?.length ? (
+                  <div className="Flex-wrap--tags">
+                    {userData.interests.map((interest) => (
+                      <span key={interest} className="Filter-tag">
+                        {interest}
+                        <span
+                          className="Filter-tag-close"
+                          onClick={() =>
+                            console.log("Remove interest:", interest)
+                          }
+                        >
+                          &nbsp;×
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="Text-color--gray-600 Flex Justify-content--center">
+                    No interests listed
+                  </span>
+                )}
+              </div>
+            </div>
+            {/* Experience */}
+            <div className="Block Margin-top--20">
+              <div className="Block-header">Experience</div>
+              <div className="Block-subtitle">
+                Your background and work history
+              </div>
+
+              <div className="Block-body">
+                <div className="Event-modal-line">
+                  <Icon
+                    glyph="briefcase"
                     className="Margin-right--8 Text-color--royal-1000"
                   />
-                  <strong>Skills:</strong>
-                </div>
-                <div className="Margin-left--20 Margin-top--4">
-                  {userData.skills?.length ? (
-                    <div className="Flex-wrap--tags">
-                      {userData.skills.map((skill) => (
-                        <span key={skill} className="Filter-tag">
-                          {skill}
-                          <span
-                            className="Filter-tag-close"
-                            onClick={() => console.log("Remove skill:", skill)}
-                          >
-                            &nbsp;×
-                          </span>
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="Text-color--gray-600">
-                      No skills listed
-                    </span>
-                  )}
-                  <div
-                    className="Button Button--small Button-color--blue-1000 Margin-top--8"
-                    onClick={() => console.log("Open add skills modal")}
-                  >
-                    Add Skill
+                  <strong>Years:</strong>
+                  <div className="Margin-left--auto">
+                    {userData.experience?.years ?? 0}
                   </div>
                 </div>
 
-                {/* Interests */}
-                <div className="Profile-header Margin-top--10">
-                  <Icon
-                    glyph="heart"
-                    className="Margin-right--8 Text-color--royal-1000"
-                  />
-                  <strong>Interests:</strong>
-                </div>
-                <div className="Margin-left--20 Margin-top--4">
-                  {userData.interests?.length ? (
-                    <div className="Flex-wrap--tags">
-                      {userData.interests.map((interest) => (
-                        <span key={interest} className="Filter-tag">
-                          {interest}
-                          <span
-                            className="Filter-tag-close"
-                            onClick={() =>
-                              console.log("Remove interest:", interest)
-                            }
-                          >
-                            &nbsp;×
-                          </span>
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="Text-color--gray-600">
-                      No interests listed
-                    </span>
-                  )}
-                  <div
-                    className="Button Button--small Button-color--blue-1000 Margin-top--8"
-                    onClick={() => console.log("Open add interests modal")}
-                  >
-                    Add Interest
+                <div className="Event-modal-line Margin-top--10">
+                  <strong>Description:</strong>
+                  <div className="Margin-left--auto">
+                    {userData.experience?.description ? (
+                      <span>{userData.experience.description}</span>
+                    ) : (
+                      <span className="Text-color--gray-600">
+                        No description provided
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
+          {/* Availability */}
           <div className="col-lg-4">
             <div className="Block">
-              <div className="Block-header">Availability & Experience</div>
-              <div className="Block-subtitle">When and how you can help</div>
+              <div className="Block-header">Availability</div>
+              <div className="Block-subtitle">Your weekly schedule</div>
 
-              <div className="Profile-info">
-                {/* Available Days */}
-                <div className="Event-modal-line">
-                  <Icon
-                    glyph="calendar"
-                    className="Margin-right--8 Text-color--royal-1000"
-                  />
-                  <strong>Available Days:</strong>
-                  <div className="Margin-left--auto">
-                    {userData.availability?.weekdays && <span>Weekdays </span>}
-                    {userData.availability?.weekends && <span>Weekends </span>}
-                    {!userData.availability?.weekdays &&
-                      !userData.availability?.weekends && (
-                        <span className="Text-color--gray-600">
-                          Not specified
-                        </span>
+              <div className="Block-body">
+                {[
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday",
+                ].map((day) => {
+                  const key =
+                    day.toLowerCase() as keyof typeof userData.availability
+                  const times = []
+
+                  if (userData.availability?.[key]?.mornings)
+                    times.push("Mornings")
+                  if (userData.availability?.[key]?.afternoons)
+                    times.push("Afternoons")
+                  if (userData.availability?.[key]?.evenings)
+                    times.push("Evenings")
+
+                  return (
+                    <div
+                      key={day}
+                      className="Event-modal-line Justify-content--space-between"
+                    >
+                      <strong>{day}:</strong>
+                      {times.length > 0 ? (
+                        <div>{times.join(", ")}</div>
+                      ) : (
+                        <div className="Text-color--gray-600">
+                          Not available
+                        </div>
                       )}
-                  </div>
-                </div>
-
-                {/* Available Times */}
-                <div className="Event-modal-line">
-                  <Icon
-                    glyph="clock"
-                    className="Margin-right--8 Text-color--royal-1000"
-                  />
-                  <strong>Available Times:</strong>
-                  <div className="Margin-left--auto">
-                    {userData.availability?.mornings && <span>Mornings </span>}
-                    {userData.availability?.afternoons && (
-                      <span>Afternoons </span>
-                    )}
-                    {userData.availability?.evenings && <span>Evenings </span>}
-                    {!userData.availability?.mornings &&
-                      !userData.availability?.afternoons &&
-                      !userData.availability?.evenings && (
-                        <span className="Text-color--gray-600">
-                          Not specified
-                        </span>
-                      )}
-                  </div>
-                </div>
-
-                {/* Volunteer Experience */}
-                <div className="Event-modal-line Margin-top--10">
-                  <Icon
-                    glyph="briefcase"
-                    className="Margin-right--8 Text-color--royal-1000"
-                  />
-                  <strong>Experience:</strong>
-                  <div className="Margin-left--auto">
-                    <div>
-                      <strong>Years:</strong> {userData.experience?.years ?? 0}
                     </div>
-                    {userData.experience?.description ? (
-                      <div>
-                        <strong>Description:</strong>{" "}
-                        {userData.experience.description}
-                      </div>
-                    ) : (
-                      <div className="Text-color--gray-600">
-                        No description provided
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  )
+                })}
+              </div>
+              <div className="Button Button-color--yellow-1000 Button--hollow">
+                Edit Availability
               </div>
             </div>
           </div>

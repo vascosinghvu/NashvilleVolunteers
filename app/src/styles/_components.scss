@@ -290,7 +290,7 @@
   }
 
   &-line {
-    margin-bottom: 1rem;
+    margin-bottom: 10px;
     
     span {
       display: inline-flex;
@@ -301,8 +301,8 @@
 }
 
 .Filter-tag {
-    background: var(--pww-color-blue-100);
-    color: var(--pww-color-blue-1000);
+    background: var(--nash-color-royal-100);
+    color: var(--nash-color-royal-1000);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 14px;

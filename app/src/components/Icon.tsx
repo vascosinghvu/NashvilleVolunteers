@@ -5,6 +5,7 @@ interface IconProps {
   regular?: boolean
   size?: string
   className?: string
+  onClick?: () => void
 }
 
 const Icon: FC<IconProps> = ({
@@ -12,6 +13,7 @@ const Icon: FC<IconProps> = ({
   regular = false,
   size = "",
   className = "",
+  onClick = () => {},
 }) => {
   const iconClass = `fa${regular ? "r" : "s"} fa-${glyph}`
 
@@ -20,6 +22,7 @@ const Icon: FC<IconProps> = ({
       className={`Icon ${iconClass} ${
         size ? `Text-fontSize--${size}` : ""
       } ${className}`}
+      onClick={onClick}
     />
   )
 }
