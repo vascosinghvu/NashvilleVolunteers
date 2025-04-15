@@ -67,7 +67,7 @@
 .Event {
     display: flex;
     flex-direction: column;
-    border-radius: var(--nash-border-radius-8);
+    border-radius: var(--nash-border-radius-16);
     box-shadow: var(--nash-shadow-dark);
     overflow: hidden; // Prevents hover scaling from affecting layout
     transition: transform 0.3s ease; // Smooth hover effect
