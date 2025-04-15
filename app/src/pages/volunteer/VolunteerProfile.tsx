@@ -7,6 +7,7 @@ import { api } from "../../api"
 import Icon from "../../components/Icon"
 import { Spinner } from "react-bootstrap"
 import { resizeImage } from "../../utils/imageUtils"
+import Modal from "../../components/Modal"
 
 interface ProfileProps {
   first_name: string
@@ -72,7 +73,7 @@ const SKILLS_OPTIONS = [
   "Translation",
   "Web Development",
   "Writing/Editing",
-  "Other"
+  "Other",
 ]
 
 const INTERESTS_OPTIONS = [
@@ -92,19 +93,19 @@ const INTERESTS_OPTIONS = [
   "Poverty Alleviation",
   "Senior Care",
   "Veterans",
-  "Other"
+  "Other",
 ]
 
 const Profile = () => {
   const { user } = useAuth()
   const [userData, setUserData] = useState<ProfileProps>()
   const [loading, setLoading] = useState(true)
-  const [isEditing, setIsEditing] = useState(false)
   const [updateSuccess, setUpdateSuccess] = useState(false)
   const [updateError, setUpdateError] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string>("")
+  const [showEditModal, setShowEditModal] = useState(false)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -114,25 +115,29 @@ const Profile = () => {
         console.log("Fetching user profile for:", user.id)
         const response = await api.get(`/volunteer/get-volunteer/${user.id}`)
         const data = response.data
-        
+
         // Parse JSONB fields if they exist
         const parsedData = {
           ...data,
           skills: data.skills ? JSON.parse(data.skills) : [],
           interests: data.interests ? JSON.parse(data.interests) : [],
-          availability: data.availability ? JSON.parse(data.availability) : {
-            weekdays: false,
-            weekends: false,
-            mornings: false,
-            afternoons: false,
-            evenings: false
-          },
-          experience: data.experience ? JSON.parse(data.experience) : {
-            years: 0,
-            description: ""
-          }
+          availability: data.availability
+            ? JSON.parse(data.availability)
+            : {
+                weekdays: false,
+                weekends: false,
+                mornings: false,
+                afternoons: false,
+                evenings: false,
+              },
+          experience: data.experience
+            ? JSON.parse(data.experience)
+            : {
+                years: 0,
+                description: "",
+              },
         }
-        
+
         setUserData(parsedData)
         console.log("User data:", parsedData)
       } catch (error) {
@@ -145,15 +150,21 @@ const Profile = () => {
     fetchUserData()
   }, [user])
 
-  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0]
     if (file) {
       try {
         // Create preview immediately for better UX
         setPreviewUrl(URL.createObjectURL(file))
-        
+
         // Resize image
-        const resizedImage = await resizeImage(file, MAX_IMAGE_SIZE, MAX_IMAGE_SIZE)
+        const resizedImage = await resizeImage(
+          file,
+          MAX_IMAGE_SIZE,
+          MAX_IMAGE_SIZE
+        )
         setSelectedImage(resizedImage)
       } catch (error) {
         console.error("Error processing image:", error)
@@ -166,9 +177,9 @@ const Profile = () => {
     try {
       setUpdateError("")
       setUpdateSuccess(false)
-      
+
       const formData = new FormData()
-      
+
       // Ensure all required fields are present and convert age to number
       const dataToSend = {
         first_name: values.first_name.trim(),
@@ -178,72 +189,87 @@ const Profile = () => {
         age: Number(values.age),
         skills: JSON.stringify(values.skills || []),
         interests: JSON.stringify(values.interests || []),
-        availability: JSON.stringify(values.availability || {
-          weekdays: false,
-          weekends: false,
-          mornings: false,
-          afternoons: false,
-          evenings: false
-        }),
-        experience: JSON.stringify(values.experience || {
-          years: 0,
-          description: ""
-        })
+        availability: JSON.stringify(
+          values.availability || {
+            weekdays: false,
+            weekends: false,
+            mornings: false,
+            afternoons: false,
+            evenings: false,
+          }
+        ),
+        experience: JSON.stringify(
+          values.experience || {
+            years: 0,
+            description: "",
+          }
+        ),
       }
-      
+
       // Validate required fields
-      if (!dataToSend.first_name || !dataToSend.last_name || !dataToSend.phone || !dataToSend.email || !dataToSend.age) {
+      if (
+        !dataToSend.first_name ||
+        !dataToSend.last_name ||
+        !dataToSend.phone ||
+        !dataToSend.email ||
+        !dataToSend.age
+      ) {
         setUpdateError("All fields are required")
         return
       }
-      
+
       // Add all fields to FormData
       Object.entries(dataToSend).forEach(([key, value]) => {
         formData.append(key, value.toString())
       })
-      
+
       // Add image if selected
       if (selectedImage) {
         formData.append("image", selectedImage)
       }
-      
+
       console.log("Submitting form data:", {
         ...dataToSend,
-        hasImage: !!selectedImage
+        hasImage: !!selectedImage,
       })
-      
+
       const response = await api.put(
         `/volunteer/update-volunteer/${user?.id}`,
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         }
       )
-      
+
       if (response.status === 200) {
         // Parse the response data
         const responseData = response.data
         const parsedData = {
           ...responseData,
           skills: responseData.skills ? JSON.parse(responseData.skills) : [],
-          interests: responseData.interests ? JSON.parse(responseData.interests) : [],
-          availability: responseData.availability ? JSON.parse(responseData.availability) : {
-            weekdays: false,
-            weekends: false,
-            mornings: false,
-            afternoons: false,
-            evenings: false
-          },
-          experience: responseData.experience ? JSON.parse(responseData.experience) : {
-            years: 0,
-            description: ""
-          }
+          interests: responseData.interests
+            ? JSON.parse(responseData.interests)
+            : [],
+          availability: responseData.availability
+            ? JSON.parse(responseData.availability)
+            : {
+                weekdays: false,
+                weekends: false,
+                mornings: false,
+                afternoons: false,
+                evenings: false,
+              },
+          experience: responseData.experience
+            ? JSON.parse(responseData.experience)
+            : {
+                years: 0,
+                description: "",
+              },
         }
         setUserData(parsedData)
         setUpdateSuccess(true)
-        setIsEditing(false)
         setSelectedImage(null)
         setPreviewUrl("")
       }
@@ -266,397 +292,395 @@ const Profile = () => {
     )
   }
 
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="Widget">
+          <div className="Widget-body Text--center">
+            <Spinner animation="border" />
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  if (!userData) {
+    return (
+      <>
+        <Navbar />
+        <div className="Widget">
+          <div className="Widget-body Text--center">
+            <p>No profile data found.</p>
+          </div>
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
       <Navbar />
-      <div className="Widget">
-        <div className="Block Widget-block">
-          <div className="Block-header">Volunteer Profile</div>
-          <div className="Block-subtitle">
-            {isEditing ? "Edit your profile details" : "Your profile details"}
+
+      {showEditModal && (
+        <Modal
+          header="Edit Profile"
+          action={() => setShowEditModal(false)}
+          large
+          body={
+            <Formik
+              initialValues={{
+                first_name: userData?.first_name || "",
+                last_name: userData?.last_name || "",
+                phone_number: userData?.phone_number || "",
+                email: userData?.email || "",
+                age: userData?.age || 18,
+                image_url: userData?.image_url || "",
+              }}
+              validationSchema={Yup.object({
+                first_name: Yup.string().required("Required"),
+                last_name: Yup.string().required("Required"),
+                phone_number: Yup.string().required("Required"),
+                email: Yup.string().email("Invalid").required("Required"),
+                age: Yup.number().min(18).required("Required"),
+              })}
+              onSubmit={async (values) => {
+                try {
+                  const formData = new FormData()
+                  formData.append("first_name", values.first_name.trim())
+                  formData.append("last_name", values.last_name.trim())
+                  formData.append("phone", values.phone_number.trim())
+                  formData.append("email", values.email.trim())
+                  formData.append("age", values.age.toString())
+                  if (selectedImage) {
+                    formData.append("image", selectedImage)
+                  }
+
+                  const response = await api.put(
+                    `/volunteer/update-volunteer/${user?.id}`,
+                    formData,
+                    { headers: { "Content-Type": "multipart/form-data" } }
+                  )
+
+                  const updated = response.data
+                  setUserData({
+                    ...userData!,
+                    ...updated,
+                    skills: userData!.skills, // keep unchanged
+                    interests: userData!.interests,
+                    availability: userData!.availability,
+                    experience: userData!.experience,
+                  })
+
+                  setShowEditModal(false)
+                  setSelectedImage(null)
+                  setPreviewUrl("")
+                } catch (error) {
+                  console.error("Profile update failed", error)
+                }
+              }}
+            >
+              {({ isSubmitting, errors, touched, setFieldValue }) => (
+                <Form>
+                  <div className="Form-group">
+                    <label>Profile Image</label>
+                    <div className="Profile-image-upload">
+                      <img
+                        src={
+                          previewUrl ||
+                          userData?.image_url ||
+                          "/default-avatar.png"
+                        }
+                        alt="Profile"
+                        className="Profile-image-preview"
+                      />
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageChange}
+                        accept="image/*"
+                        style={{ display: "none" }}
+                      />
+                      <button
+                        type="button"
+                        className="Button Button-color--blue-1000"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {userData?.image_url ? "Change Image" : "Upload Image"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {[
+                    ["first_name", "First Name"],
+                    ["last_name", "Last Name"],
+                    ["email", "Email"],
+                    ["phone_number", "Phone Number"],
+                    ["age", "Age"],
+                  ].map(([name, label]) => (
+                    <div key={name} className="Form-group">
+                      <label htmlFor={name}>{label}</label>
+                      <Field
+                        name={name as keyof typeof errors}
+                        className="Form-input-box"
+                        placeholder={`Enter your ${label.toLowerCase()}`}
+                      />
+                      {errors[name as keyof typeof errors] &&
+                        touched[name as keyof typeof touched] && (
+                          <div className="Form-error">
+                            {errors[name as keyof typeof errors]}
+                          </div>
+                        )}
+                    </div>
+                  ))}
+
+                  <div className="Flex-row Margin-top--20">
+                    <button
+                      type="submit"
+                      className="Button Button-color--blue-1000 Margin-right--10"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Saving..." : "Save Changes"}
+                    </button>
+                    <button
+                      type="button"
+                      className="Button Button-color--gray-1000"
+                      onClick={() => setShowEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
+          }
+        />
+      )}
+
+      <div className="container">
+        <div className="row py-4">
+          <div className="col-lg-4">
+            <div className="Block">
+              <div className="Block-header">Volunteer Profile</div>
+              <div className="Block-subtitle">Your profile details</div>
+
+              <div className="Profile-info">
+                <div className="Profile-image">
+                  <img
+                    src={userData.image_url || "/default-avatar.png"}
+                    alt="Profile Avatar"
+                    className="Profile-avatar"
+                  />
+                </div>
+
+                {[
+                  {
+                    label: "Name",
+                    icon: "user",
+                    value: `${userData.first_name} ${userData.last_name}`,
+                  },
+                  {
+                    label: "Email",
+                    icon: "envelope",
+                    value: userData.email,
+                  },
+                  {
+                    label: "Phone",
+                    icon: "phone",
+                    value: userData.phone_number || "Not provided",
+                  },
+                  {
+                    label: "Age",
+                    icon: "calendar",
+                    value: userData.age || "Not provided",
+                  },
+                  {
+                    label: "Joined",
+                    icon: "clock",
+                    value: user?.created_at
+                      ? new Date(user.created_at).toLocaleDateString()
+                      : "Unknown",
+                  },
+                ].map(({ label, icon, value }) => (
+                  <div key={label} className="Event-modal-line">
+                    <Icon
+                      glyph={icon}
+                      className="Margin-right--8 Text-color--royal-1000"
+                    />
+                    <strong>{label}:</strong>
+                    <div className="Margin-left--auto">{value}</div>
+                  </div>
+                ))}
+
+                <button
+                  className="Button Button-color--blue-1000 Width--100"
+                  onClick={() => setShowEditModal(true)}
+                >
+                  Edit Profile
+                </button>
+              </div>
+            </div>
+          </div>
+          {/* Skills & Interests Block */}
+          <div className="col-lg-4">
+            <div className="Block">
+              <div className="Block-header">Skills & Interests</div>
+              <div className="Block-subtitle">
+                Your listed abilities and passions
+              </div>
+
+              <div className="Profile-info">
+                {/* Skills */}
+                <div className="Profile-header">
+                  <Icon
+                    glyph="check-circle"
+                    className="Margin-right--8 Text-color--royal-1000"
+                  />
+                  <strong>Skills:</strong>
+                </div>
+                <div className="Margin-left--20 Margin-top--4">
+                  {userData.skills?.length ? (
+                    <div className="Flex-wrap--tags">
+                      {userData.skills.map((skill) => (
+                        <span key={skill} className="Filter-tag">
+                          {skill}
+                          <span
+                            className="Filter-tag-close"
+                            onClick={() => console.log("Remove skill:", skill)}
+                          >
+                            &nbsp;×
+                          </span>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="Text-color--gray-600">
+                      No skills listed
+                    </span>
+                  )}
+                  <div
+                    className="Button Button--small Button-color--blue-1000 Margin-top--8"
+                    onClick={() => console.log("Open add skills modal")}
+                  >
+                    Add Skill
+                  </div>
+                </div>
+
+                {/* Interests */}
+                <div className="Profile-header Margin-top--10">
+                  <Icon
+                    glyph="heart"
+                    className="Margin-right--8 Text-color--royal-1000"
+                  />
+                  <strong>Interests:</strong>
+                </div>
+                <div className="Margin-left--20 Margin-top--4">
+                  {userData.interests?.length ? (
+                    <div className="Flex-wrap--tags">
+                      {userData.interests.map((interest) => (
+                        <span key={interest} className="Filter-tag">
+                          {interest}
+                          <span
+                            className="Filter-tag-close"
+                            onClick={() =>
+                              console.log("Remove interest:", interest)
+                            }
+                          >
+                            &nbsp;×
+                          </span>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="Text-color--gray-600">
+                      No interests listed
+                    </span>
+                  )}
+                  <div
+                    className="Button Button--small Button-color--blue-1000 Margin-top--8"
+                    onClick={() => console.log("Open add interests modal")}
+                  >
+                    Add Interest
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {loading ? (
-            <div className="Flex--center">
-              <Spinner animation="border" />
+          <div className="col-lg-4">
+            <div className="Block">
+              <div className="Block-header">Availability & Experience</div>
+              <div className="Block-subtitle">When and how you can help</div>
+
+              <div className="Profile-info">
+                {/* Available Days */}
+                <div className="Event-modal-line">
+                  <Icon
+                    glyph="calendar"
+                    className="Margin-right--8 Text-color--royal-1000"
+                  />
+                  <strong>Available Days:</strong>
+                  <div className="Margin-left--auto">
+                    {userData.availability?.weekdays && <span>Weekdays </span>}
+                    {userData.availability?.weekends && <span>Weekends </span>}
+                    {!userData.availability?.weekdays &&
+                      !userData.availability?.weekends && (
+                        <span className="Text-color--gray-600">
+                          Not specified
+                        </span>
+                      )}
+                  </div>
+                </div>
+
+                {/* Available Times */}
+                <div className="Event-modal-line">
+                  <Icon
+                    glyph="clock"
+                    className="Margin-right--8 Text-color--royal-1000"
+                  />
+                  <strong>Available Times:</strong>
+                  <div className="Margin-left--auto">
+                    {userData.availability?.mornings && <span>Mornings </span>}
+                    {userData.availability?.afternoons && (
+                      <span>Afternoons </span>
+                    )}
+                    {userData.availability?.evenings && <span>Evenings </span>}
+                    {!userData.availability?.mornings &&
+                      !userData.availability?.afternoons &&
+                      !userData.availability?.evenings && (
+                        <span className="Text-color--gray-600">
+                          Not specified
+                        </span>
+                      )}
+                  </div>
+                </div>
+
+                {/* Volunteer Experience */}
+                <div className="Event-modal-line Margin-top--10">
+                  <Icon
+                    glyph="briefcase"
+                    className="Margin-right--8 Text-color--royal-1000"
+                  />
+                  <strong>Experience:</strong>
+                  <div className="Margin-left--auto">
+                    <div>
+                      <strong>Years:</strong> {userData.experience?.years ?? 0}
+                    </div>
+                    {userData.experience?.description ? (
+                      <div>
+                        <strong>Description:</strong>{" "}
+                        {userData.experience.description}
+                      </div>
+                    ) : (
+                      <div className="Text-color--gray-600">
+                        No description provided
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-          ) : userData ? (
-            <>
-              {updateSuccess && (
-                <div className="Alert Alert--success Margin-bottom--20">
-                  Profile updated successfully!
-                </div>
-              )}
-              {updateError && (
-                <div className="Alert Alert--error Margin-bottom--20">
-                  {updateError}
-                </div>
-              )}
-
-              {isEditing ? (
-                <Formik
-                  initialValues={{
-                    first_name: userData?.first_name || "",
-                    last_name: userData?.last_name || "",
-                    phone_number: userData?.phone_number || "",
-                    email: userData?.email || "",
-                    age: userData?.age || 18,
-                    image_url: userData?.image_url || "",
-                    skills: Array.isArray(userData?.skills) ? userData.skills : [],
-                    interests: Array.isArray(userData?.interests) ? userData.interests : [],
-                    availability: userData?.availability || {
-                      weekdays: false,
-                      weekends: false,
-                      mornings: false,
-                      afternoons: false,
-                      evenings: false,
-                    },
-                    experience: userData?.experience || {
-                      years: 0,
-                      description: "",
-                    },
-                  }}
-                  validationSchema={ProfileSchema}
-                  onSubmit={handleSubmit}
-                >
-                  {({ errors, touched, isSubmitting, values, setFieldValue }) => (
-                    <Form>
-                      <div className="Form-group">
-                        <label>Profile Image</label>
-                        <div className="Profile-image-upload">
-                          <div className="Profile-image-container">
-                            <img
-                              src={previewUrl || userData.image_url || "/default-avatar.png"}
-                              alt="Profile Preview"
-                              className="Profile-image-preview"
-                            />
-                          </div>
-                          <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleImageChange}
-                            accept="image/*"
-                            style={{ display: "none" }}
-                          />
-                          <button
-                            type="button"
-                            className="Button Button-color--blue-1000"
-                            onClick={() => fileInputRef.current?.click()}
-                          >
-                            {userData.image_url ? "Change Image" : "Upload Image"}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="Form-group">
-                        <label htmlFor="first_name">First Name</label>
-                        <Field
-                          name="first_name"
-                          className="Form-input-box"
-                          placeholder="Enter your first name"
-                        />
-                        {errors.first_name && touched.first_name && (
-                          <div className="Form-error">{errors.first_name}</div>
-                        )}
-                      </div>
-
-                      <div className="Form-group">
-                        <label htmlFor="last_name">Last Name</label>
-                        <Field
-                          name="last_name"
-                          className="Form-input-box"
-                          placeholder="Enter your last name"
-                        />
-                        {errors.last_name && touched.last_name && (
-                          <div className="Form-error">{errors.last_name}</div>
-                        )}
-                      </div>
-
-                      <div className="Form-group">
-                        <label htmlFor="email">Email</label>
-                        <Field
-                          name="email"
-                          type="email"
-                          className="Form-input-box"
-                          placeholder="Enter your email"
-                        />
-                        {errors.email && touched.email && (
-                          <div className="Form-error">{errors.email}</div>
-                        )}
-                      </div>
-
-                      <div className="Form-group">
-                        <label htmlFor="phone_number">Phone Number</label>
-                        <Field
-                          name="phone_number"
-                          className="Form-input-box"
-                          placeholder="Enter your phone number"
-                        />
-                        {errors.phone_number && touched.phone_number && (
-                          <div className="Form-error">{errors.phone_number}</div>
-                        )}
-                      </div>
-
-                      <div className="Form-group">
-                        <label htmlFor="age">Age</label>
-                        <Field
-                          name="age"
-                          type="number"
-                          className="Form-input-box"
-                          placeholder="Enter your age"
-                        />
-                        {errors.age && touched.age && (
-                          <div className="Form-error">{errors.age}</div>
-                        )}
-                      </div>
-
-                      <div className="Form-group">
-                        <label>Skills</label>
-                        <div className="Skills-container">
-                          {SKILLS_OPTIONS.map((skill) => (
-                            <label key={skill} className="Checkbox-label">
-                              <Field
-                                type="checkbox"
-                                name="skills"
-                                value={skill}
-                                className="Checkbox-input"
-                              />
-                              <span className="Checkbox-text">{skill}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="Form-group">
-                        <label>Interests</label>
-                        <div className="Interests-container">
-                          {INTERESTS_OPTIONS.map((interest) => (
-                            <label key={interest} className="Checkbox-label">
-                              <Field
-                                type="checkbox"
-                                name="interests"
-                                value={interest}
-                                className="Checkbox-input"
-                              />
-                              <span className="Checkbox-text">{interest}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="Form-group">
-                        <label>Availability</label>
-                        <div className="Availability-container">
-                          <div className="Availability-section">
-                            <h4>Days</h4>
-                            <label className="Checkbox-label">
-                              <Field type="checkbox" name="availability.weekdays" />
-                              <span className="Checkbox-text">Weekdays</span>
-                            </label>
-                            <label className="Checkbox-label">
-                              <Field type="checkbox" name="availability.weekends" />
-                              <span className="Checkbox-text">Weekends</span>
-                            </label>
-                          </div>
-                          <div className="Availability-section">
-                            <h4>Times</h4>
-                            <label className="Checkbox-label">
-                              <Field type="checkbox" name="availability.mornings" />
-                              <span className="Checkbox-text">Mornings</span>
-                            </label>
-                            <label className="Checkbox-label">
-                              <Field type="checkbox" name="availability.afternoons" />
-                              <span className="Checkbox-text">Afternoons</span>
-                            </label>
-                            <label className="Checkbox-label">
-                              <Field type="checkbox" name="availability.evenings" />
-                              <span className="Checkbox-text">Evenings</span>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="Form-group">
-                        <label>Volunteer Experience</label>
-                        <div className="Experience-container">
-                          <div className="Form-group">
-                            <label htmlFor="experience.years">Years of Experience</label>
-                            <Field
-                              name="experience.years"
-                              type="number"
-                              min="0"
-                              className="Form-input-box"
-                            />
-                          </div>
-                          <div className="Form-group">
-                            <label htmlFor="experience.description">Experience Description</label>
-                            <Field
-                              name="experience.description"
-                              as="textarea"
-                              className="Form-textarea"
-                              placeholder="Describe your previous volunteer experience..."
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="Flex-row Margin-top--20">
-                        <button
-                          type="submit"
-                          className="Button Button-color--blue-1000 Margin-right--10"
-                          disabled={isSubmitting}
-                        >
-                          {isSubmitting ? "Saving..." : "Save Changes"}
-                        </button>
-                        <button
-                          type="button"
-                          className="Button Button-color--gray-1000"
-                          onClick={() => setIsEditing(false)}
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </Form>
-                  )}
-                </Formik>
-              ) : (
-                <div className="Profile-info">
-                  <div className="Profile-image">
-                    <img
-                      src={userData.image_url || "/default-avatar.png"}
-                      alt="Profile Avatar"
-                      className="Profile-avatar"
-                    />
-                  </div>
-
-                  <div className="Event-modal-line">
-                    <Icon
-                      glyph="user"
-                      className="Margin-right--8 Text-color--royal-1000"
-                    />
-                    <strong>Name:</strong>
-                    <div className="Margin-left--auto">
-                      {userData.first_name} {userData.last_name}
-                    </div>
-                  </div>
-
-                  <div className="Event-modal-line">
-                    <Icon
-                      glyph="envelope"
-                      className="Margin-right--8 Text-color--royal-1000"
-                    />
-                    <strong>Email:</strong>
-                    <div className="Margin-left--auto">{userData.email}</div>
-                  </div>
-
-                  <div className="Event-modal-line">
-                    <Icon
-                      glyph="phone"
-                      className="Margin-right--8 Text-color--royal-1000"
-                    />
-                    <strong>Phone:</strong>
-                    <div className="Margin-left--auto">
-                      {userData.phone_number || "Not provided"}
-                    </div>
-                  </div>
-
-                  <div className="Event-modal-line">
-                    <Icon
-                      glyph="calendar"
-                      className="Margin-right--8 Text-color--royal-1000"
-                    />
-                    <strong>Age:</strong>
-                    <div className="Margin-left--auto">
-                      {userData.age || "Not provided"}
-                    </div>
-                  </div>
-
-                  <div className="Event-modal-line">
-                    <Icon
-                      glyph="clock"
-                      className="Margin-right--8 Text-color--royal-1000"
-                    />
-                    <strong>Joined:</strong>
-                    <div className="Margin-left--auto">
-                      {user?.created_at
-                        ? new Date(user.created_at).toLocaleDateString()
-                        : "Unknown"}
-                    </div>
-                  </div>
-
-                  <div className="Profile-section">
-                    <h3>Skills & Expertise</h3>
-                    <div className="Skills-tags">
-                      {Array.isArray(userData.skills) && userData.skills.length > 0 ? (
-                        userData.skills.map((skill) => (
-                          <span key={skill} className="Tag">
-                            {skill}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="Text-color--gray-600">No skills listed</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="Profile-section">
-                    <h3>Interests & Causes</h3>
-                    <div className="Interests-tags">
-                      {Array.isArray(userData.interests) && userData.interests.length > 0 ? (
-                        userData.interests.map((interest) => (
-                          <span key={interest} className="Tag">
-                            {interest}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="Text-color--gray-600">No interests listed</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="Profile-section">
-                    <h3>Availability</h3>
-                    <div className="Availability-display">
-                      <div className="Availability-days">
-                        <strong>Days:</strong>
-                        {userData.availability?.weekdays && <span>Weekdays</span>}
-                        {userData.availability?.weekends && <span>Weekends</span>}
-                      </div>
-                      <div className="Availability-times">
-                        <strong>Times:</strong>
-                        {userData.availability?.mornings && <span>Mornings</span>}
-                        {userData.availability?.afternoons && <span>Afternoons</span>}
-                        {userData.availability?.evenings && <span>Evenings</span>}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="Profile-section">
-                    <h3>Volunteer Experience</h3>
-                    <div className="Experience-display">
-                      <p>
-                        <strong>Years of Experience:</strong> {userData.experience?.years || 0}
-                      </p>
-                      {userData.experience?.description && (
-                        <p>
-                          <strong>Description:</strong> {userData.experience.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <button
-                    className="Button Button-color--blue-1000 Margin-top--20"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    Edit Profile
-                  </button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="Flex--center">No profile data found.</div>
-          )}
+          </div>
         </div>
       </div>
     </>
