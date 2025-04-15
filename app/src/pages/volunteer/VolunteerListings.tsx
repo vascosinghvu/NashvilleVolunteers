@@ -152,7 +152,8 @@ const Listings: React.FC = () => {
 
   // Filter events based on selected tags, search and dates
   const filteredEvents = React.useMemo(() => {
-    return events.filter((event) => {
+    // First filter the events
+    const filtered = events.filter((event) => {
       // Filter by search query
       if (searchQuery) {
         const searchLower = searchQuery.toLowerCase()
@@ -184,7 +185,14 @@ const Listings: React.FC = () => {
       }
 
       return true
-    })
+    });
+
+    // Then sort by date (soonest events first)
+    return filtered.sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA.getTime() - dateB.getTime();
+    });
   }, [events, selectedTags, selectedDates, searchQuery])
 
   // Update the "See All" button handler
