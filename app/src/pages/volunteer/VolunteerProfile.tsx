@@ -302,6 +302,18 @@ const Profile = () => {
     }
   }
 
+  const deleteUser = async () => {
+    if (!user?.id) return
+    try {
+      await api.delete(`/volunteer/delete-volunteer/${user.id}`)
+      // Optionally, redirect or show a success message
+      console.log("User deleted successfully")
+    } catch (error) {
+      console.error("Failed to delete user:", error)
+      setUpdateError("Could not delete user. Please try again.")
+    }
+  }
+
   if (!user) {
     return (
       <>
@@ -692,7 +704,7 @@ const Profile = () => {
               <div className="Block-subtitle">Your profile details</div>
 
               <div className="Block-body">
-                <div className="Profile-image">
+                <div className="Flex--center Margin-bottom--20">
                   <img
                     src={userData.image_url || "/default-avatar.png"}
                     alt="Profile Avatar"
@@ -744,6 +756,13 @@ const Profile = () => {
                   onClick={() => setShowEditModal(true)}
                 >
                   Edit Profile
+                </button>
+                {/* delete user */}
+                <button
+                  className="Button Button-color--red-1000 Width--100 Margin-top--10 Button--hollow"
+                  onClick={deleteUser}
+                >
+                  Delete Account
                 </button>
               </div>
             </div>

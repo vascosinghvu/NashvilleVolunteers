@@ -31,7 +31,9 @@ interface EventData {
 
 const OrganizationDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>()
-  const [organization, setOrganization] = useState<OrganizationData | null>(null)
+  const [organization, setOrganization] = useState<OrganizationData | null>(
+    null
+  )
   const [events, setEvents] = useState<EventData[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -40,14 +42,14 @@ const OrganizationDetails: React.FC = () => {
     // Hands On Nashville
     "f42d2a91-76ae-42ed-9f51-b2c5c457385e": {
       email: "handson@unitedwaygn.org",
-      phone_number: "(615) 298-1108"
+      phone_number: "(615) 298-1108",
     },
     // The Nashville Food Project
     "be50cc09-e388-4ee1-8e4e-d87a70e5669f": {
       email: "info@thenashvillefoodproject.org",
-      phone_number: "615-460-0172"
-    }
-  };
+      phone_number: "615-460-0172",
+    },
+  }
 
   useEffect(() => {
     const fetchOrganizationDetails = async () => {
@@ -55,19 +57,19 @@ const OrganizationDetails: React.FC = () => {
         setLoading(true)
         const [orgResponse, eventsResponse] = await Promise.all([
           api.get(`/organization/get-organization/${id}`),
-          api.get(`/event/organization/${id}`)
+          api.get(`/event/organization/${id}`),
         ])
-        
-        let orgData = orgResponse.data;
-        
+
+        let orgData = orgResponse.data
+
         // Apply special contact info if this is one of our special organizations
         if (id && id in specialOrgContacts) {
           orgData = {
             ...orgData,
-            ...specialOrgContacts[id as keyof typeof specialOrgContacts]
-          };
+            ...specialOrgContacts[id as keyof typeof specialOrgContacts],
+          }
         }
-        
+
         setOrganization(orgData)
         setEvents(eventsResponse.data)
       } catch (error) {
@@ -109,171 +111,135 @@ const OrganizationDetails: React.FC = () => {
   }
 
   // Determine if this is a special org for displaying custom contact info
-  const isSpecialOrg = id && id in specialOrgContacts;
+  const isSpecialOrg = id && id in specialOrgContacts
 
   return (
     <>
-      <Navbar />
-      <MetaData title={organization.org_name} description="Organization Details" />
-      <div className="Container">
-        <div style={{ 
-          display: 'grid',
-          gridTemplateColumns: '500px 1fr',
-          gap: '24px',
-          padding: '32px',
-          backgroundColor: 'white'
-        }}>
-          {/* Left column - Organization Profile */}
-          <div className="Block Widget-block" style={{ 
-            height: 'fit-content',
-            padding: '24px',
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            width: '100%'
-          }}>
-            <h1 style={{
-              fontSize: '32px',
-              fontWeight: '700',
-              color: '#1a1a1a',
-              marginBottom: '4px',
-              wordBreak: 'break-word'
-            }}>{organization.org_name}</h1>
-            <h2 style={{
-              fontSize: '20px',
-              color: '#666',
-              marginBottom: '32px',
-              wordBreak: 'break-word'
-            }}>Organization Details</h2>
+      <MetaData
+        title={organization.org_name}
+        description="Organization Details"
+      />
+      <>
+        <Navbar />
+        <MetaData
+          title={organization.org_name}
+          description="Organization Details"
+        />
+        <div className="container">
+          <div className="row py-4">
+            {/* Left Column - Org Profile */}
+            <div className="col-lg-4">
+              <div className="Block">
+                <div className="Block-header">{organization.org_name}</div>
+                <div className="Block-subtitle">Organization Details</div>
 
-            {organization.image_url && (
-              <img
-                src={organization.image_url}
-                alt="Organization Logo"
-                style={{ 
-                  width: '100%',
-                  maxWidth: '300px',
-                  height: 'auto',
-                  marginBottom: '32px',
-                  display: 'block'
-                }}
-              />
-            )}
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-              <div>
-                <h3 style={{
-                  fontSize: '24px',
-                  fontWeight: '600',
-                  color: '#1a1a1a',
-                  marginBottom: '16px'
-                }}>Description</h3>
-                <p style={{
-                  fontSize: '16px',
-                  color: '#444',
-                  lineHeight: '1.6',
-                  wordBreak: 'break-word'
-                }}>{organization.description || "No description provided"}</p>
-              </div>
-
-              <div>
-                <h3 style={{
-                  fontSize: '24px',
-                  fontWeight: '600',
-                  color: '#1a1a1a',
-                  marginBottom: '16px'
-                }}>Contact Information</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <a 
-                    href={`mailto:${organization.email}`}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      color: '#0066cc',
-                      textDecoration: 'none',
-                      fontSize: '16px',
-                      wordBreak: 'break-all'
-                    }}
-                  >
-                    <Icon glyph="envelope" className="Icon--no-shrink Margin-right--8" />
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {organization.email}
-                    </span>
-                  </a>
-
-                  {organization.phone_number && (
-                    <a 
-                      href={`tel:${organization.phone_number}`}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        color: '#0066cc',
-                        textDecoration: 'none',
-                        fontSize: '16px'
-                      }}
-                    >
-                      <Icon glyph="phone" className="Icon--no-shrink Margin-right--8" />
-                      <span>{organization.phone_number}</span>
-                    </a>
+                <div className="Block-body">
+                  {organization.image_url && (
+                    <div className="Margin-bottom--20 Flex--center">
+                      <img
+                        src={organization.image_url}
+                        alt="Organization Logo"
+                        className="Profile-avatar"
+                      />
+                    </div>
                   )}
 
-                  {organization.website && (
-                    <a 
-                      href={organization.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        color: '#0066cc',
-                        textDecoration: 'none',
-                        fontSize: '16px',
-                        wordBreak: 'break-all'
-                      }}
-                    >
-                      <Icon glyph="link" className="Icon--no-shrink Margin-right--8" />
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        Visit Website
-                      </span>
-                    </a>
-                  )}
+                  <div className="Margin-bottom--24">
+                    <h3 className="Text-fontSize--18 Text-weight--600">
+                      Description
+                    </h3>
+                    <p className="Text-fontSize--14 Margin-top--8">
+                      {organization.description || "No description provided"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="Text-fontSize--18 Text-weight--600">
+                      Contact Information
+                    </h3>
+                    <div className="Margin-top--8 Flex-column Gap--8">
+                      <div className="Event-modal-line">
+                        <Icon
+                          glyph="envelope"
+                          className="Margin-right--8 Text-color--royal-1000"
+                        />
+                        <strong>Email:</strong>
+                        <div className="Margin-left--auto">
+                          {organization.email}
+                        </div>
+                      </div>
+
+                      {organization.phone_number && (
+                        <div className="Event-modal-line">
+                          <Icon
+                            glyph="phone"
+                            className="Margin-right--8 Text-color--royal-1000"
+                          />
+                          <strong>Phone:</strong>
+                          <div className="Margin-left--auto">
+                            {organization.phone_number}
+                          </div>
+                        </div>
+                      )}
+
+                      {organization.website && (
+                        <div className="Event-modal-line">
+                          <Icon
+                            glyph="link"
+                            className="Margin-right--8 Text-color--royal-1000"
+                          />
+                          <strong>Website:</strong>
+                          <div className="Margin-left--auto">
+                            <a
+                              href={organization.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="Text-color--blue-1000 Text-decoration--none"
+                            >
+                              Visit Website
+                            </a>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Right column - Events */}
-          <div>
-            <h1 style={{
-              fontSize: '32px',
-              fontWeight: '700',
-              color: '#1a1a1a',
-              marginBottom: '32px'
-            }}>Upcoming Events</h1>
-            <div style={{ 
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-              gap: '24px'
-            }}>
-              {events.length === 0 ? (
-                <div style={{ textAlign: 'center' }}>
-                  No upcoming events from this organization.
+            {/* Right Column - Events */}
+            <div className="col-lg-8">
+              <div className="Block">
+                <div className="Block-header">Upcoming Events</div>
+                <div className="Block-subtitle">
+                  What this organization has planned
                 </div>
-              ) : (
-                events.map((event) => (
-                  <Event
-                    key={event.event_id}
-                    event={event}
-                    organizationName={organization.org_name}
-                  />
-                ))
-              )}
+
+                <div className="Block-body">
+                  {events.length === 0 ? (
+                    <div className="Text-color--gray-600 Text-align--center">
+                      No upcoming events from this organization.
+                    </div>
+                  ) : (
+                    <div className="row g-3">
+                      {events.map((event) => (
+                        <div key={event.event_id} className="col-sm-6">
+                          <Event
+                            event={event}
+                            organizationName={organization.org_name}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     </>
   )
 }
 
-export default OrganizationDetails 
+export default OrganizationDetails

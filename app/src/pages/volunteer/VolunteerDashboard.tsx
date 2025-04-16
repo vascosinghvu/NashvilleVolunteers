@@ -49,53 +49,71 @@ const VolunteerDashboard: React.FC = () => {
   const navigate = useNavigate()
 
   // Separate active, pending, and past events
-  const { activeEvents, pendingEvents, pastEvents } = registeredEvents.reduce((acc, event) => {
-    const status = getEventStatus(event.date);
-    if (status === 'past') {
-      acc.pastEvents.push(event);
-    } else if (event.restricted && !registrations.find(r => r.event_id === event.event_id && r.approved)) {
-      acc.pendingEvents.push(event);
-    } else {
-      acc.activeEvents.push(event);
+  const { activeEvents, pendingEvents, pastEvents } = registeredEvents.reduce(
+    (acc, event) => {
+      const status = getEventStatus(event.date)
+      if (status === "past") {
+        acc.pastEvents.push(event)
+      } else if (
+        event.restricted &&
+        !registrations.find((r) => r.event_id === event.event_id && r.approved)
+      ) {
+        acc.pendingEvents.push(event)
+      } else {
+        acc.activeEvents.push(event)
+      }
+      return acc
+    },
+    {
+      activeEvents: [] as EventData[],
+      pendingEvents: [] as EventData[],
+      pastEvents: [] as EventData[],
     }
-    return acc;
-  }, { activeEvents: [] as EventData[], pendingEvents: [] as EventData[], pastEvents: [] as EventData[] });
+  )
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!user?.id) return;
-      
-      try {
-        setLoading(true);
-        // Fetch user profile
-        const profileResponse = await api.get(`/volunteer/get-volunteer/${user.id}`);
-        setUserProfile(profileResponse.data);
-        
-        // Fetch registered events
-        await fetchRegisteredEvents();
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      if (!user?.id) return
 
-    fetchData();
-  }, [user]);
+      try {
+        setLoading(true)
+        // Fetch user profile
+        const profileResponse = await api.get(
+          `/volunteer/get-volunteer/${user.id}`
+        )
+        setUserProfile(profileResponse.data)
+
+        // Fetch registered events
+        await fetchRegisteredEvents()
+      } catch (error) {
+        console.error("Error fetching data:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [user])
 
   const fetchRegisteredEvents = async () => {
     if (!user?.id) return
-    
+
     try {
       // First get all registrations for this volunteer
-      const registrationsResponse = await api.get(`/registration/get-user-registrations/${user.id}`)
+      const registrationsResponse = await api.get(
+        `/registration/get-user-registrations/${user.id}`
+      )
       setRegistrations(registrationsResponse.data)
-      
+
       // Then get the event details for each registration
-      const eventPromises = registrationsResponse.data.map(async (registration: any) => {
-        const eventResponse = await api.get(`/event/get-event/${registration.event_id}`)
-        return eventResponse.data
-      })
+      const eventPromises = registrationsResponse.data.map(
+        async (registration: any) => {
+          const eventResponse = await api.get(
+            `/event/get-event/${registration.event_id}`
+          )
+          return eventResponse.data
+        }
+      )
 
       const events = await Promise.all(eventPromises)
       setRegisteredEvents(events)
@@ -123,7 +141,9 @@ const VolunteerDashboard: React.FC = () => {
   const handleUnregister = async () => {
     if (selectedEvent && user?.id) {
       try {
-        await api.delete(`/registration/delete-registration/${user.id}/${selectedEvent.event_id}`)
+        await api.delete(
+          `/registration/delete-registration/${user.id}/${selectedEvent.event_id}`
+        )
         setSelectedEvent(null)
         // Refresh the events list
         fetchRegisteredEvents()
@@ -169,7 +189,7 @@ const VolunteerDashboard: React.FC = () => {
         </div>
       </div>
     </div>
-  );
+  )
 
   return (
     <>
@@ -177,26 +197,12 @@ const VolunteerDashboard: React.FC = () => {
       <div className="Dashboard">
         <div className="Dashboard-welcome">
           <h1 className="Dashboard-welcome-title">
-            {userProfile ? `${userProfile.first_name}'s` : 'Your'} Volunteer Dashboard
+            {userProfile ? `${userProfile.first_name}'s` : "Your"} Volunteer
+            Dashboard
           </h1>
           <p className="Dashboard-welcome-subtitle">
             View and manage your registered events
           </p>
-        </div>
-
-        <div className="Dashboard-events-header-actions Margin-bottom--32">
-          <button
-            onClick={() => navigate("/listings")}
-            className="Button Button-color--yellow-1000"
-          >
-            Find More Events
-          </button>
-          <button
-            onClick={() => navigate("/volunteer/profile")}
-            className="Button Button-color--gray-1000"
-          >
-            Manage Profile
-          </button>
         </div>
 
         {registeredEvents.length === 0 ? (
@@ -211,9 +217,12 @@ const VolunteerDashboard: React.FC = () => {
           </div>
         ) : (
           <>
-            {activeEvents.length > 0 && renderEventSection(activeEvents, "Active Events")}
-            {pendingEvents.length > 0 && renderEventSection(pendingEvents, "Pending Events")}
-            {pastEvents.length > 0 && renderEventSection(pastEvents, "Past Events")}
+            {activeEvents.length > 0 &&
+              renderEventSection(activeEvents, "Active Events")}
+            {pendingEvents.length > 0 &&
+              renderEventSection(pendingEvents, "Pending Events")}
+            {pastEvents.length > 0 &&
+              renderEventSection(pastEvents, "Past Events")}
           </>
         )}
       </div>
