@@ -99,7 +99,7 @@ const Profile = () => {
         // Parse JSONB fields if they exist
         const parsedData = {
           ...data,
-          skills: data.skills ? JSON.parse(data.skills) : [],
+          skills: data.skills || [],
           interests: data.interests ? JSON.parse(data.interests) : [],
           availability: data.availability
             ? JSON.parse(data.availability)
@@ -153,45 +153,6 @@ const Profile = () => {
     }
   }
 
-  if (!user) {
-    return (
-      <>
-        <Navbar />
-        <div className="Widget">
-          <div className="Widget-body Text--center">
-            <p>Please log in to view your profile.</p>
-          </div>
-        </div>
-      </>
-    )
-  }
-
-  if (loading) {
-    return (
-      <>
-        <Navbar />
-        <div className="Widget">
-          <div className="Widget-body Text--center">
-            <Spinner animation="border" />
-          </div>
-        </div>
-      </>
-    )
-  }
-
-  if (!userData) {
-    return (
-      <>
-        <Navbar />
-        <div className="Widget">
-          <div className="Widget-body Text--center">
-            <p>No profile data found.</p>
-          </div>
-        </div>
-      </>
-    )
-  }
-
   const handleEditProfile = async (values: {
     first_name: string
     last_name: string
@@ -235,6 +196,120 @@ const Profile = () => {
       console.error("Edit profile failed:", error)
       setUpdateError("Failed to update profile.")
     }
+  }
+
+  const handleAddSkills = async (skills: string[]) => {
+    if (!user?.id) return
+
+    try {
+      const response = await api.post(`/volunteer/${user.id}/skills`, {
+        skills,
+      })
+
+      setUserData((prev) => ({
+        ...prev!,
+        skills: response.data.skills,
+      }))
+
+      setShowSkillsModal(false)
+    } catch (error) {
+      console.error("Failed to add skills:", error)
+      setUpdateError("Could not add skills. Please try again.")
+    }
+  }
+
+  const handleAddInterests = async (interests: string[]) => {
+    if (!user?.id) return
+
+    try {
+      const response = await api.post(`/volunteer/${user.id}/interests`, {
+        interests,
+      })
+
+      setUserData((prev) => ({
+        ...prev!,
+        interests: response.data.interests,
+      }))
+      setShowInterestsModal(false)
+    } catch (error) {
+      console.error("Failed to add interests:", error)
+      setUpdateError("Could not add interests. Please try again.")
+    }
+  }
+
+  const handleDeleteSkill = async (skill: string) => {
+    if (!user?.id) return
+
+    try {
+      const response = await api.delete(`/volunteer/${user.id}/skills`, {
+        data: { skill }, // must be under 'data'
+      })
+
+      setUserData((prev) => ({
+        ...prev!,
+        skills: response.data.skills,
+      }))
+    } catch (error) {
+      console.error("Failed to delete skill:", error)
+      setUpdateError("Could not remove skill. Please try again.")
+    }
+  }
+
+  const handleDeleteInterest = async (interest: string) => {
+    if (!user?.id) return
+
+    try {
+      const response = await api.delete(`/volunteer/${user.id}/interests`, {
+        data: { interest }, // must be under 'data'
+      })
+
+      setUserData((prev) => ({
+        ...prev!,
+        interests: response.data.interests,
+      }))
+    } catch (error) {
+      console.error("Failed to delete interest:", error)
+      setUpdateError("Could not remove interest. Please try again.")
+    }
+  }
+
+  if (!user) {
+    return (
+      <>
+        <Navbar />
+        <div className="Widget">
+          <div className="Widget-body Text--center">
+            <p>Please log in to view your profile.</p>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="Widget">
+          <div className="Widget-body Text--center">
+            <Spinner animation="border" />
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  if (!userData) {
+    return (
+      <>
+        <Navbar />
+        <div className="Widget">
+          <div className="Widget-body Text--center">
+            <p>No profile data found.</p>
+          </div>
+        </div>
+      </>
+    )
   }
 
   return (
@@ -322,6 +397,9 @@ const Profile = () => {
                     <button
                       type="button"
                       className="Button Button-color--gray-1000 Button--hollow Width--100 Margin-right--4"
+                      onClick={() => {
+                        setShowEditModal(false)
+                      }}
                     >
                       Cancel
                     </button>
@@ -348,8 +426,7 @@ const Profile = () => {
             <Formik
               initialValues={{ skills: userData.skills || [] }}
               onSubmit={(values) => {
-                setUserData({ ...userData, skills: values.skills })
-                setShowSkillsModal(false)
+                handleAddSkills(values.skills)
               }}
             >
               {({ values, setFieldValue }) => (
@@ -399,8 +476,7 @@ const Profile = () => {
             <Formik
               initialValues={{ interests: userData.interests || [] }}
               onSubmit={(values) => {
-                setUserData({ ...userData, interests: values.interests })
-                setShowInterestsModal(false)
+                handleAddInterests(values.interests)
               }}
             >
               {({ values, setFieldValue }) => (
@@ -431,7 +507,7 @@ const Profile = () => {
                   </div>
                   <button
                     type="submit"
-                    className="Button Button-color--blue-1000 Margin-top--10"
+                    className="Button Button-color--blue-1000 Margin-top--10 Width--100"
                   >
                     Save Interests
                   </button>
@@ -676,13 +752,13 @@ const Profile = () => {
                 </div>
 
                 {userData.skills?.length ? (
-                  <div className="Flex-row">
+                  <div className="Flex-wrap--tags">
                     {userData.skills.map((skill) => (
                       <span key={skill} className="Filter-tag">
                         {skill}
                         <span
                           className="Filter-tag-close"
-                          onClick={() => console.log("Remove skill:", skill)}
+                          onClick={() => handleDeleteSkill(skill)}
                         >
                           &nbsp;×
                         </span>
@@ -717,9 +793,7 @@ const Profile = () => {
                         {interest}
                         <span
                           className="Filter-tag-close"
-                          onClick={() =>
-                            console.log("Remove interest:", interest)
-                          }
+                          onClick={() => handleDeleteInterest(interest)}
                         >
                           &nbsp;×
                         </span>

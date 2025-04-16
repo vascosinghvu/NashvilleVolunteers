@@ -444,21 +444,31 @@ export const editProfile = async (req: Request, res: Response) => {
 
 export const addSkill = async (req: Request, res: Response) => {
   const { v_id } = req.params
-  const { skill } = req.body
+  const { skills } = req.body
 
-  if (!skill) return res.status(400).json({ error: "Skill is required" })
+  if (!Array.isArray(skills) || skills.length === 0) {
+    return res.status(400).json({ error: "Skills must be a non-empty array" })
+  }
 
   try {
     const result = await sql`
       UPDATE volunteers
-      SET skills = COALESCE(skills, '[]'::jsonb) || to_jsonb(${skill})
+      SET skills = (
+        SELECT array_agg(DISTINCT s)
+        FROM (
+          SELECT unnest(COALESCE(skills, '{}')) AS s
+          UNION
+          SELECT unnest(${skills}::text[]) AS s
+        ) combined
+      )
       WHERE v_id = ${v_id}
       RETURNING skills
     `
+
     res.status(200).json({ skills: result[0].skills })
   } catch (error) {
-    console.error("Error adding skill:", error)
-    res.status(500).json({ error: "Failed to add skill" })
+    console.error("Error adding skills:", error)
+    res.status(500).json({ error: "Failed to add skills" })
   }
 }
 
@@ -469,20 +479,16 @@ export const deleteSkill = async (req: Request, res: Response) => {
   if (!skill) return res.status(400).json({ error: "Skill is required" })
 
   try {
-    const current = await sql`
-      SELECT skills FROM volunteers WHERE v_id = ${v_id}
-    `
-    if (current.length === 0)
-      return res.status(404).json({ error: "Volunteer not found" })
-
-    const updated = (current[0].skills || []).filter((s: string) => s !== skill)
-
     const result = await sql`
       UPDATE volunteers
-      SET skills = ${JSON.stringify(updated)}::jsonb
+      SET skills = array_remove(skills, ${skill})
       WHERE v_id = ${v_id}
       RETURNING skills
     `
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Volunteer not found" })
+    }
 
     res.status(200).json({ skills: result[0].skills })
   } catch (error) {
@@ -493,21 +499,33 @@ export const deleteSkill = async (req: Request, res: Response) => {
 
 export const addInterest = async (req: Request, res: Response) => {
   const { v_id } = req.params
-  const { interest } = req.body
+  const { interests } = req.body
 
-  if (!interest) return res.status(400).json({ error: "Interest is required" })
+  if (!Array.isArray(interests) || interests.length === 0) {
+    return res
+      .status(400)
+      .json({ error: "Interests must be a non-empty array" })
+  }
 
   try {
     const result = await sql`
       UPDATE volunteers
-      SET interests = COALESCE(interests, '[]'::jsonb) || to_jsonb(${interest})
+      SET interests = (
+        SELECT array_agg(DISTINCT i)
+        FROM (
+          SELECT unnest(COALESCE(interests, '{}')) AS i
+          UNION
+          SELECT unnest(${interests}::text[]) AS i
+        ) combined
+      )
       WHERE v_id = ${v_id}
       RETURNING interests
     `
+
     res.status(200).json({ interests: result[0].interests })
   } catch (error) {
-    console.error("Error adding interest:", error)
-    res.status(500).json({ error: "Failed to add interest" })
+    console.error("Error adding interests:", error)
+    res.status(500).json({ error: "Failed to add interests" })
   }
 }
 
@@ -518,22 +536,16 @@ export const deleteInterest = async (req: Request, res: Response) => {
   if (!interest) return res.status(400).json({ error: "Interest is required" })
 
   try {
-    const current = await sql`
-      SELECT interests FROM volunteers WHERE v_id = ${v_id}
-    `
-    if (current.length === 0)
-      return res.status(404).json({ error: "Volunteer not found" })
-
-    const updated = (current[0].interests || []).filter(
-      (i: string) => i !== interest
-    )
-
     const result = await sql`
       UPDATE volunteers
-      SET interests = ${JSON.stringify(updated)}::jsonb
+      SET interests = array_remove(interests, ${interest})
       WHERE v_id = ${v_id}
       RETURNING interests
     `
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Volunteer not found" })
+    }
 
     res.status(200).json({ interests: result[0].interests })
   } catch (error) {
