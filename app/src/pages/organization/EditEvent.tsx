@@ -161,7 +161,7 @@ const EditEvent: React.FC = () => {
       formData.append('image', file)
 
       // Upload the image
-      const response = await api.put(`/event/update-event/${eventId}/image`, formData, {
+      const response = await api.put(`/event/update-event/${eventId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
