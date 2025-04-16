@@ -8,6 +8,7 @@ import MetaData from "../../components/MetaData"
 import Icon from "../../components/Icon"
 import * as yup from "yup"
 import { Form as BootstrapForm } from "react-bootstrap"
+
 interface EventFormValues {
   name: string
   description: string
@@ -45,7 +46,8 @@ const EditEvent: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>()
   const [error, setError] = useState<string>("")
   const [loading, setLoading] = useState(true)
-  const [volunteers, setVolunteers] = useState<VolunteerData[]>([])
+  const [pendingVolunteers, setPendingVolunteers] = useState<VolunteerData[]>([])
+  const [registeredVolunteers, setRegisteredVolunteers] = useState<VolunteerData[]>([])
   const [initialValues, setInitialValues] = useState<EventFormValues>({
     name: "",
     description: "",
@@ -98,7 +100,13 @@ const EditEvent: React.FC = () => {
         )
         const volunteerResponses = await Promise.all(volunteerPromises)
         const volunteerData = volunteerResponses.map(response => response.data)
-        setVolunteers(volunteerData)
+
+        if (eventData.restricted) {
+          setPendingVolunteers(volunteerData.filter((volunteer, index) => !registrations[index].approved))
+          setRegisteredVolunteers(volunteerData.filter((volunteer, index) => registrations[index].approved))
+        } else {
+          setRegisteredVolunteers(volunteerData)
+        }
 
         setLoading(false)
       } catch (err) {
@@ -179,6 +187,24 @@ const EditEvent: React.FC = () => {
       })
   }
 
+  const handleApproveVolunteer = async (volunteer: VolunteerData) => {
+    try {
+      await api.put(`/registration/approve-volunteer/${eventId}/${volunteer.v_id}`)
+      setRegisteredVolunteers(prev => [...prev, volunteer])
+      setPendingVolunteers(prev => prev.filter(v => v.v_id !== volunteer.v_id))
+    } catch (err) {
+      console.error('Failed to approve volunteer:', err)
+    }
+  }
+
+  const handleRejectVolunteer = async (volunteer: VolunteerData) => {
+    try {
+      await api.delete(`/registration/delete-registration/${volunteer.v_id}/${eventId}`)
+      setPendingVolunteers(prev => prev.filter(v => v.v_id !== volunteer.v_id))
+    } catch (err) {
+      console.error('Failed to reject volunteer:', err)
+    }
+  }
 
   if (loading) {
     return (
@@ -393,13 +419,13 @@ const EditEvent: React.FC = () => {
           <div style={{ flex: '0 0 32%' }}>
             <div className="Block" style={{ position: 'sticky', top: '24px' }}>
               <h2 className="Text-size--16 Font-weight--600 Text-color--dark-800 Margin-bottom--16">
-                Registered Volunteers ({volunteers.length}/{initialValues.people_needed})
+                Registered Volunteers ({registeredVolunteers.length}/{initialValues.people_needed})
               </h2>
-              {volunteers.length === 0 ? (
+              {registeredVolunteers.length === 0 ? (
                 <p className="Text-color--gray-600">No volunteers have registered for this event yet.</p>
               ) : (
                 <div className="space-y-2">
-                  {volunteers.map((volunteer) => (
+                  {registeredVolunteers.map((volunteer: VolunteerData) => (
                     <div 
                       key={volunteer.v_id} 
                       className="px-6 py-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
@@ -433,6 +459,62 @@ const EditEvent: React.FC = () => {
                 </div>
               )}
             </div>
+            {initialValues.restricted && (
+              <div className="Block" style={{ position: 'sticky', top: '24px' }}>
+                <h2 className="Text-size--16 Font-weight--600 Text-color--dark-800 Margin-bottom--16">
+                  Pending Volunteers ({pendingVolunteers.length}/{initialValues.people_needed})
+                </h2>
+                {pendingVolunteers.length === 0 ? (
+                  <p className="Text-color--gray-600">No pending volunteers for this event.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {pendingVolunteers.map((volunteer: VolunteerData) => (
+                      <div 
+                        key={volunteer.v_id} 
+                        className="px-6 py-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex flex-col items-center text-center px-2">
+                          <div className="bg-gray-50 p-2 rounded-full Margin-bottom--8">
+                            <Icon glyph="user" size="20" className="Text-color--royal-800" />
+                          </div>
+                          <div className="Font-weight--600 Text-color--dark-800 Margin-bottom--4">
+                            {volunteer.first_name} {volunteer.last_name}
+                          </div>
+                          <div style={{ width: '85%', margin: '0 auto' }} className="flex items-center">
+                            <span 
+                              onClick={() => handleCopyEmail(volunteer.email, volunteer.v_id)}
+                              className="cursor-pointer hover:scale-110 transition-transform duration-200 flex items-center"
+                              style={{ marginRight: '12px' }}
+                            >
+                              <Icon 
+                                glyph={copiedId === volunteer.v_id ? "check" : "copy"} 
+                                size="14" 
+                                className="Text-color--royal-800"
+                              />
+                            </span>
+                            <span className="Text-size--14 Text-color--gray-600">
+                              {volunteer.email}
+                            </span>
+                            <button
+                              onClick={() => handleApproveVolunteer(volunteer)}
+                              className="Button Button-color--blue-1000 Width--50"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => handleRejectVolunteer(volunteer)}
+                              className="Button Button-color--red-1000 Width--50"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

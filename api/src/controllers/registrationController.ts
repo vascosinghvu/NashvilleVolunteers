@@ -42,6 +42,16 @@ export const createRegistration = async (req: Request, res: Response) => {
     }
 }
 
+export const approveVolunteer = async (req: Request, res: Response) => {
+    try {
+        const { event_id, v_id } = req.params
+        const approvedRegistration = await sql`UPDATE volunteer_event SET approved = true WHERE event_id = ${event_id} AND v_id = ${v_id}`
+        res.status(200).json(approvedRegistration)
+    } catch (error) {
+        res.status(500).json({ error: "Failed to approve volunteer", details: error })
+    }
+}   
+
 export const deleteRegistration = async (req: Request, res: Response) => {
     try {
         const { v_id, event_id } = req.params

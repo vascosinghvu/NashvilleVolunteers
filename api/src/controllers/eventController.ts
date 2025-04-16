@@ -129,16 +129,18 @@ export const updateEvent = async (req: Request, res: Response) => {
       }
     }
 
-    // Handle tags - ensure they're always an array
-    let tags = Array.isArray(req.body.tags) ? req.body.tags : existingEvent[0].tags;
+    let tags = [];
+    console.log(`existingEvent[0].tags: ${existingEvent[0].tags}`);
+    console.log(`existingEvent tags type: ${typeof existingEvent[0].tags}`);
+    if (req.body.tags) {
+      tags = req.body.tags.split(',').map((tag: string) => tag.trim());
+    } else {
+      tags = existingEvent[0].tags;
+    }
 
     // Merge existing data with updates
-    const updatedData = { 
-      ...existingEvent[0], 
-      ...req.body,
-      tags,
-      image_url 
-    };
+    const updatedData = { ...existingEvent[0], ...req.body, image_url }
+    console.log(`updatedData: ${updatedData}`);
     
     // Perform update with all fields
     const updatedEvent = await sql`
