@@ -37,9 +37,12 @@
         gap: 8px;
 
         &-title {
-          font-size: var(--nash-font-size-24);
-          font-weight: 700;
           color: var(--nash-color-dark-900);
+          justify-content: space-between;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+        
         }
 
         &-divider {

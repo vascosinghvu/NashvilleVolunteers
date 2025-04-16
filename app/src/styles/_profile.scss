@@ -49,6 +49,13 @@
     border: 2px solid var(--color-royal-1000);
     background-color: var(--color-gray-100);
   }
+
+  .Profile-preview {
+    width: auto;
+    height: 150px;
+    object-fit: cover;
+    background-color: var(--color-gray-100);
+  }
   
   .Profile-image-upload {
     display: flex;

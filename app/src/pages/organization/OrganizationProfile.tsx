@@ -48,7 +48,9 @@ const OrganizationProfile = () => {
       if (!user) return
       try {
         console.log("Fetching organization profile for:", user.id)
-        const response = await api.get(`/organization/get-organization/${user.id}`)
+        const response = await api.get(
+          `/organization/get-organization/${user.id}`
+        )
         setOrgData(response.data)
         console.log("Organization data:", response.data)
       } catch (error) {
@@ -61,15 +63,21 @@ const OrganizationProfile = () => {
     fetchOrgData()
   }, [user])
 
-  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0]
     if (file) {
       try {
         // Create preview immediately for better UX
         setPreviewUrl(URL.createObjectURL(file))
-        
+
         // Resize image
-        const resizedImage = await resizeImage(file, MAX_IMAGE_SIZE, MAX_IMAGE_SIZE)
+        const resizedImage = await resizeImage(
+          file,
+          MAX_IMAGE_SIZE,
+          MAX_IMAGE_SIZE
+        )
         setSelectedImage(resizedImage)
       } catch (error) {
         console.error("Error processing image:", error)
@@ -82,26 +90,26 @@ const OrganizationProfile = () => {
     try {
       setUpdateError("")
       setUpdateSuccess(false)
-      
+
       const formData = new FormData()
-      
+
       // Add all fields to FormData
       Object.entries(values).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           formData.append(key, value.toString())
         }
       })
-      
+
       // Add image if selected
       if (selectedImage) {
         formData.append("image", selectedImage)
       }
-      
+
       const response = await api.put(
         `/organization/update-organization/${user?.id}`,
         formData
       )
-      
+
       if (response.status === 200) {
         setOrgData(response.data)
         setUpdateSuccess(true)
@@ -135,7 +143,9 @@ const OrganizationProfile = () => {
         <div className="Block Widget-block">
           <div className="Block-header">Organization Profile</div>
           <div className="Block-subtitle">
-            {isEditing ? "Edit your organization's profile" : "Your organization's profile"}
+            {isEditing
+              ? "Edit your organization's profile"
+              : "Your organization's profile"}
           </div>
 
           {loading ? (
@@ -168,7 +178,11 @@ const OrganizationProfile = () => {
                         <div className="Profile-image-upload">
                           <div className="Profile-image-container">
                             <img
-                              src={previewUrl || orgData.image_url || "/default-avatar.png"}
+                              src={
+                                previewUrl ||
+                                orgData.image_url ||
+                                "/default-avatar.png"
+                              }
                               alt="Organization Logo"
                               className="Profile-image-preview"
                             />
@@ -237,7 +251,9 @@ const OrganizationProfile = () => {
                           placeholder="Enter organization phone number"
                         />
                         {errors.phone_number && touched.phone_number && (
-                          <div className="Form-error">{errors.phone_number}</div>
+                          <div className="Form-error">
+                            {errors.phone_number}
+                          </div>
                         )}
                       </div>
 
@@ -254,7 +270,9 @@ const OrganizationProfile = () => {
                       </div>
 
                       <div className="Form-group">
-                        <label htmlFor="first_name">Contact Person First Name</label>
+                        <label htmlFor="first_name">
+                          Contact Person First Name
+                        </label>
                         <Field
                           name="first_name"
                           className="Form-input-box"
@@ -266,7 +284,9 @@ const OrganizationProfile = () => {
                       </div>
 
                       <div className="Form-group">
-                        <label htmlFor="last_name">Contact Person Last Name</label>
+                        <label htmlFor="last_name">
+                          Contact Person Last Name
+                        </label>
                         <Field
                           name="last_name"
                           className="Form-input-box"
@@ -302,7 +322,7 @@ const OrganizationProfile = () => {
                 </Formik>
               ) : (
                 <div className="Profile-info">
-                  <div className="Profile-image">
+                  <div className="Flex--center Margin-bottom--20">
                     <img
                       src={orgData.image_url || "/default-avatar.png"}
                       alt="Organization Logo"
@@ -325,7 +345,9 @@ const OrganizationProfile = () => {
                       className="Margin-right--8 Text-color--royal-1000"
                     />
                     <strong>Description:</strong>
-                    <div className="Margin-left--auto">{orgData.description}</div>
+                    <div className="Margin-left--auto">
+                      {orgData.description}
+                    </div>
                   </div>
 
                   <div className="Event-modal-line">

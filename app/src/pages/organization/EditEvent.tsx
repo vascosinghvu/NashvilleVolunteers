@@ -31,11 +31,11 @@ interface VolunteerData {
 const validationSchema = yup.object().shape({
   name: yup.string().required("Event name is required"),
   description: yup.string().required("Description is required"),
-  date: yup.date()
-    .required("Date is required"),
+  date: yup.date().required("Date is required"),
   time: yup.string().required("Time is required"),
   location: yup.string().required("Location is required"),
-  people_needed: yup.number()
+  people_needed: yup
+    .number()
     .min(1, "At least one volunteer is needed")
     .required("Number of volunteers needed is required"),
 })
@@ -46,8 +46,12 @@ const EditEvent: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>()
   const [error, setError] = useState<string>("")
   const [loading, setLoading] = useState(true)
-  const [pendingVolunteers, setPendingVolunteers] = useState<VolunteerData[]>([])
-  const [registeredVolunteers, setRegisteredVolunteers] = useState<VolunteerData[]>([])
+  const [pendingVolunteers, setPendingVolunteers] = useState<VolunteerData[]>(
+    []
+  )
+  const [registeredVolunteers, setRegisteredVolunteers] = useState<
+    VolunteerData[]
+  >([])
   const [initialValues, setInitialValues] = useState<EventFormValues>({
     name: "",
     description: "",
@@ -57,7 +61,7 @@ const EditEvent: React.FC = () => {
     people_needed: 1,
     tags: [],
     image_url: "",
-    restricted: false
+    restricted: false,
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string>("")
@@ -75,7 +79,9 @@ const EditEvent: React.FC = () => {
         const eventData = eventResponse.data
 
         // Format the date to YYYY-MM-DD
-        const formattedDate = new Date(eventData.date).toISOString().split('T')[0]
+        const formattedDate = new Date(eventData.date)
+          .toISOString()
+          .split("T")[0]
 
         setInitialValues({
           name: eventData.name,
@@ -84,14 +90,16 @@ const EditEvent: React.FC = () => {
           time: eventData.time,
           location: eventData.location,
           people_needed: eventData.people_needed,
-          tags: eventData.tags.join(', ') || "",
+          tags: eventData.tags.join(", ") || "",
           image_url: eventData.image_url,
-          restricted: eventData.restricted
+          restricted: eventData.restricted,
         })
         setImagePreview(eventData.image_url || "")
 
         // Fetch volunteer registrations
-        const registrationsResponse = await api.get(`/registration/get-event-registrations/${eventId}`)
+        const registrationsResponse = await api.get(
+          `/registration/get-event-registrations/${eventId}`
+        )
         const registrations = registrationsResponse.data
 
         // Fetch volunteer details for each registration
@@ -99,11 +107,21 @@ const EditEvent: React.FC = () => {
           api.get(`/volunteer/get-volunteer/${reg.v_id}`)
         )
         const volunteerResponses = await Promise.all(volunteerPromises)
-        const volunteerData = volunteerResponses.map(response => response.data)
+        const volunteerData = volunteerResponses.map(
+          (response) => response.data
+        )
 
         if (eventData.restricted) {
-          setPendingVolunteers(volunteerData.filter((volunteer, index) => !registrations[index].approved))
-          setRegisteredVolunteers(volunteerData.filter((volunteer, index) => registrations[index].approved))
+          setPendingVolunteers(
+            volunteerData.filter(
+              (volunteer, index) => !registrations[index].approved
+            )
+          )
+          setRegisteredVolunteers(
+            volunteerData.filter(
+              (volunteer, index) => registrations[index].approved
+            )
+          )
         } else {
           setRegisteredVolunteers(volunteerData)
         }
@@ -151,21 +169,27 @@ const EditEvent: React.FC = () => {
     fileInputRef.current?.click()
   }
 
-  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0]
     if (!file) return
 
     try {
       // Create FormData for image upload
       const formData = new FormData()
-      formData.append('image', file)
+      formData.append("image", file)
 
       // Upload the image
-      const response = await api.put(`/event/update-event/${eventId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
+      const response = await api.put(
+        `/event/update-event/${eventId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
 
       if (response.status === 200) {
         setImagePreview(URL.createObjectURL(file))
@@ -177,32 +201,41 @@ const EditEvent: React.FC = () => {
   }
 
   const handleCopyEmail = (email: string, id: number) => {
-    navigator.clipboard.writeText(email)
+    navigator.clipboard
+      .writeText(email)
       .then(() => {
         setCopiedId(id)
         setTimeout(() => setCopiedId(null), 2000) // Reset after 2 seconds
       })
-      .catch(err => {
-        console.error('Failed to copy email:', err)
+      .catch((err) => {
+        console.error("Failed to copy email:", err)
       })
   }
 
   const handleApproveVolunteer = async (volunteer: VolunteerData) => {
     try {
-      await api.put(`/registration/approve-volunteer/${eventId}/${volunteer.v_id}`)
-      setRegisteredVolunteers(prev => [...prev, volunteer])
-      setPendingVolunteers(prev => prev.filter(v => v.v_id !== volunteer.v_id))
+      await api.put(
+        `/registration/approve-volunteer/${eventId}/${volunteer.v_id}`
+      )
+      setRegisteredVolunteers((prev) => [...prev, volunteer])
+      setPendingVolunteers((prev) =>
+        prev.filter((v) => v.v_id !== volunteer.v_id)
+      )
     } catch (err) {
-      console.error('Failed to approve volunteer:', err)
+      console.error("Failed to approve volunteer:", err)
     }
   }
 
   const handleRejectVolunteer = async (volunteer: VolunteerData) => {
     try {
-      await api.delete(`/registration/delete-registration/${volunteer.v_id}/${eventId}`)
-      setPendingVolunteers(prev => prev.filter(v => v.v_id !== volunteer.v_id))
+      await api.delete(
+        `/registration/delete-registration/${volunteer.v_id}/${eventId}`
+      )
+      setPendingVolunteers((prev) =>
+        prev.filter((v) => v.v_id !== volunteer.v_id)
+      )
     } catch (err) {
-      console.error('Failed to reject volunteer:', err)
+      console.error("Failed to reject volunteer:", err)
     }
   }
 
@@ -226,351 +259,233 @@ const EditEvent: React.FC = () => {
         title="Edit Event - Nashville Volunteers"
         description="Edit volunteer event"
       />
-      <div className="Dashboard">
-        <div className="Dashboard-welcome">
-          <h1 className="Dashboard-welcome-title">Edit Event</h1>
-          <p className="Dashboard-welcome-subtitle">Update your event details below.</p>
-        </div>
 
-        {error && (
-          <div className="Form-error Margin-bottom--16">{error}</div>
-        )}
-
-        <div style={{ display: 'flex', gap: '24px', width: '100%' }}>
-          <div style={{ flex: `0 0 ${initialValues.restricted ? '50%' : '65%'}` }}>
+      <div className="container py-4">
+        <div className="row">
+          {/* Event Form */}
+          <div className="col-lg-4">
             <div className="Block">
-              <Formik
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-                onSubmit={handleSubmit}
-                enableReinitialize
-              >
-                {({ errors, touched, isValid, isSubmitting }) => (
-                  <Form>
-                    <div className="Form-group Margin-bottom--24">
-                      <label>Event Image</label>
-                      <div 
-                        onClick={handleImageClick}
-                        style={{ 
-                          cursor: 'pointer',
-                          position: 'relative',
-                          width: '400px',
-                          height: '250px',
-                          backgroundColor: '#f5f5f5',
-                          borderRadius: '8px',
-                          overflow: 'hidden',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          border: '2px dashed #ccc'
-                        }}
-                      >
-                        {imagePreview ? (
-                          <img 
-                            src={imagePreview} 
-                            alt="Event" 
-                            style={{
-                              maxWidth: '100%',
-                              maxHeight: '100%',
-                              objectFit: 'contain'
-                            }}
+              <div className="Block-header">Event Details</div>
+              <div className="Block-subtitle">
+                Update your event details below.
+              </div>
+              <div className="Block-body">
+                {error && (
+                  <div className="Form-error Margin-bottom--16">{error}</div>
+                )}
+                <Formik
+                  initialValues={initialValues}
+                  validationSchema={validationSchema}
+                  onSubmit={handleSubmit}
+                  enableReinitialize
+                >
+                  {({ errors, touched, isValid, isSubmitting }) => (
+                    <Form>
+                      <div className="Form-group">
+                        <label>Event Image</label>
+                        <div
+                          className="Flex--center"
+                          onClick={handleImageClick}
+                        >
+                          {imagePreview ? (
+                            <img
+                              src={imagePreview}
+                              alt="Event"
+                              className="Profile-preview"
+                            />
+                          ) : (
+                            <div className="Text-color--gray-600 text-center">
+                              <Icon glyph="image" size="32" />
+                              <div className="Margin-top--8">
+                                Click to upload image
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          style={{ display: "none" }}
+                        />
+                      </div>
+
+                      {[
+                        { name: "name", type: "text", label: "Event Name" },
+                        {
+                          name: "description",
+                          type: "textarea",
+                          label: "Description",
+                        },
+                        { name: "date", type: "date", label: "Date" },
+                        { name: "time", type: "time", label: "Time" },
+                        { name: "location", type: "text", label: "Location" },
+                        {
+                          name: "people_needed",
+                          type: "number",
+                          label: "Volunteers Needed",
+                        },
+                        { name: "tags", type: "text", label: "Tags" },
+                      ].map(({ name, type, label }) => (
+                        <div key={name} className="Form-group">
+                          <label htmlFor={name}>{label}</label>
+                          <Field
+                            as={type === "textarea" ? "textarea" : "input"}
+                            type={type}
+                            name={name}
+                            className="Form-input-box"
+                            placeholder={label}
+                            rows={type === "textarea" ? 4 : undefined}
+                            min={type === "number" ? 1 : undefined}
                           />
-                        ) : (
-                          <div className="Text-color--gray-600">
-                            <Icon glyph="image" size="32" />
-                            <div className="Margin-top--8">Click to upload image</div>
-                          </div>
+                          {/* {errors[name] && touched[name] && (
+                            <div className="Form-error">{errors[name]}</div>
+                          )} */}
+                        </div>
+                      ))}
+
+                      <div className="Form-group">
+                        <label htmlFor="restricted">Restricted</label>
+                        <Field
+                          as={BootstrapForm.Switch}
+                          name="restricted"
+                          className="Form-input-box"
+                          defaultChecked={initialValues.restricted}
+                        />
+                        {errors.restricted && touched.restricted && (
+                          <div className="Form-error">{errors.restricted}</div>
                         )}
                       </div>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        style={{ display: 'none' }}
-                      />
-                    </div>
 
-                    <div className="Form-group">
-                      <label htmlFor="name">Event Name</label>
-                      <Field
-                        type="text"
-                        name="name"
-                        className="Form-input-box"
-                        placeholder="Enter event name"
-                      />
-                      {errors.name && touched.name && (
-                        <div className="Form-error">{errors.name}</div>
-                      )}
-                    </div>
-
-                    <div className="Form-group">
-                      <label htmlFor="description">Description</label>
-                      <Field
-                        as="textarea"
-                        name="description"
-                        className="Form-input-box"
-                        placeholder="Describe your event"
-                        rows={4}
-                      />
-                      {errors.description && touched.description && (
-                        <div className="Form-error">{errors.description}</div>
-                      )}
-                    </div>
-
-                    <div className="Form-group">
-                      <label htmlFor="date">Date</label>
-                      <Field
-                        type="date"
-                        name="date"
-                        className="Form-input-box"
-                      />
-                      {errors.date && touched.date && (
-                        <div className="Form-error">{errors.date}</div>
-                      )}
-                    </div>
-
-                    <div className="Form-group">
-                      <label htmlFor="time">Time</label>
-                      <Field
-                        type="time"
-                        name="time"
-                        className="Form-input-box"
-                      />
-                      {errors.time && touched.time && (
-                        <div className="Form-error">{errors.time}</div>
-                      )}
-                    </div>
-
-                    <div className="Form-group">
-                      <label htmlFor="location">Location</label>
-                      <Field
-                        type="text"
-                        name="location"
-                        className="Form-input-box"
-                        placeholder="Enter event location"
-                      />
-                      {errors.location && touched.location && (
-                        <div className="Form-error">{errors.location}</div>
-                      )}
-                    </div>
-
-                    <div className="Form-group">
-                      <label htmlFor="people_needed">Number of Volunteers Needed</label>
-                      <Field
-                        type="number"
-                        name="people_needed"
-                        className="Form-input-box"
-                        min="1"
-                      />
-                      {errors.people_needed && touched.people_needed && (
-                        <div className="Form-error">{errors.people_needed}</div>
-                      )}
-                    </div>
-
-                    <div className="Form-group">
-                      <label htmlFor="tags">Tags</label>
-                      <Field
-                        type="text"
-                        name="tags"
-                        className="Form-input-box"
-                        placeholder="Enter tags separated by commas"
-                      />
-                      {errors.tags && touched.tags && (
-                        <div className="Form-error">{errors.tags}</div>
-                      )}
-                    </div>
-
-                    <div className="Form-group">
-                      <label htmlFor="restricted">Restricted</label>
-                      <Field
-                        as={BootstrapForm.Switch}
-                        name="restricted"
-                        className="Form-input-box"
-                        defaultChecked={initialValues.restricted}
-                      />
-                      {errors.restricted && touched.restricted && (
-                        <div className="Form-error">{errors.restricted}</div>
-                      )}
-                    </div>
-
-                    <div className="flex space-x-4 Margin-top--32">
-                      <button
-                        type="button"
-                        onClick={() => navigate("/organization/dashboard")}
-                        className="Button Button-color--gray-500 Width--50"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="Button Button-color--blue-1000 Width--50"
-                        disabled={isSubmitting || !isValid}
-                      >
-                        {isSubmitting ? "Updating Event..." : "Update Event"}
-                      </button>
-                    </div>
-                  </Form>
-                )}
-              </Formik>
+                      <div className="flex space-x-4 Margin-top--24">
+                        <button
+                          type="button"
+                          onClick={() => navigate("/organization/dashboard")}
+                          className="Button Button-color--gray-500 Width--50"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="Button Button-color--blue-1000 Width--50"
+                          disabled={isSubmitting || !isValid}
+                        >
+                          {isSubmitting ? "Updating Event..." : "Update Event"}
+                        </button>
+                      </div>
+                    </Form>
+                  )}
+                </Formik>
+              </div>
             </div>
           </div>
 
-          <div style={{ flex: `0 0 ${initialValues.restricted ? '50%' : '35%'}` }}>
-            {initialValues.restricted ? (
-              <div style={{ 
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '24px',
-                position: 'sticky',
-                top: '24px'
-              }}>
-                <div className="Block" style={{ overflow: 'auto', maxHeight: 'calc(100vh - 80px)' }}>
-                  <h2 className="Text-size--16 Font-weight--600 Text-color--dark-800 Margin-bottom--16">
-                    Registered Volunteers ({registeredVolunteers.length}/{initialValues.people_needed})
-                  </h2>
-                  {registeredVolunteers.length === 0 ? (
-                    <p className="Text-color--gray-600">No volunteers have registered for this event yet.</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {registeredVolunteers.map((volunteer: VolunteerData) => (
-                        <div 
-                          key={volunteer.v_id} 
-                          className="px-6 py-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex flex-col items-center text-center px-2">
-                            {/* <div className="bg-gray-50 p-2 rounded-full Margin-bottom--8">
-                              <Icon glyph="user" size="20" className="Text-color--royal-800" />
-                            </div> */}
-                            <div className="Font-weight--600 Text-color--dark-800 Margin-bottom--4">
-                              <a href={`/volunteer/${volunteer.v_id}`}>
-                                {volunteer.first_name} {volunteer.last_name}
-                              </a>
-                            </div>
-                            <div style={{ width: '85%', margin: '0 auto' }} className="flex items-center">
-                              <span 
-                                onClick={() => handleCopyEmail(volunteer.email, volunteer.v_id)}
-                                className="cursor-pointer hover:scale-110 transition-transform duration-200 flex items-center"
-                                style={{ marginRight: '12px' }}
-                              >
-                                <Icon 
-                                  glyph={copiedId === volunteer.v_id ? "check" : "copy"} 
-                                  size="14" 
-                                  className="Text-color--royal-800"
-                                />
-                              </span>
-                              <span className="Text-size--14 Text-color--gray-600">
-                                {volunteer.email}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="Block" style={{ overflow: 'auto', maxHeight: 'calc(100vh - 80px)' }}>
-                  <h2 className="Text-size--16 Font-weight--600 Text-color--dark-800 Margin-bottom--16">
-                    Pending Volunteers ({pendingVolunteers.length}/{initialValues.people_needed})
-                  </h2>
-                  {pendingVolunteers.length === 0 ? (
-                    <p className="Text-color--gray-600">No pending volunteers for this event.</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {pendingVolunteers.map((volunteer: VolunteerData) => (
-                        <div 
-                          key={volunteer.v_id} 
-                          className="px-6 py-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex flex-col items-center text-center px-2">
-                            {/* <div className="bg-gray-50 p-2 rounded-full Margin-bottom--8">
-                              <Icon glyph="user" size="20" className="Text-color--royal-800" />
-                            </div> */}
-                            <div className="Font-weight--600 Text-color--dark-800 Margin-bottom--4">
-                              <a href={`/volunteer/${volunteer.v_id}`}>
-                                {volunteer.first_name} {volunteer.last_name}
-                              </a>
-                            </div>
-                            <div style={{ width: '85%', margin: '0 auto' }} className="flex items-center">
-                              <span 
-                                onClick={() => handleCopyEmail(volunteer.email, volunteer.v_id)}
-                                className="cursor-pointer hover:scale-110 transition-transform duration-200 flex items-center"
-                                style={{ marginRight: '12px' }}
-                              >
-                                <Icon 
-                                  glyph={copiedId === volunteer.v_id ? "check" : "copy"} 
-                                  size="14" 
-                                  className="Text-color--royal-800"
-                                />
-                              </span>
-                              <span className="Text-size--14 Text-color--gray-600">
-                                {volunteer.email}
-                              </span>
-                              <button
-                                onClick={() => handleApproveVolunteer(volunteer)}
-                                className="Button Button-color--blue-1000 Width--50"
-                              >
-                                Approve
-                              </button>
-                              <button
-                                onClick={() => handleRejectVolunteer(volunteer)}
-                                className="Button Button-color--red-1000 Width--50"
-                              >
-                                Reject
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+          {/* Registered Volunteers */}
+          <div className="col-lg-4">
+            <div className="Block">
+              <div className="Block-header">Registered Volunteers</div>
+              <div className="Block-subtitle">
+                {registeredVolunteers.length}/{initialValues.people_needed}{" "}
+                registered
               </div>
-            ) : (
-              <div className="Block" style={{ position: 'sticky', top: '24px', overflow: 'auto', maxHeight: 'calc(100vh - 80px)' }}>
-                <h2 className="Text-size--16 Font-weight--600 Text-color--dark-800 Margin-bottom--16">
-                  Registered Volunteers ({registeredVolunteers.length}/{initialValues.people_needed})
-                </h2>
+              <div className="Block-body">
                 {registeredVolunteers.length === 0 ? (
-                  <p className="Text-color--gray-600">No volunteers have registered for this event yet.</p>
+                  <p className="Text-color--gray-600">No registrations yet.</p>
                 ) : (
-                  <div className="space-y-2">
-                    {registeredVolunteers.map((volunteer: VolunteerData) => (
-                      <div 
-                        key={volunteer.v_id} 
-                        className="px-6 py-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
-                      >
-                        <div className="flex flex-col items-center text-center px-2">
-                          {/* <div className="bg-gray-50 p-2 rounded-full Margin-bottom--8">
-                            <Icon glyph="user" size="20" className="Text-color--royal-800" />
-                          </div> */}
-                          <div className="Font-weight--600 Text-color--dark-800 Margin-bottom--4">
-                            {volunteer.first_name} {volunteer.last_name}
-                          </div>
-                          <div style={{ width: '85%', margin: '0 auto' }} className="flex items-center">
-                            <span 
-                              onClick={() => handleCopyEmail(volunteer.email, volunteer.v_id)}
-                              className="cursor-pointer hover:scale-110 transition-transform duration-200 flex items-center"
-                              style={{ marginRight: '12px' }}
-                            >
-                              <Icon 
-                                glyph={copiedId === volunteer.v_id ? "check" : "copy"} 
-                                size="14" 
-                                className="Text-color--royal-800"
-                              />
-                            </span>
-                            <span className="Text-size--14 Text-color--gray-600">
-                              {volunteer.email}
-                            </span>
-                          </div>
+                  registeredVolunteers.map((vol) => (
+                    <div
+                      key={vol.v_id}
+                      className="Volunteer-card Volunteer-card--approved"
+                    >
+                      <div className="Volunteer-avatar">
+                        <Icon glyph="user" size="24" />
+                      </div>
+                      <div className="Volunteer-details">
+                        <div className="Volunteer-name">
+                          {vol.first_name} {vol.last_name}
+                        </div>
+                        <div className="Volunteer-contact">
+                          <span
+                            onClick={() => handleCopyEmail(vol.email, vol.v_id)}
+                            className="Icon-click"
+                          >
+                            <Icon
+                              glyph={copiedId === vol.v_id ? "check" : "copy"}
+                              size="14"
+                              className="Text-color--royal-800"
+                            />
+                          </span>
+                          <span className="Text-size--14 Text-color--gray-600">
+                            {vol.email}
+                          </span>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))
                 )}
               </div>
-            )}
+            </div>
+          </div>
+
+          {/* Pending Volunteers */}
+          <div className="col-lg-4">
+            <div className="Block">
+              <div className="Block-header">Pending Volunteers</div>
+              <div className="Block-subtitle">
+                {pendingVolunteers.length} Pending Requests
+              </div>
+              <div className="Block-body">
+                {pendingVolunteers.length === 0 ? (
+                  <p className="Text-color--gray-600">No pending requests.</p>
+                ) : (
+                  pendingVolunteers.map((vol) => (
+                    <div
+                      key={vol.v_id}
+                      className="Volunteer-card Volunteer-card--pending"
+                    >
+                      <div className="Volunteer-avatar">
+                        <Icon glyph="user" size="24" />
+                      </div>
+                      <div className="Volunteer-details">
+                        <div className="Volunteer-name">
+                          {vol.first_name} {vol.last_name}
+                        </div>
+                        <div className="Volunteer-contact">
+                          <span
+                            onClick={() => handleCopyEmail(vol.email, vol.v_id)}
+                            className="Icon-click"
+                          >
+                            <Icon
+                              glyph={copiedId === vol.v_id ? "check" : "copy"}
+                              size="14"
+                              className="Text-color--royal-800"
+                            />
+                          </span>
+                          <span className="Text-size--14 Text-color--gray-600">
+                            {vol.email}
+                          </span>
+                        </div>
+                        <div className="Volunteer-actions">
+                          <button
+                            className="Button Button-color--blue-1000 Width--50"
+                            onClick={() => handleApproveVolunteer(vol)}
+                          >
+                            Approve
+                          </button>
+                          <button
+                            className="Button Button-color--red-1000 Width--50"
+                            onClick={() => handleRejectVolunteer(vol)}
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -578,4 +493,4 @@ const EditEvent: React.FC = () => {
   )
 }
 
-export default EditEvent 
+export default EditEvent
