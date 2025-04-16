@@ -287,21 +287,35 @@ const Listings: React.FC = () => {
 
         {currentView === "grid" ? (
           <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 Margin-top--20">
-            {filteredEvents.length === 0 && !loading && (
+            {filteredEvents.filter(event => {
+              // Only show events that are today or in the future for grid view
+              const eventDate = new Date(event.date);
+              const today = new Date();
+              today.setHours(0, 0, 0, 0); // Set to beginning of today
+              return eventDate >= today;
+            }).length === 0 && !loading && (
               <div className="Width--100 Text--center">
-                No volunteer opportunities match your criteria.
+                No upcoming volunteer opportunities match your criteria.
               </div>
             )}
-            {filteredEvents.map((evt: EventData) => (
-              <div key={evt.event_id} className="col">
-                <Event
-                  event={evt}
-                  organizationName={orgMap[evt.o_id] || ""}
-                  onClick={() => setSelectedEvent(evt)}
-                  onOrganizationClick={() => navigate(`/organization/${evt.o_id}`)}
-                />
-              </div>
-            ))}
+            {filteredEvents
+              .filter(event => {
+                // Only show events that are today or in the future for grid view
+                const eventDate = new Date(event.date);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Set to beginning of today
+                return eventDate >= today;
+              })
+              .map((evt: EventData) => (
+                <div key={evt.event_id} className="col">
+                  <Event
+                    event={evt}
+                    organizationName={orgMap[evt.o_id] || ""}
+                    onClick={() => setSelectedEvent(evt)}
+                    onOrganizationClick={() => navigate(`/organization/${evt.o_id}`)}
+                  />
+                </div>
+              ))}
           </div>
         ) : (
           <div className="Margin-top--20">
