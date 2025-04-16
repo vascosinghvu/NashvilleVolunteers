@@ -271,7 +271,7 @@ const EditEvent: React.FC = () => {
 
       {showInfoModal && selectedVolunteer && (
         <Modal
-          header="My Full Profile"
+          header={`${selectedVolunteer.first_name}'s profile`}
           action={() => setShowInfoModal(false)}
           body={
             <div>
