@@ -306,6 +306,32 @@ const Profile = () => {
     }
   }
 
+  const handleUpdateAvailability = async (availability: {
+    [day: string]: {
+      mornings: boolean
+      afternoons: boolean
+      evenings: boolean
+    }
+  }) => {
+    if (!user?.id) return
+
+    try {
+      const response = await api.put(`/volunteer/${user.id}/availability`, {
+        availability
+      })
+
+      setUserData((prev) => ({
+        ...prev!,
+        availability: availability,
+      }))
+      setShowAvailabilityModal(false)
+    } catch (error) {
+      console.error("Failed to update availability:", error)
+      setUpdateError("Could not update availability. Please try again.")
+    }
+  }
+  
+
   const deleteUser = async () => {
     if (!user?.id) return
     try {
@@ -573,8 +599,7 @@ const Profile = () => {
                 availability: userData.availability || {},
               }}
               onSubmit={(values) => {
-                setUserData({ ...userData, availability: values.availability })
-                setShowAvailabilityModal(false)
+                handleUpdateAvailability(values.availability)
               }}
             >
               {({ values, setFieldValue }) => (
