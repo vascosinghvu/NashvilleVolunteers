@@ -288,7 +288,6 @@ const Profile = () => {
         description,
       })
 
-      
       const updatedExperience = JSON.parse(response.data.experience)
       console.log("Updated experience:", updatedExperience)
       console.log("Updated experience years:", updatedExperience.years)
@@ -317,7 +316,7 @@ const Profile = () => {
 
     try {
       const response = await api.put(`/volunteer/${user.id}/availability`, {
-        availability
+        availability,
       })
 
       setUserData((prev) => ({
@@ -330,7 +329,6 @@ const Profile = () => {
       setUpdateError("Could not update availability. Please try again.")
     }
   }
-  
 
   const deleteUser = async () => {
     if (!user?.id) return
