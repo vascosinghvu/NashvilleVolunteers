@@ -31,30 +31,6 @@ interface ProfileProps {
   }
 }
 
-// Validation schema
-const ProfileSchema = Yup.object().shape({
-  first_name: Yup.string().required("First name is required"),
-  last_name: Yup.string().required("Last name is required"),
-  phone_number: Yup.string().required("Phone number is required"),
-  age: Yup.number()
-    .min(18, "Must be at least 18 years old")
-    .required("Age is required"),
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  skills: Yup.array().of(Yup.string()),
-  interests: Yup.array().of(Yup.string()),
-  availability: Yup.object().shape({
-    weekdays: Yup.boolean(),
-    weekends: Yup.boolean(),
-    mornings: Yup.boolean(),
-    afternoons: Yup.boolean(),
-    evenings: Yup.boolean(),
-  }),
-  experience: Yup.object().shape({
-    years: Yup.number().min(0, "Years must be 0 or greater"),
-    description: Yup.string(),
-  }),
-})
-
 const MAX_IMAGE_SIZE = 400 // Reduced maximum width/height in pixels for better file size
 
 // Add these constants after the ProfileSchema
@@ -177,112 +153,6 @@ const Profile = () => {
     }
   }
 
-  const handleSubmit = async (values: ProfileProps) => {
-    try {
-      setUpdateError("")
-      setUpdateSuccess(false)
-
-      const formData = new FormData()
-
-      // Ensure all required fields are present and convert age to number
-      const dataToSend = {
-        first_name: values.first_name.trim(),
-        last_name: values.last_name.trim(),
-        phone: values.phone_number.trim(),
-        email: values.email.trim(),
-        age: Number(values.age),
-        skills: JSON.stringify(values.skills || []),
-        interests: JSON.stringify(values.interests || []),
-        availability: JSON.stringify(
-          values.availability || {
-            weekdays: false,
-            weekends: false,
-            mornings: false,
-            afternoons: false,
-            evenings: false,
-          }
-        ),
-        experience: JSON.stringify(
-          values.experience || {
-            years: 0,
-            description: "",
-          }
-        ),
-      }
-
-      // Validate required fields
-      if (
-        !dataToSend.first_name ||
-        !dataToSend.last_name ||
-        !dataToSend.phone ||
-        !dataToSend.email ||
-        !dataToSend.age
-      ) {
-        setUpdateError("All fields are required")
-        return
-      }
-
-      // Add all fields to FormData
-      Object.entries(dataToSend).forEach(([key, value]) => {
-        formData.append(key, value.toString())
-      })
-
-      // Add image if selected
-      if (selectedImage) {
-        formData.append("image", selectedImage)
-      }
-
-      console.log("Submitting form data:", {
-        ...dataToSend,
-        hasImage: !!selectedImage,
-      })
-
-      const response = await api.put(
-        `/volunteer/update-volunteer/${user?.id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      )
-
-      if (response.status === 200) {
-        // Parse the response data
-        const responseData = response.data
-        const parsedData = {
-          ...responseData,
-          skills: responseData.skills ? JSON.parse(responseData.skills) : [],
-          interests: responseData.interests
-            ? JSON.parse(responseData.interests)
-            : [],
-          availability: responseData.availability
-            ? JSON.parse(responseData.availability)
-            : {
-                weekdays: false,
-                weekends: false,
-                mornings: false,
-                afternoons: false,
-                evenings: false,
-              },
-          experience: responseData.experience
-            ? JSON.parse(responseData.experience)
-            : {
-                years: 0,
-                description: "",
-              },
-        }
-        setUserData(parsedData)
-        setUpdateSuccess(true)
-        setSelectedImage(null)
-        setPreviewUrl("")
-      }
-    } catch (error) {
-      console.error("Error updating profile:", error)
-      setUpdateError("Failed to update profile. Please try again.")
-    }
-  }
-
   if (!user) {
     return (
       <>
@@ -322,6 +192,51 @@ const Profile = () => {
     )
   }
 
+  const handleEditProfile = async (values: {
+    first_name: string
+    last_name: string
+    phone_number: string
+    email: string
+    age: number
+  }) => {
+    try {
+      const formData = new FormData()
+      formData.append("first_name", values.first_name.trim())
+      formData.append("last_name", values.last_name.trim())
+      formData.append("phone", values.phone_number.trim())
+      formData.append("email", values.email.trim())
+      if (selectedImage) {
+        formData.append("image", selectedImage)
+      }
+
+      const response = await api.put(
+        `/volunteer/edit-profile/${user?.id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      )
+
+      const updated = response.data
+      setUserData({
+        ...userData!,
+        ...updated,
+        // preserve fields from volunteers table
+        skills: userData!.skills,
+        interests: userData!.interests,
+        availability: userData!.availability,
+        experience: userData!.experience,
+      })
+
+      setShowEditModal(false)
+      setSelectedImage(null)
+      setPreviewUrl("")
+    } catch (error) {
+      console.error("Edit profile failed:", error)
+      setUpdateError("Failed to update profile.")
+    }
+  }
+
   return (
     <>
       <Navbar />
@@ -348,46 +263,11 @@ const Profile = () => {
                 email: Yup.string().email("Invalid").required("Required"),
                 age: Yup.number().min(18).required("Required"),
               })}
-              onSubmit={async (values) => {
-                try {
-                  const formData = new FormData()
-                  formData.append("first_name", values.first_name.trim())
-                  formData.append("last_name", values.last_name.trim())
-                  formData.append("phone", values.phone_number.trim())
-                  formData.append("email", values.email.trim())
-                  formData.append("age", values.age.toString())
-                  if (selectedImage) {
-                    formData.append("image", selectedImage)
-                  }
-
-                  const response = await api.put(
-                    `/volunteer/update-volunteer/${user?.id}`,
-                    formData,
-                    { headers: { "Content-Type": "multipart/form-data" } }
-                  )
-
-                  const updated = response.data
-                  setUserData({
-                    ...userData!,
-                    ...updated,
-                    skills: userData!.skills, // keep unchanged
-                    interests: userData!.interests,
-                    availability: userData!.availability,
-                    experience: userData!.experience,
-                  })
-
-                  setShowEditModal(false)
-                  setSelectedImage(null)
-                  setPreviewUrl("")
-                } catch (error) {
-                  console.error("Profile update failed", error)
-                }
-              }}
+              onSubmit={handleEditProfile}
             >
               {({ isSubmitting, errors, touched, setFieldValue }) => (
                 <Form>
                   <div className="Form-group">
-                    <label>Profile Image</label>
                     <div className="Profile-image-upload">
                       <img
                         src={
@@ -396,8 +276,9 @@ const Profile = () => {
                           "/default-avatar.png"
                         }
                         alt="Profile"
-                        className="Profile-image-preview"
+                        className="Profile-image"
                       />
+
                       <input
                         type="file"
                         ref={fileInputRef}
@@ -407,7 +288,7 @@ const Profile = () => {
                       />
                       <button
                         type="button"
-                        className="Button Button-color--blue-1000"
+                        className="Button Button-color--blue-1000 Width--100"
                         onClick={() => fileInputRef.current?.click()}
                       >
                         {userData?.image_url ? "Change Image" : "Upload Image"}
@@ -420,7 +301,6 @@ const Profile = () => {
                     ["last_name", "Last Name"],
                     ["email", "Email"],
                     ["phone_number", "Phone Number"],
-                    ["age", "Age"],
                   ].map(([name, label]) => (
                     <div key={name} className="Form-group">
                       <label htmlFor={name}>{label}</label>
@@ -440,18 +320,17 @@ const Profile = () => {
 
                   <div className="Flex-row Margin-top--20">
                     <button
+                      type="button"
+                      className="Button Button-color--gray-1000 Button--hollow Width--100 Margin-right--4"
+                    >
+                      Cancel
+                    </button>
+                    <button
                       type="submit"
-                      className="Button Button-color--blue-1000 Margin-right--10"
+                      className="Button Button-color--blue-1000 Margin-left--4 Width--100"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? "Saving..." : "Save Changes"}
-                    </button>
-                    <button
-                      type="button"
-                      className="Button Button-color--gray-1000"
-                      onClick={() => setShowEditModal(false)}
-                    >
-                      Cancel
                     </button>
                   </div>
                 </Form>
