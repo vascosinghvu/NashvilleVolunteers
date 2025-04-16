@@ -394,7 +394,7 @@ const OrganizationProfile = () => {
 
                   <div className="Flex-row Margin-top--20">
                     <button
-                      className="Button Button-color--blue-1000"
+                      className="Button Button-color--blue-1000 Width--100"
                       onClick={() => setIsEditing(true)}
                     >
                       Edit Profile
