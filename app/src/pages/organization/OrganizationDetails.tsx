@@ -35,6 +35,20 @@ const OrganizationDetails: React.FC = () => {
   const [events, setEvents] = useState<EventData[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Special organization contact info
+  const specialOrgContacts = {
+    // Hands On Nashville
+    "f42d2a91-76ae-42ed-9f51-b2c5c457385e": {
+      email: "handson@unitedwaygn.org",
+      phone_number: "(615) 298-1108"
+    },
+    // The Nashville Food Project
+    "be50cc09-e388-4ee1-8e4e-d87a70e5669f": {
+      email: "info@thenashvillefoodproject.org",
+      phone_number: "615-460-0172"
+    }
+  };
+
   useEffect(() => {
     const fetchOrganizationDetails = async () => {
       try {
@@ -43,7 +57,18 @@ const OrganizationDetails: React.FC = () => {
           api.get(`/organization/get-organization/${id}`),
           api.get(`/event/organization/${id}`)
         ])
-        setOrganization(orgResponse.data)
+        
+        let orgData = orgResponse.data;
+        
+        // Apply special contact info if this is one of our special organizations
+        if (id && id in specialOrgContacts) {
+          orgData = {
+            ...orgData,
+            ...specialOrgContacts[id as keyof typeof specialOrgContacts]
+          };
+        }
+        
+        setOrganization(orgData)
         setEvents(eventsResponse.data)
       } catch (error) {
         console.error("Failed to fetch organization details:", error)
@@ -82,6 +107,9 @@ const OrganizationDetails: React.FC = () => {
       </>
     )
   }
+
+  // Determine if this is a special org for displaying custom contact info
+  const isSpecialOrg = id && id in specialOrgContacts;
 
   return (
     <>
