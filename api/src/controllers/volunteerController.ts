@@ -472,31 +472,6 @@ export const addSkill = async (req: Request, res: Response) => {
   }
 }
 
-export const deleteSkill = async (req: Request, res: Response) => {
-  const { v_id } = req.params
-  const { skill } = req.body
-
-  if (!skill) return res.status(400).json({ error: "Skill is required" })
-
-  try {
-    const result = await sql`
-      UPDATE volunteers
-      SET skills = array_remove(skills, ${skill})
-      WHERE v_id = ${v_id}
-      RETURNING skills
-    `
-
-    if (result.length === 0) {
-      return res.status(404).json({ error: "Volunteer not found" })
-    }
-
-    res.status(200).json({ skills: result[0].skills })
-  } catch (error) {
-    console.error("Error deleting skill:", error)
-    res.status(500).json({ error: "Failed to delete skill" })
-  }
-}
-
 export const addInterest = async (req: Request, res: Response) => {
   const { v_id } = req.params
   const { interests } = req.body
@@ -529,16 +504,45 @@ export const addInterest = async (req: Request, res: Response) => {
   }
 }
 
-export const deleteInterest = async (req: Request, res: Response) => {
+export const updateSkills = async (req: Request, res: Response) => {
   const { v_id } = req.params
-  const { interest } = req.body
+  const { skills } = req.body
 
-  if (!interest) return res.status(400).json({ error: "Interest is required" })
+  if (!Array.isArray(skills)) {
+    return res.status(400).json({ error: "Skills must be an array" })
+  }
 
   try {
     const result = await sql`
       UPDATE volunteers
-      SET interests = array_remove(interests, ${interest})
+      SET skills = ${sql.array(skills)}
+      WHERE v_id = ${v_id}
+      RETURNING skills
+    `
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Volunteer not found" })
+    }
+
+    res.status(200).json({ skills: result[0].skills })
+  } catch (error) {
+    console.error("Error updating skills:", error)
+    res.status(500).json({ error: "Failed to update skills" })
+  }
+}
+
+export const updateInterests = async (req: Request, res: Response) => {
+  const { v_id } = req.params
+  const { interests } = req.body
+
+  if (!Array.isArray(interests)) {
+    return res.status(400).json({ error: "Interests must be an array" })
+  }
+
+  try {
+    const result = await sql`
+      UPDATE volunteers
+      SET interests = ${sql.array(interests)}
       WHERE v_id = ${v_id}
       RETURNING interests
     `
@@ -549,8 +553,8 @@ export const deleteInterest = async (req: Request, res: Response) => {
 
     res.status(200).json({ interests: result[0].interests })
   } catch (error) {
-    console.error("Error deleting interest:", error)
-    res.status(500).json({ error: "Failed to delete interest" })
+    console.error("Error updating interests:", error)
+    res.status(500).json({ error: "Failed to update interests" })
   }
 }
 
@@ -608,9 +612,9 @@ export default {
   deleteVolunteer,
   editProfile,
   addSkill,
-  deleteSkill,
+  updateSkills,
   addInterest,
-  deleteInterest,
+  updateInterests,
   updateExperience,
   updateAvailability,
 }

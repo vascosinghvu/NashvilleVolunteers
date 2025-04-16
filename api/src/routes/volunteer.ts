@@ -43,10 +43,10 @@ router.put(
 )
 
 router.post("/:v_id/skills", volunteerController.addSkill)
-router.delete("/:v_id/skills", volunteerController.deleteSkill)
+router.put("/:v_id/skills", volunteerController.updateSkills)
 
 router.post("/:v_id/interests", volunteerController.addInterest)
-router.delete("/:v_id/interests", volunteerController.deleteInterest)
+router.put("/:v_id/interests", volunteerController.updateInterests)
 
 router.put("/:v_id/experience", volunteerController.updateExperience)
 router.put("/:v_id/availability", volunteerController.updateAvailability)

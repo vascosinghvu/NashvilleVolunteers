@@ -100,7 +100,7 @@ const Profile = () => {
         const parsedData = {
           ...data,
           skills: data.skills || [],
-          interests: data.interests ? JSON.parse(data.interests) : [],
+          interests: data.interests || [],
           availability: data.availability
             ? JSON.parse(data.availability)
             : {
@@ -238,11 +238,15 @@ const Profile = () => {
   }
 
   const handleDeleteSkill = async (skill: string) => {
-    if (!user?.id) return
+    if (!user?.id || !userData?.skills) return
 
     try {
-      const response = await api.delete(`/volunteer/${user.id}/skills`, {
-        data: { skill }, // must be under 'data'
+      // Filter out the skill to delete
+      const updatedSkills = userData.skills.filter((s) => s !== skill)
+
+      // Send the new array to the server
+      const response = await api.put(`/volunteer/${user.id}/skills`, {
+        skills: updatedSkills,
       })
 
       setUserData((prev) => ({
@@ -256,11 +260,13 @@ const Profile = () => {
   }
 
   const handleDeleteInterest = async (interest: string) => {
-    if (!user?.id) return
+    if (!user?.id || !userData?.interests) return
 
     try {
-      const response = await api.delete(`/volunteer/${user.id}/interests`, {
-        data: { interest }, // must be under 'data'
+      const updatedInterests = userData.interests.filter((i) => i !== interest)
+
+      const response = await api.put(`/volunteer/${user.id}/interests`, {
+        interests: updatedInterests,
       })
 
       setUserData((prev) => ({
@@ -270,6 +276,29 @@ const Profile = () => {
     } catch (error) {
       console.error("Failed to delete interest:", error)
       setUpdateError("Could not remove interest. Please try again.")
+    }
+  }
+
+  const handleUpdateExperience = async (years: number, description: string) => {
+    if (!user?.id) return
+
+    try {
+      const response = await api.put(`/volunteer/${user.id}/experience`, {
+        years,
+        description,
+      })
+
+      setUserData((prev) => ({
+        ...prev!,
+        experience: {
+          years: response.data.experience.years ?? 0,
+          description: response.data.experience.description ?? "",
+        },
+      }))
+      setShowExperienceModal(false)
+    } catch (error) {
+      console.error("Failed to update experience:", error)
+      setUpdateError("Could not update experience. Please try again.")
     }
   }
 
@@ -616,14 +645,7 @@ const Profile = () => {
                 description: userData.experience?.description ?? "",
               }}
               onSubmit={(values) => {
-                setUserData({
-                  ...userData,
-                  experience: {
-                    years: values.years,
-                    description: values.description,
-                  },
-                })
-                setShowExperienceModal(false)
+                handleUpdateExperience(values.years, values.description)
               }}
             >
               {({ values, setFieldValue }) => (
@@ -822,7 +844,7 @@ const Profile = () => {
                   />
                   <strong>Years:</strong>
                   <div className="Margin-left--auto">
-                    {userData.experience?.years ?? 0}
+                    {userData.experience?.years}
                   </div>
                 </div>
 
