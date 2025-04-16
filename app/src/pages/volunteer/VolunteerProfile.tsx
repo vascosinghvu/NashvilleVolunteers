@@ -107,6 +107,9 @@ const Profile = () => {
   const [previewUrl, setPreviewUrl] = useState<string>("")
   const [showEditModal, setShowEditModal] = useState(false)
   const [showSkillsModal, setShowSkillsModal] = useState(false)
+  const [showInterestsModal, setShowInterestsModal] = useState(false)
+  const [showAvailabilityModal, setShowAvailabilityModal] = useState(false)
+  const [showExperienceModal, setShowExperienceModal] = useState(false)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -509,6 +512,201 @@ const Profile = () => {
         />
       )}
 
+      {showInterestsModal && (
+        <Modal
+          header="Add Interests"
+          action={() => setShowInterestsModal(false)}
+          body={
+            <Formik
+              initialValues={{ interests: userData.interests || [] }}
+              onSubmit={(values) => {
+                setUserData({ ...userData, interests: values.interests })
+                setShowInterestsModal(false)
+              }}
+            >
+              {({ values, setFieldValue }) => (
+                <Form>
+                  <div className="Flex-wrap--tags">
+                    {INTERESTS_OPTIONS.map((interest) => {
+                      const isSelected = values.interests.includes(interest)
+
+                      return (
+                        <span
+                          key={interest}
+                          className={`Badge ${
+                            isSelected
+                              ? "Badge-color--blue-1000"
+                              : "Badge--hollow"
+                          } Cursor--pointer Margin--4`}
+                          onClick={() => {
+                            const updated = isSelected
+                              ? values.interests.filter((i) => i !== interest)
+                              : [...values.interests, interest]
+                            setFieldValue("interests", updated)
+                          }}
+                        >
+                          {interest}
+                        </span>
+                      )
+                    })}
+                  </div>
+                  <button
+                    type="submit"
+                    className="Button Button-color--blue-1000 Margin-top--10"
+                  >
+                    Save Interests
+                  </button>
+                </Form>
+              )}
+            </Formik>
+          }
+        />
+      )}
+
+      {showAvailabilityModal && (
+        <Modal
+          header="Edit Weekly Availability"
+          action={() => setShowAvailabilityModal(false)}
+          body={
+            <Formik
+              initialValues={{
+                availability: userData.availability || {},
+              }}
+              onSubmit={(values) => {
+                setUserData({ ...userData, availability: values.availability })
+                setShowAvailabilityModal(false)
+              }}
+            >
+              {({ values, setFieldValue }) => (
+                <Form>
+                  {[
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                    "Sunday",
+                  ].map((day) => {
+                    const key = day.toLowerCase()
+                    const slots = values.availability[key] || {
+                      mornings: false,
+                      afternoons: false,
+                      evenings: false,
+                    }
+
+                    const updateSlot = (slot: keyof typeof slots) => {
+                      const updated = {
+                        ...values.availability[key],
+                        [slot]: !slots[slot],
+                      }
+                      setFieldValue("availability", {
+                        ...values.availability,
+                        [key]: updated,
+                      })
+                    }
+
+                    return (
+                      <div key={day} className="Margin-bottom--10">
+                        <strong>{day}</strong>
+                        <div className="Flex-wrap--tags Margin-top--6 Justify-content--spaceAround">
+                          {["mornings", "afternoons", "evenings"].map(
+                            (slot) => {
+                              const label =
+                                slot[0].toUpperCase() + slot.slice(1)
+                              const selected = slots[slot as keyof typeof slots]
+
+                              return (
+                                <span
+                                  key={slot}
+                                  className={`Badge ${
+                                    selected
+                                      ? "Badge-color--blue-1000"
+                                      : "Badge--hollow"
+                                  } Cursor--pointer Margin--4`}
+                                  onClick={() => updateSlot(slot as any)}
+                                >
+                                  {label}
+                                  {selected && <>&nbsp;×</>}
+                                </span>
+                              )
+                            }
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+
+                  <button
+                    type="submit"
+                    className="Button Button-color--blue-1000 Margin-top--10"
+                  >
+                    Save Availability
+                  </button>
+                </Form>
+              )}
+            </Formik>
+          }
+        />
+      )}
+
+      {showExperienceModal && (
+        <Modal
+          header="Edit Experience"
+          action={() => setShowExperienceModal(false)}
+          body={
+            <Formik
+              initialValues={{
+                years: userData.experience?.years ?? 0,
+                description: userData.experience?.description ?? "",
+              }}
+              onSubmit={(values) => {
+                setUserData({
+                  ...userData,
+                  experience: {
+                    years: values.years,
+                    description: values.description,
+                  },
+                })
+                setShowExperienceModal(false)
+              }}
+            >
+              {({ values, setFieldValue }) => (
+                <Form>
+                  <div className="Form-group">
+                    <label htmlFor="years">Years of Experience</label>
+                    <Field
+                      name="years"
+                      type="number"
+                      className="Form-input-box"
+                      min={0}
+                    />
+                  </div>
+
+                  <div className="Form-group">
+                    <label htmlFor="description">Experience Description</label>
+                    <Field
+                      as="textarea"
+                      name="description"
+                      rows={4}
+                      className="Form-input-box"
+                      placeholder="Describe your experience, background, and relevant work..."
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="Button Button-color--blue-1000 Margin-top--10 Width--100"
+                  >
+                    Save Experience
+                  </button>
+                </Form>
+              )}
+            </Formik>
+          }
+        />
+      )}
+
       <div className="container">
         <div className="row py-4">
           <div className="col-lg-4">
@@ -630,6 +828,7 @@ const Profile = () => {
                   <Icon
                     glyph="plus"
                     className="Margin-left--auto Text-colorHover--yellow-1000"
+                    onClick={() => setShowInterestsModal(true)}
                   />
                 </div>
                 {userData.interests?.length ? (
@@ -674,16 +873,27 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <div className="Event-modal-line Margin-top--10">
-                  <strong>Description:</strong>
-                  <div className="Margin-left--auto">
+                <div className="Margin-top--10">
+                  <div className="Flex-row Align-items--center">
+                    <strong>Description:</strong>
+                  </div>
+
+                  <div className="Margin-top--6">
                     {userData.experience?.description ? (
-                      <span>{userData.experience.description}</span>
+                      <p className="Text-fontSize--14 Text-color--gray-900">
+                        {userData.experience.description}
+                      </p>
                     ) : (
-                      <span className="Text-color--gray-600">
+                      <p className="Text-color--gray-600">
                         No description provided
-                      </span>
+                      </p>
                     )}
+                  </div>
+                  <div
+                    className="Button Button-color--blue-1000 Margin-top--10"
+                    onClick={() => setShowExperienceModal(true)}
+                  >
+                    Edit Experience
                   </div>
                 </div>
               </div>
@@ -708,33 +918,42 @@ const Profile = () => {
                 ].map((day) => {
                   const key =
                     day.toLowerCase() as keyof typeof userData.availability
-                  const times = []
+                  const slots = userData.availability?.[key] || {}
 
-                  if (userData.availability?.[key]?.mornings)
-                    times.push("Mornings")
-                  if (userData.availability?.[key]?.afternoons)
-                    times.push("Afternoons")
-                  if (userData.availability?.[key]?.evenings)
-                    times.push("Evenings")
+                  const tags = Object.entries(slots)
+                    .filter(([_, available]) => available)
+                    .map(([slot]) => {
+                      const label = slot[0].toUpperCase() + slot.slice(1)
+                      return (
+                        <span
+                          key={slot}
+                          className="Filter-tag Margin-right--4 Margin-top--4"
+                        >
+                          {label}
+                        </span>
+                      )
+                    })
 
                   return (
-                    <div
-                      key={day}
-                      className="Event-modal-line Justify-content--space-between"
-                    >
-                      <strong>{day}:</strong>
-                      {times.length > 0 ? (
-                        <div>{times.join(", ")}</div>
-                      ) : (
-                        <div className="Text-color--gray-600">
-                          Not available
-                        </div>
-                      )}
+                    <div key={day} className="Margin-bottom--12">
+                      <strong>{day}</strong>
+                      <div className="Margin-top--4 Flex-wrap--tags">
+                        {tags.length > 0 ? (
+                          tags
+                        ) : (
+                          <span className="Text-color--gray-600">
+                            Not available
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )
                 })}
               </div>
-              <div className="Button Button-color--yellow-1000 Button--hollow">
+              <div
+                className="Button Button-color--blue-1000"
+                onClick={() => setShowAvailabilityModal(true)}
+              >
                 Edit Availability
               </div>
             </div>
