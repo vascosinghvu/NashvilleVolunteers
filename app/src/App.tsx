@@ -17,6 +17,7 @@ import OrganizationProfile from "./pages/organization/OrganizationProfile"
 import CreateEvent from "./pages/organization/CreateEvent"
 import EditEvent from "./pages/organization/EditEvent"
 import OrganizationDetails from "./pages/organization/OrganizationDetails"
+import VolunteerDetails from "./pages/volunteer/VolunteerDetails"
 
 function App() {
   const { user } = useAuth()
@@ -104,6 +105,7 @@ function App() {
         />
 
         <Route path="/organization/:id" element={<OrganizationDetails />} />
+        <Route path="/volunteer/:id" element={<VolunteerDetails />} />
 
         {/* Catch-All: Redirect to Listings if Route Not Found */}
         <Route path="*" element={<Navigate to="/listings" />} />

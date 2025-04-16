@@ -34,8 +34,8 @@ export const getEventRegistrations = async (req: Request, res: Response) => {
 
 export const createRegistration = async (req: Request, res: Response) => {
     try {
-        const { v_id, event_id } = req.body
-        const newRegistration = await sql`INSERT INTO volunteer_event (v_id, event_id) VALUES (${v_id}, ${event_id})`
+        const { v_id, event_id, approved } = req.body
+        const newRegistration = await sql`INSERT INTO volunteer_event (v_id, event_id, approved) VALUES (${v_id}, ${event_id}, ${approved})`
         res.status(201).json(newRegistration)
     } catch (error) {
         res.status(500).json({ error: "Failed to create registration", details: error })
