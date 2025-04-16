@@ -639,7 +639,7 @@ const Profile = () => {
 
                   <button
                     type="submit"
-                    className="Button Button-color--blue-1000 Margin-top--10"
+                    className="Button Button-color--blue-1000 Margin-top--10 Width--100"
                   >
                     Save Availability
                   </button>
@@ -878,7 +878,7 @@ const Profile = () => {
                     <strong>Description:</strong>
                   </div>
 
-                  <div className="Margin-top--6">
+                  <div className="Margin-top--6  Justify-content--center">
                     {userData.experience?.description ? (
                       <p className="Text-fontSize--14 Text-color--gray-900">
                         {userData.experience.description}
