@@ -20,6 +20,7 @@ interface EventData {
   o_id: number
   image_url?: string
   tags: string[]
+  restricted?: boolean
 }
 
 interface UserProfile {
@@ -31,8 +32,15 @@ interface UserProfile {
   age: number
 }
 
+interface RegistrationData {
+  event_id: number
+  v_id: number
+  approved: boolean
+}
+
 const VolunteerDashboard: React.FC = () => {
   const [registeredEvents, setRegisteredEvents] = useState<EventData[]>([])
+  const [registrations, setRegistrations] = useState<RegistrationData[]>([])
   const [orgMap, setOrgMap] = useState<{ [key: number]: string }>({})
   const [loading, setLoading] = useState(true)
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null)
@@ -40,16 +48,18 @@ const VolunteerDashboard: React.FC = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
 
-  // Separate active and past events
-  const { activeEvents, pastEvents } = registeredEvents.reduce((acc, event) => {
+  // Separate active, pending, and past events
+  const { activeEvents, pendingEvents, pastEvents } = registeredEvents.reduce((acc, event) => {
     const status = getEventStatus(event.date);
     if (status === 'past') {
       acc.pastEvents.push(event);
+    } else if (event.restricted && !registrations.find(r => r.event_id === event.event_id && r.approved)) {
+      acc.pendingEvents.push(event);
     } else {
       acc.activeEvents.push(event);
     }
     return acc;
-  }, { activeEvents: [] as EventData[], pastEvents: [] as EventData[] });
+  }, { activeEvents: [] as EventData[], pendingEvents: [] as EventData[], pastEvents: [] as EventData[] });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,6 +89,7 @@ const VolunteerDashboard: React.FC = () => {
     try {
       // First get all registrations for this volunteer
       const registrationsResponse = await api.get(`/registration/get-user-registrations/${user.id}`)
+      setRegistrations(registrationsResponse.data)
       
       // Then get the event details for each registration
       const eventPromises = registrationsResponse.data.map(async (registration: any) => {
@@ -201,6 +212,7 @@ const VolunteerDashboard: React.FC = () => {
         ) : (
           <>
             {activeEvents.length > 0 && renderEventSection(activeEvents, "Active Events")}
+            {pendingEvents.length > 0 && renderEventSection(pendingEvents, "Pending Events")}
             {pastEvents.length > 0 && renderEventSection(pastEvents, "Past Events")}
           </>
         )}
