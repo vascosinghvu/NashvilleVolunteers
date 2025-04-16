@@ -6,6 +6,7 @@ import { api } from "../../api"
 import Navbar from "../../components/Navbar"
 import MetaData from "../../components/MetaData"
 import * as yup from "yup"
+import { Form as BootstrapForm } from "react-bootstrap"
 
 interface EventFormValues {
   name: string
@@ -14,6 +15,8 @@ interface EventFormValues {
   time: string
   location: string
   people_needed: number
+  tags: string[]
+  restricted: boolean
 }
 
 const initialValues: EventFormValues = {
@@ -23,6 +26,8 @@ const initialValues: EventFormValues = {
   time: "",
   location: "",
   people_needed: 1,
+  tags: [],
+  restricted: false,
 }
 
 const validationSchema = yup.object().shape({
@@ -168,6 +173,32 @@ const CreateEvent: React.FC = () => {
                     />
                     {errors.people_needed && touched.people_needed && (
                       <div className="Form-error">{errors.people_needed}</div>
+                    )}
+                  </div>
+
+                  <div className="Form-group">
+                    <label htmlFor="tags">Tags</label>
+                    <Field
+                      type="text"
+                      name="tags"
+                      className="Form-input-box"
+                      placeholder="Enter tags separated by commas"
+                    />
+                    {errors.tags && touched.tags && (
+                      <div className="Form-error">{errors.tags}</div>
+                    )}
+                  </div>
+
+                  <div className="Form-group">
+                    <label htmlFor="restricted">Restricted</label>
+                    <Field 
+                      as={BootstrapForm.Check} 
+                      type="switch" 
+                      name="restricted" 
+                      className="Form-input-box"
+                    />
+                    {errors.restricted && touched.restricted && (
+                      <div className="Form-error">{errors.restricted}</div>
                     )}
                   </div>
 
