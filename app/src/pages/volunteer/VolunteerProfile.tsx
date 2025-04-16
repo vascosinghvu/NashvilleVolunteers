@@ -288,11 +288,15 @@ const Profile = () => {
         description,
       })
 
+      
+      const updatedExperience = JSON.parse(response.data.experience)
+      console.log("Updated experience:", updatedExperience)
+      console.log("Updated experience years:", updatedExperience.years)
       setUserData((prev) => ({
         ...prev!,
         experience: {
-          years: response.data.experience.years ?? 0,
-          description: response.data.experience.description ?? "",
+          years: updatedExperience.years ?? 0,
+          description: updatedExperience.description ?? "",
         },
       }))
       setShowExperienceModal(false)
