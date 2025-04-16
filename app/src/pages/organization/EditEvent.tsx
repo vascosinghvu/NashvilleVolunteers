@@ -262,6 +262,13 @@ const EditEvent: React.FC = () => {
 
       <div className="container py-4">
         <div className="row">
+          <div
+            className="col-lg-12 mb-4"
+            onClick={() => navigate("/organization/dashboard")}
+            style={{ cursor: "pointer" }}
+          >
+            <Icon glyph="chevron-left" className="Text-colorHover--teal-1000" />
+          </div>
           {/* Event Form */}
           <div className="col-lg-4">
             <div className="Block">
@@ -444,37 +451,45 @@ const EditEvent: React.FC = () => {
                       key={vol.v_id}
                       className="Volunteer-card Volunteer-card--pending"
                     >
-                      <div className="Volunteer-avatar">
-                        <Icon glyph="user" size="24" />
-                      </div>
-                      <div className="Volunteer-details">
-                        <div className="Volunteer-name">
-                          {vol.first_name} {vol.last_name}
+                      <div className="Flex-column Width--100">
+                        <div className="Flex-row">
+                          <div className="Volunteer-avatar">
+                            <Icon glyph="user" size="24" />
+                          </div>
+                          <div className="Volunteer-details">
+                            <div className="Volunteer-name">
+                              {vol.first_name} {vol.last_name}
+                            </div>
+                            <div className="Volunteer-contact">
+                              <span
+                                onClick={() =>
+                                  handleCopyEmail(vol.email, vol.v_id)
+                                }
+                                className="Icon-click"
+                              >
+                                <Icon
+                                  glyph={
+                                    copiedId === vol.v_id ? "check" : "copy"
+                                  }
+                                  size="14"
+                                  className="Text-color--royal-800"
+                                />
+                              </span>
+                              <span className="Text-size--14 Text-color--gray-600">
+                                {vol.email}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="Volunteer-contact">
-                          <span
-                            onClick={() => handleCopyEmail(vol.email, vol.v_id)}
-                            className="Icon-click"
-                          >
-                            <Icon
-                              glyph={copiedId === vol.v_id ? "check" : "copy"}
-                              size="14"
-                              className="Text-color--royal-800"
-                            />
-                          </span>
-                          <span className="Text-size--14 Text-color--gray-600">
-                            {vol.email}
-                          </span>
-                        </div>
-                        <div className="Volunteer-actions">
+                        <div className="Flex-row Width--100 Margin-top--10">
                           <button
-                            className="Button Button-color--blue-1000 Width--50"
+                            className="Button Button-color--green-1000 Button--small Width--100 Margin-right--4"
                             onClick={() => handleApproveVolunteer(vol)}
                           >
                             Approve
                           </button>
                           <button
-                            className="Button Button-color--red-1000 Width--50"
+                            className="Button Button-color--red-1000 Button--small Width--100 Margin-left--4"
                             onClick={() => handleRejectVolunteer(vol)}
                           >
                             Reject

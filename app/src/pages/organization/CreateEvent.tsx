@@ -33,12 +33,14 @@ const initialValues: EventFormValues = {
 const validationSchema = yup.object().shape({
   name: yup.string().required("Event name is required"),
   description: yup.string().required("Description is required"),
-  date: yup.date()
+  date: yup
+    .date()
     .min(new Date(), "Event date must be in the future")
     .required("Date is required"),
   time: yup.string().required("Time is required"),
   location: yup.string().required("Location is required"),
-  people_needed: yup.number()
+  people_needed: yup
+    .number()
     .min(1, "At least one volunteer is needed")
     .required("Number of volunteers needed is required"),
 })
@@ -58,9 +60,12 @@ const CreateEvent: React.FC = () => {
         o_id: user.id,
         ...values,
       }
-      
+
       console.log("Submitting event with data:", payload)
-      console.log("API URL:", `${process.env.REACT_APP_API_URL}/event/create-event`)
+      console.log(
+        "API URL:",
+        `${process.env.REACT_APP_API_URL}/event/create-event`
+      )
 
       const response = await api.post("/event/create-event", payload)
 
@@ -131,7 +136,7 @@ const CreateEvent: React.FC = () => {
                       type="date"
                       name="date"
                       className="Form-input-box"
-                      min={new Date().toISOString().split('T')[0]}
+                      min={new Date().toISOString().split("T")[0]}
                     />
                     {errors.date && touched.date && (
                       <div className="Form-error">{errors.date}</div>
@@ -140,11 +145,7 @@ const CreateEvent: React.FC = () => {
 
                   <div className="Form-group">
                     <label htmlFor="time">Time</label>
-                    <Field
-                      type="time"
-                      name="time"
-                      className="Form-input-box"
-                    />
+                    <Field type="time" name="time" className="Form-input-box" />
                     {errors.time && touched.time && (
                       <div className="Form-error">{errors.time}</div>
                     )}
@@ -164,7 +165,9 @@ const CreateEvent: React.FC = () => {
                   </div>
 
                   <div className="Form-group">
-                    <label htmlFor="people_needed">Number of Volunteers Needed</label>
+                    <label htmlFor="people_needed">
+                      Number of Volunteers Needed
+                    </label>
                     <Field
                       type="number"
                       name="people_needed"
@@ -191,10 +194,10 @@ const CreateEvent: React.FC = () => {
 
                   <div className="Form-group">
                     <label htmlFor="restricted">Restricted</label>
-                    <Field 
-                      as={BootstrapForm.Check} 
-                      type="switch" 
-                      name="restricted" 
+                    <Field
+                      as={BootstrapForm.Check}
+                      type="switch"
+                      name="restricted"
                       className="Form-input-box"
                     />
                     {errors.restricted && touched.restricted && (
@@ -202,17 +205,17 @@ const CreateEvent: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="flex space-x-4">
+                  <div className="Flex-row">
                     <button
                       type="button"
                       onClick={() => navigate("/dashboard")}
-                      className="Button Button-color--gray-500 Width--50"
+                      className="Button Button-color--gray-500 Width--100 Margin-right--4"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="Button Button-color--blue-1000 Width--50"
+                      className="Button Button-color--blue-1000 Width--100 Margin-left--4"
                       disabled={isSubmitting || !isValid || !dirty}
                     >
                       {isSubmitting ? "Creating Event..." : "Create Event"}
@@ -228,4 +231,4 @@ const CreateEvent: React.FC = () => {
   )
 }
 
-export default CreateEvent 
+export default CreateEvent
