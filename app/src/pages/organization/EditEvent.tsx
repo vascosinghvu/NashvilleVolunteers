@@ -237,7 +237,7 @@ const EditEvent: React.FC = () => {
         )}
 
         <div style={{ display: 'flex', gap: '24px', width: '100%' }}>
-          <div style={{ flex: '0 0 65%' }}>
+          <div style={{ flex: `0 0 ${initialValues.restricted ? '50%' : '65%'}` }}>
             <div className="Block">
               <Formik
                 initialValues={initialValues}
@@ -416,67 +416,135 @@ const EditEvent: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ flex: '0 0 32%' }}>
-            <div className="Block" style={{ position: 'sticky', top: '24px' }}>
-              <h2 className="Text-size--16 Font-weight--600 Text-color--dark-800 Margin-bottom--16">
-                Registered Volunteers ({registeredVolunteers.length}/{initialValues.people_needed})
-              </h2>
-              {registeredVolunteers.length === 0 ? (
-                <p className="Text-color--gray-600">No volunteers have registered for this event yet.</p>
-              ) : (
-                <div className="space-y-2">
-                  {registeredVolunteers.map((volunteer: VolunteerData) => (
-                    <div 
-                      key={volunteer.v_id} 
-                      className="px-6 py-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex flex-col items-center text-center px-2">
-                        <div className="bg-gray-50 p-2 rounded-full Margin-bottom--8">
-                          <Icon glyph="user" size="20" className="Text-color--royal-800" />
+          <div style={{ flex: `0 0 ${initialValues.restricted ? '50%' : '35%'}` }}>
+            {initialValues.restricted ? (
+              <div style={{ 
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '24px',
+                position: 'sticky',
+                top: '24px'
+              }}>
+                <div className="Block" style={{ overflow: 'auto', maxHeight: 'calc(100vh - 80px)' }}>
+                  <h2 className="Text-size--16 Font-weight--600 Text-color--dark-800 Margin-bottom--16">
+                    Registered Volunteers ({registeredVolunteers.length}/{initialValues.people_needed})
+                  </h2>
+                  {registeredVolunteers.length === 0 ? (
+                    <p className="Text-color--gray-600">No volunteers have registered for this event yet.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {registeredVolunteers.map((volunteer: VolunteerData) => (
+                        <div 
+                          key={volunteer.v_id} 
+                          className="px-6 py-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex flex-col items-center text-center px-2">
+                            {/* <div className="bg-gray-50 p-2 rounded-full Margin-bottom--8">
+                              <Icon glyph="user" size="20" className="Text-color--royal-800" />
+                            </div> */}
+                            <div className="Font-weight--600 Text-color--dark-800 Margin-bottom--4">
+                              <a href={`/volunteer/${volunteer.v_id}`}>
+                                {volunteer.first_name} {volunteer.last_name}
+                              </a>
+                            </div>
+                            <div style={{ width: '85%', margin: '0 auto' }} className="flex items-center">
+                              <span 
+                                onClick={() => handleCopyEmail(volunteer.email, volunteer.v_id)}
+                                className="cursor-pointer hover:scale-110 transition-transform duration-200 flex items-center"
+                                style={{ marginRight: '12px' }}
+                              >
+                                <Icon 
+                                  glyph={copiedId === volunteer.v_id ? "check" : "copy"} 
+                                  size="14" 
+                                  className="Text-color--royal-800"
+                                />
+                              </span>
+                              <span className="Text-size--14 Text-color--gray-600">
+                                {volunteer.email}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="Font-weight--600 Text-color--dark-800 Margin-bottom--4">
-                          {volunteer.first_name} {volunteer.last_name}
-                        </div>
-                        <div style={{ width: '85%', margin: '0 auto' }} className="flex items-center">
-                          <span 
-                            onClick={() => handleCopyEmail(volunteer.email, volunteer.v_id)}
-                            className="cursor-pointer hover:scale-110 transition-transform duration-200 flex items-center"
-                            style={{ marginRight: '12px' }}
-                          >
-                            <Icon 
-                              glyph={copiedId === volunteer.v_id ? "check" : "copy"} 
-                              size="14" 
-                              className="Text-color--royal-800"
-                            />
-                          </span>
-                          <span className="Text-size--14 Text-color--gray-600">
-                            {volunteer.email}
-                          </span>
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
-            {initialValues.restricted && (
-              <div className="Block" style={{ position: 'sticky', top: '24px' }}>
+
+                <div className="Block" style={{ overflow: 'auto', maxHeight: 'calc(100vh - 80px)' }}>
+                  <h2 className="Text-size--16 Font-weight--600 Text-color--dark-800 Margin-bottom--16">
+                    Pending Volunteers ({pendingVolunteers.length}/{initialValues.people_needed})
+                  </h2>
+                  {pendingVolunteers.length === 0 ? (
+                    <p className="Text-color--gray-600">No pending volunteers for this event.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {pendingVolunteers.map((volunteer: VolunteerData) => (
+                        <div 
+                          key={volunteer.v_id} 
+                          className="px-6 py-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex flex-col items-center text-center px-2">
+                            {/* <div className="bg-gray-50 p-2 rounded-full Margin-bottom--8">
+                              <Icon glyph="user" size="20" className="Text-color--royal-800" />
+                            </div> */}
+                            <div className="Font-weight--600 Text-color--dark-800 Margin-bottom--4">
+                              <a href={`/volunteer/${volunteer.v_id}`}>
+                                {volunteer.first_name} {volunteer.last_name}
+                              </a>
+                            </div>
+                            <div style={{ width: '85%', margin: '0 auto' }} className="flex items-center">
+                              <span 
+                                onClick={() => handleCopyEmail(volunteer.email, volunteer.v_id)}
+                                className="cursor-pointer hover:scale-110 transition-transform duration-200 flex items-center"
+                                style={{ marginRight: '12px' }}
+                              >
+                                <Icon 
+                                  glyph={copiedId === volunteer.v_id ? "check" : "copy"} 
+                                  size="14" 
+                                  className="Text-color--royal-800"
+                                />
+                              </span>
+                              <span className="Text-size--14 Text-color--gray-600">
+                                {volunteer.email}
+                              </span>
+                              <button
+                                onClick={() => handleApproveVolunteer(volunteer)}
+                                className="Button Button-color--blue-1000 Width--50"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleRejectVolunteer(volunteer)}
+                                className="Button Button-color--red-1000 Width--50"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="Block" style={{ position: 'sticky', top: '24px', overflow: 'auto', maxHeight: 'calc(100vh - 80px)' }}>
                 <h2 className="Text-size--16 Font-weight--600 Text-color--dark-800 Margin-bottom--16">
-                  Pending Volunteers ({pendingVolunteers.length}/{initialValues.people_needed})
+                  Registered Volunteers ({registeredVolunteers.length}/{initialValues.people_needed})
                 </h2>
-                {pendingVolunteers.length === 0 ? (
-                  <p className="Text-color--gray-600">No pending volunteers for this event.</p>
+                {registeredVolunteers.length === 0 ? (
+                  <p className="Text-color--gray-600">No volunteers have registered for this event yet.</p>
                 ) : (
                   <div className="space-y-2">
-                    {pendingVolunteers.map((volunteer: VolunteerData) => (
+                    {registeredVolunteers.map((volunteer: VolunteerData) => (
                       <div 
                         key={volunteer.v_id} 
                         className="px-6 py-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
                       >
                         <div className="flex flex-col items-center text-center px-2">
-                          <div className="bg-gray-50 p-2 rounded-full Margin-bottom--8">
+                          {/* <div className="bg-gray-50 p-2 rounded-full Margin-bottom--8">
                             <Icon glyph="user" size="20" className="Text-color--royal-800" />
-                          </div>
+                          </div> */}
                           <div className="Font-weight--600 Text-color--dark-800 Margin-bottom--4">
                             {volunteer.first_name} {volunteer.last_name}
                           </div>
@@ -495,18 +563,6 @@ const EditEvent: React.FC = () => {
                             <span className="Text-size--14 Text-color--gray-600">
                               {volunteer.email}
                             </span>
-                            <button
-                              onClick={() => handleApproveVolunteer(volunteer)}
-                              className="Button Button-color--blue-1000 Width--50"
-                            >
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => handleRejectVolunteer(volunteer)}
-                              className="Button Button-color--red-1000 Width--50"
-                            >
-                              Reject
-                            </button>
                           </div>
                         </div>
                       </div>

@@ -23,6 +23,7 @@ interface EventData {
   time: string
   description: string
   tags: string[]
+  restricted: boolean
   image_url?: string
   link?: string
 }
@@ -136,6 +137,7 @@ const Listings: React.FC = () => {
         const registrationResponse = await api.post("/registration/create-registration", {
           v_id: user.id,
           event_id: selectedEvent.event_id,
+          approved: selectedEvent.restricted ? false : true,
         })
 
         if (registrationResponse.status === 201) {
@@ -310,8 +312,11 @@ const Listings: React.FC = () => {
                       size="48"
                     />
                   </div>
-                  <h3>Successfully Registered!</h3>
-                  <p>You have been registered for {selectedEvent.name}</p>
+                  <h3>Successfully {selectedEvent.restricted ? "Applied" : "Registered"}!</h3>
+                  <p>
+                    You have {selectedEvent.restricted ? "applied" : "been registered"} for {selectedEvent.name}
+                    {selectedEvent.restricted && "\nPlease check back later for approval."}
+                  </p>
                   {selectedEvent && (
                     <a
                       href={(() => {
@@ -418,6 +423,16 @@ const Listings: React.FC = () => {
                     </span>
                     {orgMap[selectedEvent.o_id] || "Loading..."}
                   </div>
+                  <div className="Event-modal-line">
+                    <span>
+                      <Icon
+                        glyph="lock"
+                        className="Margin-right--8 Text-color--royal-1000"
+                      />
+                      <strong>Event Access:</strong>
+                    </span>
+                    {selectedEvent.restricted ? "Application Required" : "No Application Required"}
+                  </div>
                   {registrationError && (
                     <div className="Alert Alert--error Margin-top--16">
                       {registrationError}
@@ -435,7 +450,7 @@ const Listings: React.FC = () => {
                       >
                         {selectedEvent.tags?.includes("External") 
                           ? `Register on ${orgMap[selectedEvent.o_id] || "External Site"}` 
-                          : "Register for Event"}
+                          : `${selectedEvent.restricted ? "Apply" : "Register"} for Event`}
                       </div>
                     )}
                   </div>

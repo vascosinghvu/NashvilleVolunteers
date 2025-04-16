@@ -1,4 +1,5 @@
 import React from "react"
+import Icon from "./Icon"
 
 interface EventProps {
   event: {
@@ -12,6 +13,7 @@ interface EventProps {
     people_needed?: number
     o_id: number
     image_url?: string
+    restricted?: boolean
   }
   organizationName?: string
   onClick?: () => void
@@ -88,6 +90,20 @@ const Event: React.FC<EventProps> = ({ event, organizationName, onClick, onOrgan
             <div style={{ fontSize: '10px', fontWeight: 'bold', color: '#666666' }}>{formattedDate.day}</div>
             <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#000000' }}>{formattedDate.date}</div>
             <div style={{ fontSize: '10px', fontWeight: 'bold', color: '#666666' }}>{formattedDate.month}</div>
+          </div>
+        )}
+        {event.restricted && (
+          <div className="Event-restricted" style={{ 
+            position: 'absolute', 
+            top: '10px', 
+            right: '10px', 
+            background: '#FFFFFF',
+            padding: '4px',
+            borderRadius: '4px',
+            fontSize: '0.75rem',
+            color: '#000000'
+          }}>
+            <Icon glyph="lock" size="16" className="Text-color--royal-1000" />
           </div>
         )}
         <div className="Event-tags" style={{ 
