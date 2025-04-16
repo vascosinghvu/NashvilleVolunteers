@@ -33,12 +33,14 @@ export const getEvent = async (req: Request, res: Response) => {
 
 export const createEvent = async (req: Request, res: Response) => {
   try {
-    const { o_id, name, description, time, date, people_needed, location } = req.body
+    const { o_id, name, description, time, date, people_needed, location, tags, restricted } = req.body
 
     // Get next available event_id
     const maxIdResult = await sql`
       SELECT COALESCE(MAX(event_id), 0) + 1 as next_id FROM events
     `
+
+    const tagsArray = tags.split(',').map((tag: string) => tag.trim());
 
     const newEvent = await sql`
       INSERT INTO events (
@@ -52,7 +54,8 @@ export const createEvent = async (req: Request, res: Response) => {
         location,
         image_url,
         tags,
-        search_text
+        search_text,
+        restricted
       )
       VALUES (
         ${maxIdResult[0].next_id},
@@ -64,8 +67,9 @@ export const createEvent = async (req: Request, res: Response) => {
         ${people_needed}::integer, 
         ${location},
         ${null},
-        ${[]},
-        ${null}
+        ${tagsArray},
+        ${null},
+        ${restricted}
       )
       RETURNING *
     `
@@ -125,8 +129,16 @@ export const updateEvent = async (req: Request, res: Response) => {
       }
     }
 
+    // Handle tags - ensure they're always an array
+    let tags = Array.isArray(req.body.tags) ? req.body.tags : existingEvent[0].tags;
+
     // Merge existing data with updates
-    const updatedData = { ...existingEvent[0], ...req.body, image_url }
+    const updatedData = { 
+      ...existingEvent[0], 
+      ...req.body,
+      tags,
+      image_url 
+    };
     
     // Perform update with all fields
     const updatedEvent = await sql`
@@ -139,7 +151,9 @@ export const updateEvent = async (req: Request, res: Response) => {
         date = ${updatedData.date},
         people_needed = ${updatedData.people_needed},
         location = ${updatedData.location},
-        image_url = ${image_url}
+        image_url = ${image_url},
+        tags = ${tags},
+        restricted = ${updatedData.restricted}
       WHERE event_id = ${event_id}
       RETURNING *
     `

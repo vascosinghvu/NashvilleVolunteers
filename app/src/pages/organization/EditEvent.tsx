@@ -7,7 +7,7 @@ import Navbar from "../../components/Navbar"
 import MetaData from "../../components/MetaData"
 import Icon from "../../components/Icon"
 import * as yup from "yup"
-
+import { Form as BootstrapForm } from "react-bootstrap"
 interface EventFormValues {
   name: string
   description: string
@@ -17,6 +17,7 @@ interface EventFormValues {
   people_needed: number
   tags: string[]
   image_url?: string
+  restricted: boolean
 }
 
 interface VolunteerData {
@@ -53,7 +54,8 @@ const EditEvent: React.FC = () => {
     location: "",
     people_needed: 1,
     tags: [],
-    image_url: ""
+    image_url: "",
+    restricted: false
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string>("")
@@ -80,8 +82,9 @@ const EditEvent: React.FC = () => {
           time: eventData.time,
           location: eventData.location,
           people_needed: eventData.people_needed,
-          tags: eventData.tags || [],
-          image_url: eventData.image_url
+          tags: eventData.tags.join(', ') || "",
+          image_url: eventData.image_url,
+          restricted: eventData.restricted
         })
         setImagePreview(eventData.image_url || "")
 
@@ -175,6 +178,7 @@ const EditEvent: React.FC = () => {
         console.error('Failed to copy email:', err)
       })
   }
+
 
   if (loading) {
     return (
@@ -335,6 +339,32 @@ const EditEvent: React.FC = () => {
                       />
                       {errors.people_needed && touched.people_needed && (
                         <div className="Form-error">{errors.people_needed}</div>
+                      )}
+                    </div>
+
+                    <div className="Form-group">
+                      <label htmlFor="tags">Tags</label>
+                      <Field
+                        type="text"
+                        name="tags"
+                        className="Form-input-box"
+                        placeholder="Enter tags separated by commas"
+                      />
+                      {errors.tags && touched.tags && (
+                        <div className="Form-error">{errors.tags}</div>
+                      )}
+                    </div>
+
+                    <div className="Form-group">
+                      <label htmlFor="restricted">Restricted</label>
+                      <Field
+                        as={BootstrapForm.Switch}
+                        name="restricted"
+                        className="Form-input-box"
+                        defaultChecked={initialValues.restricted}
+                      />
+                      {errors.restricted && touched.restricted && (
+                        <div className="Form-error">{errors.restricted}</div>
                       )}
                     </div>
 
