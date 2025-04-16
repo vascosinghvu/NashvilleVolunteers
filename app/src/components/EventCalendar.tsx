@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Calendar, momentLocalizer, Components, View } from 'react-big-calendar';
-import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import moment from 'moment';
 import Icon from './Icon';
 
 // Match the EventData interface from VolunteerListings
@@ -17,6 +17,7 @@ interface EventData {
   tags: string[];
   image_url?: string;
   link?: string;
+  restricted: boolean;
 }
 
 interface EventCalendarProps {
