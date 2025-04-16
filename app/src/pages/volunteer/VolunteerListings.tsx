@@ -11,6 +11,8 @@ import TagFilter from "../../components/TagFilter"
 import DateFilter from "../../components/DateFilter"
 import { formatDate, formatTime } from "../../utils/formatters"
 import { useAuth } from "../../context/AuthContext"
+import ViewToggle, { ViewType } from "../../components/ViewToggle"
+import EventCalendar from "../../components/EventCalendar"
 
 // Rename interface Event → EventData to avoid name clash with "Event" component
 interface EventData {
@@ -44,6 +46,7 @@ const Listings: React.FC = () => {
     end: null,
   })
   const [searchQuery, setSearchQuery] = useState("")
+  const [currentView, setCurrentView] = useState<ViewType>("grid")
 
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -202,6 +205,10 @@ const Listings: React.FC = () => {
     setSelectedDates({ start: null, end: null })
   }
 
+  const handleViewChange = (view: ViewType) => {
+    setCurrentView(view);
+  };
+
   if (loading) {
     return <div>Loading...</div>
   }
@@ -216,7 +223,7 @@ const Listings: React.FC = () => {
             glyph="heart" 
             regular={true}
             size="72" 
-            className="Text-color--red-1000 Margin-bottom--16" 
+            className="Text-color--red-1000 Margin-bottom--8" 
           />
         </div>
         <h1 className="Flex--center">Nashville Volunteers</h1>
@@ -244,7 +251,7 @@ const Listings: React.FC = () => {
                   </button>
                   <button
                     type="button"
-                    className="Button Button-color--yellow-1000 Button--hollow Margin-left--10"
+                    className="Button Button-color--yellow-1000 Button--hollow Margin-left--10 Display--none"
                     onClick={handleSeeAll}
                   >
                     See All
@@ -268,27 +275,47 @@ const Listings: React.FC = () => {
                 selectedDates={selectedDates}
                 onDateChange={setSelectedDates}
               />
+              <ViewToggle 
+                currentView={currentView}
+                onViewChange={handleViewChange}
+              />
             </div>
           </div>
         </div>
 
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 Margin-top--20">
-          {filteredEvents.length === 0 && !loading && (
-            <div className="Width--100 Text--center">
-              No volunteer opportunities match your criteria.
-            </div>
-          )}
-          {filteredEvents.map((evt: EventData) => (
-            <div key={evt.event_id} className="col">
-              <Event
-                event={evt}
-                organizationName={orgMap[evt.o_id] || ""}
-                onClick={() => setSelectedEvent(evt)}
-                onOrganizationClick={() => navigate(`/organization/${evt.o_id}`)}
+        {currentView === "grid" ? (
+          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 Margin-top--20">
+            {filteredEvents.length === 0 && !loading && (
+              <div className="Width--100 Text--center">
+                No volunteer opportunities match your criteria.
+              </div>
+            )}
+            {filteredEvents.map((evt: EventData) => (
+              <div key={evt.event_id} className="col">
+                <Event
+                  event={evt}
+                  organizationName={orgMap[evt.o_id] || ""}
+                  onClick={() => setSelectedEvent(evt)}
+                  onOrganizationClick={() => navigate(`/organization/${evt.o_id}`)}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="Margin-top--20">
+            {filteredEvents.length === 0 && !loading ? (
+              <div className="Width--100 Text--center">
+                No volunteer opportunities match your criteria.
+              </div>
+            ) : (
+              <EventCalendar 
+                events={filteredEvents}
+                onEventClick={setSelectedEvent}
+                organizationMap={orgMap}
               />
-            </div>
-          ))}
-        </div>
+            )}
+          </div>
+        )}
       </div>
       {selectedEvent && (
         <Modal
