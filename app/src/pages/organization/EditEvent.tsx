@@ -8,6 +8,7 @@ import MetaData from "../../components/MetaData"
 import Icon from "../../components/Icon"
 import * as yup from "yup"
 import { Form as BootstrapForm } from "react-bootstrap"
+import Modal from "../../components/Modal"
 
 interface EventFormValues {
   name: string
@@ -25,7 +26,10 @@ interface VolunteerData {
   v_id: number
   first_name: string
   last_name: string
+  phone_number: string
   email: string
+  skills?: string[]
+  interests?: string[]
 }
 
 const validationSchema = yup.object().shape({
@@ -66,6 +70,9 @@ const EditEvent: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string>("")
   const [copiedId, setCopiedId] = useState<number | null>(null)
+  const [showInfoModal, setShowInfoModal] = useState(false)
+  const [selectedVolunteer, setSelectedVolunteer] =
+    useState<VolunteerData | null>(null)
 
   useEffect(() => {
     const fetchEventAndVolunteers = async () => {
@@ -125,6 +132,8 @@ const EditEvent: React.FC = () => {
         } else {
           setRegisteredVolunteers(volunteerData)
         }
+
+        console.log(volunteerData, "volunteerData")
 
         setLoading(false)
       } catch (err) {
@@ -259,6 +268,142 @@ const EditEvent: React.FC = () => {
         title="Edit Event - Nashville Volunteers"
         description="Edit volunteer event"
       />
+
+      {showInfoModal && selectedVolunteer && (
+        <Modal
+          header="My Full Profile"
+          action={() => setShowInfoModal(false)}
+          body={
+            <div>
+              {/* Name */}
+              <div className="Event-modal-line">
+                <Icon
+                  glyph="user"
+                  className="Margin-right--8 Text-color--royal-1000"
+                />
+                <strong>Name:</strong>
+                <span className="Margin-left--8">
+                  {selectedVolunteer.first_name} {selectedVolunteer.last_name}
+                </span>
+              </div>
+
+              {/* Email */}
+              <div className="Event-modal-line">
+                <Icon
+                  glyph="envelope"
+                  className="Margin-right--8 Text-color--royal-1000"
+                />
+                <strong>Email:</strong>
+                <span className="Margin-left--8">
+                  {selectedVolunteer.email}
+                </span>
+              </div>
+
+              {/* Phone */}
+              <div className="Event-modal-line">
+                <Icon
+                  glyph="phone"
+                  className="Margin-right--8 Text-color--royal-1000"
+                />
+                <strong>Phone:</strong>
+                <span className="Margin-left--8">
+                  {selectedVolunteer.phone_number || "N/A"}
+                </span>
+              </div>
+
+              {/* Skills */}
+              <div
+                className="Event-modal-line"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "8px 0",
+                  borderBottom: "1px solid var(--nash-color-gray-300)",
+                  textAlign: "right",
+                }}
+              >
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    minWidth: "150px",
+                    whiteSpace: "nowrap",
+                    flexGrow: 1,
+                  }}
+                >
+                  <Icon
+                    glyph="check-circle"
+                    className="Margin-right--8 Text-color--royal-1000"
+                  />
+                  <strong>Skills:</strong>
+                </span>
+              </div>
+              <div className="Flex-wrap--tags Margin-bottom--16">
+                {selectedVolunteer?.skills?.length ? (
+                  selectedVolunteer.skills.map((s) => (
+                    <span key={s} className="Filter-tag">
+                      {s}
+                    </span>
+                  ))
+                ) : (
+                  <span className="Text-color--gray-600">No skills listed</span>
+                )}
+              </div>
+
+              {/* Interests */}
+              <div
+                className="Event-modal-line"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "8px 0",
+                  borderBottom: "1px solid var(--nash-color-gray-300)",
+                  textAlign: "right",
+                }}
+              >
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    minWidth: "150px",
+                    whiteSpace: "nowrap",
+                    flexGrow: 1,
+                  }}
+                >
+                  <Icon
+                    glyph="heart"
+                    className="Margin-right--8 Text-color--royal-1000"
+                  />
+                  <strong>Interests:</strong>
+                </span>
+              </div>
+              <div className="Flex-wrap--tags">
+                {selectedVolunteer?.interests?.length ? (
+                  selectedVolunteer.interests.map((i) => (
+                    <span key={i} className="Filter-tag">
+                      {i}
+                    </span>
+                  ))
+                ) : (
+                  <span className="Text-color--gray-600">
+                    No interests listed
+                  </span>
+                )}
+              </div>
+
+              {/* Close button */}
+              <div className="Margin-top--20 Flex-row Justify-content--end">
+                <button
+                  className="Button Button-color--blue-1000 Width--100"
+                  onClick={() => setShowInfoModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          }
+        />
+      )}
 
       <div className="container py-4">
         <div className="row">
@@ -404,6 +549,10 @@ const EditEvent: React.FC = () => {
                     <div
                       key={vol.v_id}
                       className="Volunteer-card Volunteer-card--approved"
+                      onClick={() => {
+                        setShowInfoModal(true)
+                        setSelectedVolunteer(vol)
+                      }}
                     >
                       <div className="Volunteer-avatar">
                         <Icon glyph="user" size="24" />
@@ -450,6 +599,10 @@ const EditEvent: React.FC = () => {
                     <div
                       key={vol.v_id}
                       className="Volunteer-card Volunteer-card--pending"
+                      onClick={() => {
+                        setShowInfoModal(true)
+                        setSelectedVolunteer(vol)
+                      }}
                     >
                       <div className="Flex-column Width--100">
                         <div className="Flex-row">

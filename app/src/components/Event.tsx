@@ -166,7 +166,7 @@ const Event: React.FC<EventProps> = ({
                   ? "Badge-color--green-1000"
                   : tag === "Hands On"
                   ? "Badge-color--royal-1000"
-                  : "Badge-color--blue-1000"
+                  : "Badge-color--light-1000"
               }`}
             >
               {tag}
